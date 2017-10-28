@@ -11,8 +11,13 @@ import datetime
 import time
 import logging
 import sys, getopt
+import numpy as np
 from bs4 import BeautifulSoup as BS
+from yahoo_finance import Share
+import struct
+import binascii
 
+########### Global Variables and Configurations ###########
 # Global Constants
 GPU = False
 STOCK_TAGS = [	'amzn',
@@ -32,10 +37,24 @@ STOCK_TAGS = [	'amzn',
 				'wmt']
 
 ARTICLES_PER_STOCK = 10
+SUCCESS_THREASHOLD = 5
 
-# Global Variables and Configurations
+# Global Stock Data
 stock_data = {}
-logging.basicConfig(filename="stock_market_prediction.log", level=logging.DEBUG, format="%(asctime)s: %(levelname)s>\t%(message)s")
+stock_prices = {}
+
+# Global Word Data
+words_by_letter = []
+num_words_by_letter = []
+
+# Global Configurations
+if not os.path.exists('./data/'):
+	os.makedirs('./data/')
+	os.makedirs('./data/articles/')
+elif not os.path.exists('./data/articles/'):
+	os.makedirs('./data/articles/')
+
+logging.basicConfig(filename="./data/stock_market_prediction.log", level=logging.DEBUG, format="%(asctime)s: %(levelname)s>\t%(message)s")
 logging.info('RUNNING STOCK MARKET PREDICTION')
 
 '''
@@ -136,6 +155,7 @@ def pull_recent_articles(directory):
 				article = ''
 				for paragraphs in article_parts:
 					article += paragraphs.text
+					article += ' '
 
 				# Store the url and article as a tuple into the stock data and write them to the stock's file
 				stock_data[ticker].append((link, article))
@@ -154,7 +174,7 @@ def pull_recent_articles(directory):
 
 	# Check all tags for number of articles loaded
 	for ticker in STOCK_TAGS:
-		if len(stock_data[ticker]) < ARTICLES_PER_STOCK:
+		if len(stock_data[ticker]) < SUCCESS_THREASHOLD:
 			return False
 	return True
 
@@ -208,13 +228,270 @@ def load_articles(directory):
 			stock_data[ticker].append((current_link[:-1], current_article))
 			logging.debug('-- Article for ' + ticker + ' from ' + current_link[:-1]+ ' has been pulled and is ' + str(len(current_article)) + ' characters')
 
-		logging.debug('Finished pulling articles for: ' + ticker + ', time: ' + str(time.time() - start))
+		logging.debug('Finished pulling ' + str(len(stock_data[ticker])) + ' articles for: ' + ticker + ', time: ' + str(time.time() - start))
 
 	# Check all tags for number of articles loaded
 	for ticker in STOCK_TAGS:
-		if len(stock_data[ticker]) < ARTICLES_PER_STOCK:
+		if len(stock_data[ticker]) < SUCCESS_THREASHOLD:
 			return False
 	return True
+
+'''
+Step 2.1 is to pull all stock data for the current day and add it to the stock prices data structure. The yahoo finance api is used
+for this and open and close prices are all thats kept.
+'''
+def pull_todays_stock_prices():
+
+	# Get todays date as a string
+	today = datetime.datetime.now()
+	today_str = str(today.month) + '-' + str(today.day) + '-' + str(today.year)
+
+	# For each stock, get todays value
+	for tickers in STOCK_TAGS:
+
+		# If the stock is not in the stock prices, add it
+		if tickers not in stock_prices:	
+			stock_prices[tickers] = {}
+
+		# Get todays stock open and close
+		open_p = Share(tickers).get_open()
+		close_p = Share(tickers).get_price()
+
+		print open_p, ', ', close_p
+
+		# Add todays prices to the dictionary for today
+		stock_prices[tickers][today_str] = (float(open_p), float(close_p))
+
+'''
+Step 2.2 is to load past stock data into the data structure. This will be used before pulling the data after the first run. This pulls
+data from the stock price data file and loads it up so that new prices can be added to it.
+'''
+def load_past_stock_data():
+
+	file = open('./data/stock_price_data.txt', 'r+')
+
+	# Iterate through the lines in the file
+	current_stock = ''
+	for lines in file:
+
+		# If the first character is not a '-', is a ticker, add it to the dictionary (w/o the newline)
+		if lines[:1] != '-':
+			stock_prices[lines[:-1]] = {}
+			current_stock = lines[:-1]
+
+		# If the first character is a '-', it has data so split it up and add it
+		else:
+			data = lines.split()
+			stock_prices[current_stock][data[1]] = (float(data[2]), float(data[3]))
+
+	file.close()
+
+'''
+Step 2.3 is to save the stock price data structure to a file so it can be loaded on subsequent days. 
+'''
+def save_stock_data():
+
+	file = open('./data/stock_price_data.txt', 'w')
+
+	# Iterate through all the stocks and write each to the file in the following manner:
+	# amzn
+	# - 10/27/2017 1053.23 1100.34
+	# - 10/28/2017 ...
+	# agn
+	# - 10/27...
+
+	# Iterate through the stocks to write them to the file
+	for ticker in STOCK_TAGS:
+		
+		# Write the ticker to the file
+		file.write(ticker + '\n')
+
+		# Write each day to the file
+		for days, price in stock_prices[ticker].iteritems():
+			file.write('- ' + days + ' ' + str(price[0]) + ' ' + str(price[1]) + '\n')
+
+	file.close()
+
+'''
+Step 3.1 is to load all the word weights into the right data structures so it can be used in analyzing the new data. 
+'''
+def load_all_word_weights():
+	
+	# For each letter, add a 1000 word array of 24 characters each with the last 8 characters for a float (weight of the word) and int (number of occurences)
+	# - abcdefghijklmnopq0.32####
+	for letters in range(0, 26):
+		letter_words = bytearray(24*1000)
+		words_by_letter.append(letter_words)
+		num_words_by_letter.append(0)
+
+
+	# Open the file to be loaded
+	file = open('./data/word_weight_data.txt', 'r+')
+
+	# Iterate over all the lines in the file
+	letter_index = 0
+	for lines in file:
+
+		# If the first character is not a '-', it indicates a letter change
+		if lines[:1] != '-':
+			letter_index = ord(lines[:1]) - 97
+
+		# If not a '-', pack up the data, store it, and update the number of words
+		else:
+			# Get the data
+			data = lines.split()
+
+			# Store the data
+			struct.pack_into('16s f i', words_by_letter[letter_index], num_words_by_letter[letter_index]*24, data[1], float(data[2]), int(data[3]))
+			num_words_by_letter[letter_index] += 1
+
+	file.close()
+
+
+
+
+'''
+Step 3.2 is to update all the word weights. This function goes through each of the articles and finds every word in them. It then
+calls the update_word function which either adds or updates the word in the weight array. 
+'''
+def update_all_word_weights(day):
+	'''
+	| |
+	|_|
+	|_|_______________
+	|3|_0_|__1__|__2__
+	|_|         |'hey'|
+	| |         | 0.8  |
+	| |         | 80  |
+
+	'''
+
+	# If the weighting arrays are empty, create them 
+	if len(words_by_letter) == 0 or words_by_letter == 0:
+
+		# For each letter, add a 1000 word array of 24 characters each with the last 8 characters for a float (weight of the word) and int (number of occurences)
+		# - abcdefghijklmnopq0.32####
+		for letters in range(0, 26):
+			letter_words = bytearray(24*1000)
+			words_by_letter.append(letter_words)
+			num_words_by_letter.append(0)
+
+	# At this point, the weighting arrays are initialized or loaded
+	# - Next step is to iterate through articles and get the words
+	for ticker in STOCK_TAGS:
+		
+		# For each stock, iterate through the articles
+		for articles in stock_data[ticker]:
+		
+			# Get the text (ignore link)
+			text = articles[1]
+
+			# Variables to keep track of words
+			word_in_progress = False
+			word_number = 0
+			word_start_index = 0
+
+			# Iterate through the characters to find words
+			for ii, chars in enumerate(text):
+
+				# If there is a word being found and non-character pops up, word is over
+				if word_in_progress and (not chars.isalpha() or ii == len(text)):
+
+					# Reset word variables
+					word_in_progress = False
+					word_number += 1
+
+					# Get the found word
+					found_word = text[word_start_index:ii]
+
+					# Add the word to the word arrays or update its current value
+					if len(found_word) > 1:
+						update_word(ticker, found_word, day)
+
+				# If a word is not being found and letter pops up, start the word
+				elif not word_in_progress and chars.isalpha():
+
+					# Start the word
+					word_in_progress = True
+					word_start_index = ii
+
+'''
+Step 3.2.1 is to update the specific word. This function goes through all the other words starting with that letter and either updates
+their weights or adds them to the list.
+'''
+def update_word(ticker, word_upper, day):
+	
+	# Make the word lowercase and get the length of the word
+	word = word_upper.lower()
+	len_word = len(word)
+
+	# Find the letter index for the words array
+	index = ord(word[:1]) - 97
+	if index < 0 or index > 25:
+		print 'Error: invalid word: ', word
+		sys.exit()
+
+	# Get the array containing words of the right letter
+	letter_words = words_by_letter[index]
+	num_letter_words = num_words_by_letter[index]
+
+	# Search that array for the current word
+	found = False
+	for ii in range(0, num_letter_words):
+		
+		# Get the current word data to be compared
+		test_data = struct.unpack_from('16s f i', letter_words, ii * 24)
+
+		# Check if the word is the same
+		if test_data[0][:len(test_data[0].split('\0', 1)[0])] == word :
+			
+			# If it is the same, mark it as found and update its values
+			# weight = (weight * value + increase)/(value + increase)
+			found = True
+			change = stock_prices[ticker][day][1] - stock_prices[ticker][day][0]
+			if change > 0:
+				val = (test_data[1] * test_data[2] + 1) / (test_data[2] + 1)
+			else:
+				val = (test_data[1] * test_data[2]) / (test_data[2] + 1)
+
+			struct.pack_into('16s f i', letter_words, ii * 24, word, val, test_data[2] + 1)
+
+	if not found:
+		# Get whether the stock went up or down
+		# weight is automatically 1 or 0 for the first one
+		change = stock_prices[ticker][day][1] - stock_prices[ticker][day][0]
+		if change > 0:
+			val = 1
+		else:
+			val = 0
+
+		# Pack the data into the array
+		struct.pack_into('16s f i', letter_words, num_letter_words*24, word, val, 1)
+		num_words_by_letter[index] += 1
+
+'''
+Step 3.3 is to save all the word weights to a file so it can be loaded in later to be used in subsequent days.
+'''
+def save_all_word_weights():
+
+	file = open('./data/word_weight_data.txt', 'w')
+
+	# Iterate through all letters and words in each letter and write them to a file
+	for first_letter in range(0, 26):
+
+		# Write the letter to the file
+		file.write(chr(first_letter + 97) + '\n')
+
+		# For each letter, iterate through the words saved for that letter
+		for words in range(0, num_words_by_letter[first_letter]):
+
+			# For each word, unpack the word from the buffer
+			raw_data = struct.unpack_from('16s f i', words_by_letter[first_letter], words * 24)
+
+			# Write the data to the file
+			file.write('- ' + raw_data[0].split('\0', 1)[0] + ' ' + str(raw_data[1]) + ' ' + str(raw_data[2]) + '\n')
+
+	file.close()
 
 '''
 Main Execution
@@ -231,7 +508,7 @@ def main():
 
 	# First, prepare the folder to save all the articles for the day in
 	today = datetime.datetime.now()
-	directory = './stock_market_prediction-' + str(today.month) + '-' + str(today.day) + '-' + str(today.year) + '/'
+	directory = './data/articles/stock_market_prediction-' + str(today.month) + '-' + str(today.day) + '-' + str(today.year) + '/'
 	create_new = True
 
 	# Get any command line arguments to edit actions
@@ -257,7 +534,7 @@ def main():
 		logging.info('Loading articles from: ' + directory)
 
 	# Check to see if the directory exists
-	# - Create if if creating new, exit if does exist but trying to load
+	# - Create if creating new, exit if does exist but trying to load
 	if not os.path.exists(directory) and create_new:
 		os.makedirs(directory)
 		logging.debug('Created directory: ' + directory)
@@ -284,12 +561,43 @@ def main():
 
 
 	'''
-	Now that data has been loaded, the second part of the program is to analyze the data. For now, that is restricted
-	to seeing which words are common so that a proper analysis scheme can be determined.
+	Now that data has been loaded, the second part of the program is to analyze the data.
 
 	'''
-	print ''
-	print 'Finding words in articles'
+	#pull_todays_stock_prices()
+	load_past_stock_data()
+	load_all_word_weights()
+	#update_all_word_weights(str(today.month) + '-' + str(today.day) + '-' + str(today.year))
+	save_all_word_weights()
+	save_stock_data()
+	
+
+	#update_all_word_weights(str(today.month) + '-' + str(today.day) + '-' + str(today.year))
+	
+	
+
+	# Show current list of words (starting with all the A words)
+	#a_words = words_by_letter[ord('t')-97]
+	#for each_word in range(0, num_words_by_letter[ord('t')-97]):
+
+	#	test_data = struct.unpack_from('16s f i', a_words, each_word * 24)
+	#	print test_data[0].split('\0', 1)[0], '\t\t: ', test_data[1], ', ', test_data[2]
+
+
+
+
+
+'''
+Analysis Function 1: Get the frequency of all words and generate two histograms. The first is a histogram of word occurances ignoring 
+the most common words (500+ occurences). The second is a histogram in order from greatest to least with all words.
+'''
+def generate_histograms(directory):
+
+	if not os.path.exists(directory):
+		os.makedirs(directory)
+		logging.debug('Created histogram directory: ' + directory)
+
+	logging.info('Generating word frequencies and creating histograms')
 
 	words = {}
 
@@ -324,7 +632,7 @@ def main():
 							words[new_word] = 1
 
 	# Print the word frequency to a file as a histogram
-	file = open('word_frequencies.txt', 'w')
+	file = open(directory + 'word_frequencies.txt', 'w')
 
 	words_total = 0
 	words_unique = 0
@@ -359,11 +667,129 @@ def main():
 	print 'Total words: ', words_unique
 
 
+	# Print the word frequency to a file as a histogram
+	file = open(directory + 'word_frequencies_ordered.txt', 'w')
 
+	max_value = 0
+	max_key = ''
 
+	for items in words.iteritems():
+		for key, value in words.iteritems():
+			if value > max_value:
+				max_value = value
+				max_key = key
 
+		file.write(max_key)
+		if len(max_key) < 8:
+			file.write('\t\t\t|')
+		elif len(key) < 16:
+			file.write('\t\t|')
+		else:
+			file.write('\t|')
 
+		# For each time it is seen, write one dot
+		for ii in range(0, max_value):
+			file.write('.')
+		file.write('\n')
 
+		words[max_key] = -1
+		max_value = 0
+		max_key = ''
+
+	file.close()
+
+	logging.info('Histograms have been generated')
+
+def find_sentences(article, sentences):
+
+	sentence_started = False
+	index = 0
+	num = 0
+	for ii, chars in enumerate(article):
+
+		if chars.isalpha() and not sentence_started:
+			sentence_started = True
+			sentences[index] = ii
+			index += 1
+
+		if (chars == '.' or chars == '\n') and sentence_started:
+			sentence_started = False
+			sentences[index] = ii
+			index += 1
+			num += 1
+
+	return num
+
+def compare_sentences(article, sentences, num):
+
+	compare_sentence = article[sentences[0]:sentences[1]]
+	word_indices = []
+	num_compare = 0
+	index = 0
+	word_in_progress = False
+	for ii, chars in enumerate(compare_sentence):
+
+		if not word_in_progress and chars.isalpha():
+			word_in_progress = True
+			word_indices.append(ii)
+
+		if not chars.isalpha() and word_in_progress:
+			word_in_progress = False
+			word_indices.append(ii)
+			num_compare += 1
+
+		if ii == len(compare_sentence) and word_in_progress:
+			word_indices.append(len(compare_sentence))
+			num_compare += 1
+	print word_indices
+	print compare_sentence
+
+	ss = 2
+	for ii in range(0, num):
+		similar = 0
+		total = 0
+
+		current = article[sentences[ss]:sentences[ss+1]]
+		ss += 2
+		#print current
+
+		new_indices = []
+		new_index = 0
+		num_test = 0
+		new_word_in_progress = False
+		for jj, chars in enumerate(current):
+
+			if not new_word_in_progress and chars.isalpha():
+				new_word_in_progress = True
+				new_indices.append(jj)
+
+			if not chars.isalpha() and new_word_in_progress:
+				new_word_in_progress = False
+				new_indices.append(jj)
+				num_test += 1
+
+			if jj == len(current) and new_word_in_progress:
+				new_indices.append(len(current))
+				num_test += 1
+
+		ww = 0
+		ww2 = 0
+		#print new_indices
+		for each in range(0, num_test):
+			word = current[new_indices[ww]:new_indices[ww+1]]
+			#print '----- ', new_indices[ww], ', ', new_indices[ww+1], ' - ', word
+			for comp in range(0, num_compare):
+				#print '-------- ', comp, ', ', word_indices[ww2], ', ', word_indices[ww2+1], ' - ', compare_sentence[word_indices[ww2]:word_indices[ww2+1]]
+				if word == compare_sentence[word_indices[ww2]:word_indices[ww2 + 1]]:
+					similar += 1
+					#print word, ' is in ', compare_sentence
+					break
+				ww2 += 2
+			ww2 = 0
+			ww+=2
+			total += 1
+
+		print 'Sentence ', ii, ' has ', similar, '/', total
 
 
 

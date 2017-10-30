@@ -905,6 +905,109 @@ def predict_movement2():
 
 	file.close()
 
+def predict_movement3():
+
+	global weight_average
+	global weight_stdev
+	global weight_sum
+	global weight_max
+	global weight_min
+	global weight_count
+
+	logging.info('Prediction stock movements with method 3 -> If rating is above mean, buy, below mean, sell')
+	print 'PREDICTIONS BASED ON:'
+	print '\t- AVG: ', weight_average
+	print '\t- STD: ', weight_stdev
+
+	# Open file to store todays predictions in
+	today = datetime.datetime.now()
+	today_str = str(today.month) + '-' + str(today.day) + '-' + str(today.year)
+	file = open('./output/prediction3-' + today_str + '.txt', 'w')
+
+	file.write('Predictions Based On Weighting Stats: \n')
+	file.write('- Avg: ' + str(weight_average) + '\n')
+	file.write('- Std: ' + str(weight_stdev) + '\n')
+	file.write('- Sum: ' + str(weight_sum) + '\n')
+	file.write('- Cnt: ' + str(weight_count) + '\n')
+	file.write('- Max: ' + str(weight_max) + '\n')
+	file.write('- Min: ' + str(weight_min) + '\n\n')
+
+
+	# Iterate through stocks as predictions are seperate for each
+	for tickers in STOCK_TAGS:
+
+		logging.debug('- Finding prediction for: ' + tickers)
+
+		stock_rating_sum = 0
+		stock_rating_cnt = 0
+
+		# Iterate through each article for the stock
+		for articles in stock_data[tickers]:
+
+			# Get the text (ignore link)
+			text = articles[1]
+
+			# Variables to keep track of words
+			word_in_progress = False
+			word_number = 0
+			word_start_index = 0
+
+			# Iterate through the characters to find words
+			for ii, chars in enumerate(text):
+
+				# If there is a word being found and non-character pops up, word is over
+				if word_in_progress and (not chars.isalpha() or ii == len(text)):
+
+					# Reset word variables
+					word_in_progress = False
+					word_number += 1
+
+					# Get the found word
+					found_word = text[word_start_index:ii]
+
+					# Add the word to the word arrays or update its current value
+					if len(found_word) > 1:
+						
+						stock_rating_sum += get_word_weight(found_word)
+						stock_rating_cnt += 1
+
+
+				# If a word is not being found and letter pops up, start the word
+				elif not word_in_progress and chars.isalpha():
+
+					# Start the word
+					word_in_progress = True
+					word_start_index = ii
+
+		# After each word in every article has been examined for that stock, find the average rating
+		stock_rating = stock_rating_sum / stock_rating_cnt
+
+		# Calculate the number of standard deviations above the mean and find the probability of that for a 'normal' distribution 
+		# - Assuming normal because as the word library increases, it should be able to be modeled as normal
+		std_above_avg = (stock_rating - weight_average) / weight_stdev
+		probability = norm(weight_average, weight_stdev).cdf(stock_rating)
+
+		if stock_rating > weight_average:
+			rating = 'buy'
+		elif stock_rating < weight_average:
+			rating = 'sell'
+		else:
+			rating = 'undecided'
+
+		print 'RATING FOR: ', tickers
+		print '\t- STD ABOVE MEAN: ', std_above_avg
+		print '\t- RAW VAL RATING: ', stock_rating
+		print '\t- PROBABILITY IS: ', probability
+		print '\t- CORRESPONDS TO: ', rating
+
+		file.write('Prediction for: ' + tickers + ' \n')
+		file.write('- Std above mean: ' + str(std_above_avg) + '\n')
+		file.write('- Raw val rating: ' + str(stock_rating) + '\n')
+		file.write('- probability is: ' + str(probability) + '\n')
+		file.write('- Corresponds to: ' + str(rating) + '\n\n')
+
+	file.close()
+
 '''
 Display help and exit
 '''
@@ -999,6 +1102,7 @@ def main():
 		analyze_weights()
 		predict_movement()
 		predict_movement2()
+		predict_movement3()
 
 	# If updating
 	else:

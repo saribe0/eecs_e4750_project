@@ -1,98 +1,98 @@
 Predictions Based On Weighting Stats: 
-- Avg: 0.895867809432
-- Std: 0.2033375517
-- Sum: 4881.5836936
-- Cnt: 5449
+- Avg: 0.804400581482
+- Std: 0.243271600724
+- Sum: 5745.02895294
+- Cnt: 7142
 - Max: 1.0
-- Min: 0.00877192895859
+- Min: 0.00578034762293
 
 Prediction for: amzn 
-- Std above mean: -0.0973439994499
-- Raw val rating: 0.876074118911
-- probability is: 0.461226607692
+- Std above mean: -0.435413006322
+- Raw val rating: 0.698476962458
+- probability is: 0.331631335662
 - Corresponds to: sell
 
 Prediction for: amat 
-- Std above mean: -0.0346298111435
-- Raw val rating: 0.888826268418
-- probability is: 0.486187464948
+- Std above mean: -0.726143717565
+- Raw val rating: 0.627750436954
+- probability is: 0.233875335454
 - Corresponds to: sell
 
 Prediction for: agn 
-- Std above mean: -0.0180943660971
-- Raw val rating: 0.89218854533
-- probability is: 0.49278178621
+- Std above mean: -0.789648564171
+- Raw val rating: 0.612301511266
+- probability is: 0.214866518999
 - Corresponds to: sell
 
 Prediction for: goog 
-- Std above mean: -0.0500686935588
-- Raw val rating: 0.885686963867
-- probability is: 0.480033823678
+- Std above mean: -0.422386276479
+- Raw val rating: 0.701645995879
+- probability is: 0.336371546588
 - Corresponds to: sell
 
 Prediction for: hd 
-- Std above mean: -0.0770627895681
-- Raw val rating: 0.880198050474
-- probability is: 0.46928679728
+- Std above mean: -0.79267062786
+- Raw val rating: 0.611566328995
+- probability is: 0.213984873727
 - Corresponds to: sell
 
 Prediction for: lmt 
-- Std above mean: -0.0419064509626
-- Raw val rating: 0.887346654293
-- probability is: 0.483286636896
+- Std above mean: -0.394166780499
+- Raw val rating: 0.708510997837
+- probability is: 0.346728954885
 - Corresponds to: sell
 
 Prediction for: data 
-- Std above mean: -0.250672826548
-- Raw val rating: 0.844896610604
-- probability is: 0.401033535642
+- Std above mean: -0.186663138824
+- Raw val rating: 0.758990740904
+- probability is: 0.425962379508
 - Corresponds to: sell
 
 Prediction for: nflx 
-- Std above mean: -0.0036167773855
-- Raw val rating: 0.895132382774
-- probability is: 0.498557117728
+- Std above mean: -0.639954645194
+- Raw val rating: 0.648717790554
+- probability is: 0.261101043043
 - Corresponds to: sell
 
 Prediction for: aapl 
-- Std above mean: -0.101865842058
-- Raw val rating: 0.875154658506
-- probability is: 0.459431581487
+- Std above mean: -0.355225253981
+- Raw val rating: 0.717984365328
+- probability is: 0.361210423452
 - Corresponds to: sell
 
 Prediction for: ge 
-- Std above mean: -0.538629484761
-- Raw val rating: 0.786344208728
-- probability is: 0.295071269309
+- Std above mean: -1.07420693844
+- Raw val rating: 0.543076540057
+- probability is: 0.141364971655
 - Corresponds to: sell
 
 Prediction for: tsla 
-- Std above mean: -0.0807440631467
-- Raw val rating: 0.879449509318
-- probability is: 0.467822746935
+- Std above mean: -0.463492755628
+- Raw val rating: 0.691645956896
+- probability is: 0.321505603165
 - Corresponds to: sell
 
 Prediction for: bac 
-- Std above mean: -0.0969939905735
-- Raw val rating: 0.876145288859
-- probability is: 0.461365583388
+- Std above mean: -0.838676515156
+- Raw val rating: 0.60037440315
+- probability is: 0.200825430256
 - Corresponds to: sell
 
 Prediction for: nvda 
-- Std above mean: -0.0880563667637
-- Raw val rating: 0.877962643403
-- probability is: 0.464915937944
+- Std above mean: -0.417480890081
+- Raw val rating: 0.70283933708
+- probability is: 0.338163349632
 - Corresponds to: sell
 
 Prediction for: baba 
-- Std above mean: -0.00167787608173
-- Raw val rating: 0.895526634218
-- probability is: 0.499330624604
+- Std above mean: -0.395192863604
+- Raw val rating: 0.708261380958
+- probability is: 0.346350279487
 - Corresponds to: sell
 
 Prediction for: wmt 
-- Std above mean: 0.00203396423772
-- Raw val rating: 0.89628139074
-- probability is: 0.500811433772
-- Corresponds to: buy
+- Std above mean: -0.715453562366
+- Raw val rating: 0.630351048121
+- probability is: 0.237164412797
+- Corresponds to: sell
 

@@ -36,7 +36,12 @@ STOCK_TAGS = [	'amzn',
 				'bac',
 				'nvda',
 				'baba',
-				'wmt']
+				'wmt',
+				'jpm',
+				'mu',
+				'uaa',
+				'gild',
+				'xom'  ]
 
 ARTICLES_PER_STOCK = 10
 SUCCESS_THREASHOLD = 5
@@ -214,8 +219,11 @@ the dictionary.
 def load_articles(day):
 	
 	directory = './data/articles/stock_market_prediction-' + day + '/'
-	logging.info('Loading articles from directory: ' + directory)
+	if not os.path.exists(directory):
+		logging.error('Could not find articles to load for: ' + day)
+		return False
 
+	logging.info('Loading articles from directory: ' + directory)
 	print 'Loading articles'
 
 	# Iterate through the stock tags
@@ -262,11 +270,10 @@ def load_articles(day):
 
 		logging.debug('Finished pulling ' + str(len(stock_data[ticker])) + ' articles for: ' + ticker + ', time: ' + str(time.time() - start))
 
-	# Check all tags for number of articles loaded
-	for ticker in STOCK_TAGS:
 		if len(stock_data[ticker]) < SUCCESS_THREASHOLD:
 			logging.error('Could not load the threshold (' + str(SUCCESS_THREASHOLD) + ') number of articles. Either not saved or another error occured.')
 			return False
+
 	return True
 
 '''
@@ -449,6 +456,10 @@ def update_all_word_weights(option, day):
 		
 		logging.debug('- Updating word weights for: ' + ticker)
 
+		if not ticker in stock_data:
+			logging.warning('- Could not find articles loaded for ' + ticker)
+			continue
+
 		# For each stock, iterate through the articles
 		for articles in stock_data[ticker]:
 		
@@ -499,7 +510,7 @@ def update_word(ticker, option, word_upper, day):
 	index = ord(word[:1]) - 97
 	if index < 0 or index > 25:
 		logging.warning('-- Could not find the following word in the database: ' + word)
-		return
+		return 
 
 	# Get the array containing words of the right letter
 	letter_words = words_by_letter[index]
@@ -518,6 +529,14 @@ def update_word(ticker, option, word_upper, day):
 			# If it is the same, mark it as found and update its values
 			# weight = (weight * value + increase)/(value + increase)
 			found = True
+
+			if not ticker in stock_prices:
+				logging.error('-- Could not find stock ' + ticker + ' in stock price data')
+				return
+			if not day in stock_prices[ticker]:
+				logging.error('-- Could not find stock price data for ' + ticker + ' on ' + day)
+				return 
+
 			change = stock_prices[ticker][day][1] - stock_prices[ticker][day][0]
 
 			if option == 'opt1':
@@ -638,6 +657,11 @@ def analyze_weights():
 			if weight < weight_min:
 				weight_min = weight
 
+	# If no words have been found with weights return false
+	if weight_count == 0:
+		logging.error('Could not find any words with weights to analyze')
+		return False
+
 	# Once all weights have been iterated through, calculate the average
 	weight_average = weight_sum / weight_count
 
@@ -654,6 +678,8 @@ def analyze_weights():
 	logging.debug('-- cnt: ' + str(weight_count))
 	logging.debug('-- max: ' + str(weight_max))
 	logging.debug('-- min: ' + str(weight_min))
+
+	return True
 
 '''
 Morning Prediction Step Helper
@@ -732,6 +758,10 @@ def predict_movement():
 
 		stock_rating_sum = 0
 		stock_rating_cnt = 0
+
+		if not tickers in stock_data:
+			logging.warning('- Could not find articles loaded for ' + tickers)
+			continue
 
 		# Iterate through each article for the stock
 		for articles in stock_data[tickers]:
@@ -835,6 +865,10 @@ def predict_movement2():
 
 		stock_rating_sum = 0
 		stock_rating_cnt = 0
+
+		if not tickers in stock_data:
+			logging.warning('- Could not find articles loaded for ' + tickers)
+			continue
 
 		# Iterate through each article for the stock
 		for articles in stock_data[tickers]:
@@ -941,6 +975,10 @@ def predict_movement3():
 		stock_rating_sum = 0
 		stock_rating_cnt = 0
 
+		if not tickers in stock_data:
+			logging.warning('- Could not find articles loaded for ' + tickers)
+			continue
+
 		# Iterate through each article for the stock
 		for articles in stock_data[tickers]:
 
@@ -1015,14 +1053,20 @@ def print_help():
 
 	logging.debug('Displaying help and exiting')
 
-	print 'To pull articles for the current day, process them, and return a rating, use:'
+	print 'To predict stock price based on articles for the current day, use (must have already pulled articles): '
 	print '\t ./stock_market_prediction.py -p\n'
-	print 'To update word weights and stock prices for the current day, use:'
+	print 'To predict stock price based on articles for a specific day, use (must have already pulled articles): '
+	print '\t ./stock_market_prediction.py -p -d mm-dd-yyyy\n'
+	print 'To pull articles for the current day, use (currently no support for pulling articles for previous days):'
+	print '\t ./stock_market_prediction.py -a\n'
+	print 'To pull stock prices for the current day, use (currently no support for pulling prices for previous days):'
+	print '\t ./stock_market_prediction.py -s\n'
+	print 'To update word weights for articles and prices from the current day, use (must have already pulled weights and prices):'
 	print '\t ./stock_market_prediction.py -u\n'
-	print 'To specify a day to update word weights for, use (stock prices must have already been updated):'
-	print '\t ./stock_market_prediction.py -u -d 10-25-2017\n'
-	print 'To specify a date range to update word weights for, use (stock prices must have already been updated):'
-	print '\t ./stock_market_prediction.py -u -s 10-22-2017 -e 10-26-2017\n'
+	print 'To update word weights for articles and prices from a specifc day, use (must have already pulled weights and prices):'
+	print '\t ./stock_market_prediction.py -u -d mm-dd-yyyy\n'
+	print 'To update word weights for articles and prices from a date range, use (must have already pulled weights and prices):'
+	print '\t ./stock_market_prediction.py -u -b mm-dd-yyyy -e mm-dd-yyyy\n'
 
 	sys.exit(2)
 
@@ -1031,7 +1075,7 @@ Verifies that a date is valid and in the right format
 '''
 def verify_date(date):
 
-	today = datetime.datetime.now()
+	today = datetime.date.today()
 	date_parts = date.split('-')
 
 	if len(date_parts) < 3:
@@ -1053,98 +1097,135 @@ Main Execution
 '''
 def main():
 
-	update = False
-	day = 0  # 0 for today, -1 for range, 1 for a specific day
+	execution_type = -1
 	specified_day = ''
 	start_day = ''
 	end_day = ''
 
+	today = datetime.date.today()
+	today_str = str(today.month) + '-' + str(today.day) + '-' + str(today.year)
+
 	# First get any command line arguments to edit actions
 	try:
-		opts, args = getopt.getopt(sys.argv[1:], 'hpud:s:e:')
+		opts, args = getopt.getopt(sys.argv[1:], 'hpsaud:b:e:')
 	except getopt.GetoptError:
 		print_help()
 	for opt, arg in opts:
 		# Help message
 		if opt == '-h':
 			print_help()
-		# Command line args request an update
+		# Command line argument for Predict
+		elif opt == '-p':
+			execution_type = 0
+		# Command line argument for pull new Articles
+		elif opt == '-a':
+			execution_type = 1
+		# Command line argument for pull new Stock prices
+		elif opt == '-s':
+			execution_type = 2
+		# Command line argument for Update word weights
 		elif opt == '-u':
-			update = True
-		# Command line args request a prediction (can not have prediction and update together)
-		elif opt == '-p' and not update:
-			update = False
-		# Command line args request a specific day
-		elif opt == '-d' and day == 0:
-			day = 1
+			execution_type = 3
+		# Command line argument for adding a specfic Day (will only matter for predict and update)
+		elif opt == '-d':
 			specified_day = arg
-		# Command line args request a date range, this is the start
-		elif opt == '-s' and day == 0:
-			day = -1
+		# Command line argument for specifying the Beginning of a date range (only for update)
+		elif opt == '-b':
 			start_day = arg
-		# Command line args specify an end to the date range
-		elif opt == '-e' and day == -1:
+		# Command line argument for specifying the End of a date range (only for update)
+		elif opt == '-e':
 			end_day = arg
 
+	# Depending on the input type, preform the proper action
+	# Predict
+	if execution_type == 0:
 
-	# Start of actual execution, begin by loading all the data
-	logging.info('Loading all data')
-	load_all_word_weights('opt1')
+		# First prepare the day to predict on
+		if not verify_date(specified_day):
+			specified_day = today_str
 
-	# If pulling new stock data, do so
-	if not update:
-		logging.info('Pulling new articles and creating a prediction')
+		logging.info('Predicting price movement for: ' + specified_day)
 
-		today = datetime.datetime.now()
-		load_articles(str(today.month) + '-' + str(today.day) + '-' + str(today.year))
-
-		#pull_recent_articles()
-		analyze_weights()
+		# Call the proper functions
+		load_all_word_weights('opt1')
+		if not load_articles(specified_day):
+			sys.exit(-1)
+		if not analyze_weights():
+			sys.exit(-1)
 		predict_movement()
 		predict_movement2()
 		predict_movement3()
 
-	# If updating
-	else:
-		# Load all stock prices
+		logging.info('Predicting complete')
+
+	# Pull new articles
+	elif execution_type == 1:
+
+		logging.info('Pulling articles for: ' + today_str)
+
+		# Call the proper functions
+		pull_recent_articles()
+
+		logging.info('Pulling articles complete')
+
+	# Pull new stock prices
+	elif execution_type == 2:
+
+		logging.info('Pulling stock prices for: ' + today_str)
+
+		# Call the proper functions
+		load_stock_prices()
+		pull_stock_prices()
+		save_stock_prices()
+
+		logging.info('Pulling stock prices complete')
+
+	# Update word weights
+	elif execution_type == 3:
+
+		# Load non-day specific values
+		logging.info('Loading non-day specific data before updating word weights')
+
+		load_all_word_weights('opt1')
 		load_stock_prices()
 
-		# Then for each of the days, update the word weights
+		# Prepare the days to update word weights for
 		days = []
 
-		# Today's date, get the day, and add it
-		today = datetime.datetime.now()
-		if day == 0:
+		if not verify_date(specified_day):
+			specified_day = today_str
 
-			# First update the stock prices
-			pull_stock_prices()
-			
-			days.append(str(today.month) + '-' + str(today.day) + '-' + str(today.year))
-
-		# A specified date
-		elif day == 1 and verify_date(specified_day):
+		if not verify_date(start_day):
 			days.append(specified_day)
+		else:
+			date_parts1 = start_day.split('-')
+			date1 = datetime.date(int(date_parts1[2]), int(date_parts1[0]), int(date_parts1[1]))
+			date2 = datetime.date.today()
+			if verify_date(end_day):
+				date_parts2 = end_day.split('-')
+				d2 = datetime.date(int(date_parts2[2]), int(date_parts2[0]), int(date_parts2[1]))
 
-		# A range of dates
-		elif day == -1:
-			print 'A range... to be implemented.'
+			delta = date2-date1
+			for each_day in range(0, delta.days + 1):
+				temp_day = date1 + datetime.timedelta(days = each_day)
+				days.append(str(temp_day.month) + '-' + str(temp_day.day) + '-' + str(temp_day.year))
 
 		for each in days:
 
 			logging.info('Updating word weights for: ' + each)
 
-			load_articles(each)
-			update_all_word_weights('opt1', each)
-			stock_data.clear()
+			# Call the proper functions
+			if load_articles(each):
+				update_all_word_weights('opt1', each)
+			stock_data.clear() # To prepare for the next set of articles
 
-		save_stock_prices()
+		# Save data
+		logging.info('Saving word weights')
+		save_all_word_weights('opt1')
+		
+		logging.info('Updating word weights complete')
 
-	# After execution, save data
-	logging.info('Saving all data')
-	save_all_word_weights('opt1')
-
-	logging.info('Finished running, closing')
-	print 'Done.'
+	print 'Done'
 
 
 

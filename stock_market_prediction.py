@@ -199,7 +199,6 @@ def pull_recent_articles():
 				break
 
 	# Check all tags for number of articles loaded
-	print ''
 	for ticker in STOCK_TAGS:
 		if len(stock_data[ticker]) < SUCCESS_THREASHOLD:
 			logging.error('Could not pull the threshold (' + str(SUCCESS_THREASHOLD) + ') number of articles. Either not saved or another error occured.')
@@ -217,7 +216,7 @@ def load_articles(day):
 	directory = './data/articles/stock_market_prediction-' + day + '/'
 	logging.info('Loading articles from directory: ' + directory)
 
-	print 'Loading articles '
+	print 'Loading articles'
 
 	# Iterate through the stock tags
 	for ticker in STOCK_TAGS:
@@ -264,7 +263,6 @@ def load_articles(day):
 		logging.debug('Finished pulling ' + str(len(stock_data[ticker])) + ' articles for: ' + ticker + ', time: ' + str(time.time() - start))
 
 	# Check all tags for number of articles loaded
-	print ''
 	for ticker in STOCK_TAGS:
 		if len(stock_data[ticker]) < SUCCESS_THREASHOLD:
 			logging.error('Could not load the threshold (' + str(SUCCESS_THREASHOLD) + ') number of articles. Either not saved or another error occured.')
@@ -832,7 +830,7 @@ def verify_date(date):
 		return False
 
 	try:
-		test_date = datetime.datetime(int(date_parts[2]), int(date_parts[1]), int(date_parts[0]))
+		test_date = datetime.datetime(int(date_parts[2]), int(date_parts[0]), int(date_parts[1]))
 	except:
 		return False
 
@@ -898,8 +896,8 @@ def main():
 
 	# If updating
 	else:
-		# First update the stock prices
-		pull_stock_prices()
+		# Load all stock prices
+		load_stock_prices()
 
 		# Then for each of the days, update the word weights
 		days = []
@@ -907,6 +905,9 @@ def main():
 		# Today's date, get the day, and add it
 		today = datetime.datetime.now()
 		if day == 0:
+
+			# First update the stock prices
+			pull_stock_prices()
 			
 			days.append(str(today.month) + '-' + str(today.day) + '-' + str(today.year))
 

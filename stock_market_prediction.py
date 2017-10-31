@@ -1149,8 +1149,10 @@ def main():
 		# Call the proper functions
 		load_all_word_weights('opt1')
 		if not load_articles(specified_day):
+			print 'Error: Could not load articles for: ', specified_day
 			sys.exit(-1)
 		if not analyze_weights():
+			print 'Error: Unable to analyze weights'
 			sys.exit(-1)
 		predict_movement()
 		predict_movement2()

@@ -399,7 +399,7 @@ def save_stock_prices():
 		file.write(ticker + '\n')
 
 		# Write each day to the file
-		for days, price in stock_prices[ticker].iteritems():
+		for days, price in stock_prices[ticker].items():
 			file.write('- ' + days + ' ' + str(price[0]) + ' ' + str(price[1]) + '\n')
 
 	file.close()

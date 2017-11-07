@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 ####################################################################################################
 ## Created 10/27/2017 by Sam Beaulieu
 ##
@@ -13,11 +13,11 @@ import logging
 import sys, getopt
 import numpy as np
 from bs4 import BeautifulSoup as BS
-from yahoo_finance import Share
 import struct
 import binascii
 import math
 from scipy.stats import norm
+import re
 
 ########### Global Variables and Configurations ###########
 # Global Constants
@@ -45,6 +45,7 @@ STOCK_TAGS = [	'amzn',
 
 ARTICLES_PER_STOCK = 10
 SUCCESS_THREASHOLD = 5
+MAX_WORDS_PER_LETTER = 1500
 
 # Global Stock Data
 stock_data = {}
@@ -100,7 +101,7 @@ def pull_recent_articles():
 	if not os.path.exists(directory):
 		os.makedirs(directory)
 
-	print 'Pulling articles '
+	print('Pulling articles')
 
 	# Iterate through the stock tags
 	for ticker in STOCK_TAGS:
@@ -113,7 +114,7 @@ def pull_recent_articles():
 		# Make the request to google news for the ticker and get its raw html
 		try:
 			r = requests.get('https://www.google.com/search?biw=1366&bih=671&tbm=nws&ei=HRDyWcDlJoa-jwSuwZCYBg&q=' + ticker)
-		except requests.exceptions.RequestException, error:
+		except requests.exceptions.RequestException as error:
 			logging.warning('- Could not pull articles for: ' + ticker + ', Error: ' + str(error))
 			continue
 
@@ -138,7 +139,7 @@ def pull_recent_articles():
 				# Once the link as been found, make a request for its html content
 				try:
 					r = requests.get(link)
-				except requests.exceptions.RequestException, error:
+				except requests.exceptions.RequestException as error:
 					logging.warning('-- Could not pull article for: ' + link + ', Error: ' + str(error))
 					continue
 
@@ -167,6 +168,9 @@ def pull_recent_articles():
 					raw_text = raw_html.find('div', attrs={'id' : 'main_content'})
 
 				if raw_text == None:
+					raw_text = raw_html.find('div', attrs={'id' : 'page-content'} )
+
+				if raw_text == None:
 					raw_text = raw_html.find('div', attrs={'id' : 'article'} )
 
 				if raw_text == None:
@@ -179,7 +183,7 @@ def pull_recent_articles():
 				# Get all the paragraph parts of the article's content
 				article_parts = raw_text.find_all('p')
 				if len(article_parts) == 0:
-					logging.warning('-- Could not find a article text in: ' + link + ', trying next link')
+					logging.warning('-- Could not find article text in: ' + link + ', trying next link')
 					continue
 
 				# Combine all the paragraphs into a single text block
@@ -190,8 +194,8 @@ def pull_recent_articles():
 
 				# Store the url and article as a tuple into the stock data and write them to the stock's file
 				stock_data[ticker].append((link, article))
-				file.write(link.encode("utf-8") + '\n\n')
-				file.write(article.encode("utf-8") + '\n')
+				file.write(link + '\n\n')
+				file.write(article + '\n')
 				file.write('\n')
 				logging.debug('-- Article ' + ticker + ':' + str(counter) + ' from ' + link + ' has been pulled and is ' + str(len(article)) + ' characters')
 
@@ -224,7 +228,7 @@ def load_articles(day):
 		return False
 
 	logging.info('Loading articles from directory: ' + directory)
-	print 'Loading articles'
+	print('Loading articles')
 
 	# Iterate through the stock tags
 	for ticker in STOCK_TAGS:
@@ -234,7 +238,7 @@ def load_articles(day):
 		logging.debug('Starting to load articles for: ' + ticker)
 		try:
 			file = open(directory + ticker + '.txt', 'r+')
-		except IOError, error:
+		except IOError as error:
 			logging.warning('- Could not load articles for: ' + ticker + ', Error: ' + str(error))
 			continue
 
@@ -284,11 +288,11 @@ data from the stock price data file and loads it up so that new prices can be ad
 def load_stock_prices():
 
 	logging.info('Loading past stock prices')
-	print 'Loading stock prices'
+	print('Loading stock prices')
 
 	try:
 		file = open('./data/stock_price_data.txt', 'r+')
-	except IOError, error:
+	except IOError as error:
 		logging.warning('- Could not load stock prices, Error: ' + str(error))
 		return
 
@@ -320,7 +324,7 @@ def pull_stock_prices():
 	today_str = str(today.month) + '-' + str(today.day) + '-' + str(today.year)
 
 	logging.info('Pulling stock prices for: ' + today_str)
-	print 'Pulling stock prices'
+	print('Pulling stock prices')
 
 	# For each stock, get todays value
 	for tickers in STOCK_TAGS:
@@ -329,16 +333,44 @@ def pull_stock_prices():
 
 		# If the stock is not in the stock prices, add it
 		if tickers not in stock_prices:	
-			stock_prices[tickers] = {}
+			stock_price[tickers] = {}
 
 		# Get todays stock open and close
-		open_p = Share(tickers).get_open()
-		close_p = Share(tickers).get_price()
+		open_p, close_p = get_price(tickers)
 
-		logging.debug('-- Price for: ' + tickers + ' is open: ' + open_p + ', close: ' + close_p)
+		logging.debug('-- Price for: ' + tickers + ' is open: ' + str(open_p) + ', close: ' + str(close_p))
 
 		# Add todays prices to the dictionary for today
-		stock_prices[tickers][today_str] = (float(open_p), float(close_p))
+		stock_prices[tickers][today_str] = (open_p, close_p)
+
+def get_price(ticker):
+
+	# Make the request to google finance for the ticker and get its raw html
+	try:
+		r = requests.get('https://finance.google.com/finance?q=' + ticker)
+	except requests.exceptions.RequestException as error:
+		logging.warning('- Could not pull price for: ' + ticker + ', Error: ' + str(error))
+		return -1, 1
+
+	raw_html = BS(r.text, 'html.parser')
+
+	open_html = raw_html.find('table', attrs={'class' : 'snap-data'})
+	open_raw = open_html.find_all('tr')
+	open_raw2 = open_raw[2].find('td', attrs={'class' : 'val'})
+	try:
+		open_p = float(open_raw2.text[:-1].replace(',',''))
+	except:
+		logging.warning('- Could not pull price for: ' + ticker)
+		return -1, 2
+
+	close_raw = raw_html.find('span', attrs={'id' : re.compile(r'ref_*')})
+	try:
+		close_p = float(close_raw.text.replace(',',''))
+	except:
+		logging.warning('- Could not pull price for: ' + ticker)
+		return -1, 3
+
+	return open_p, close_p
 
 '''
 Evening Update Step
@@ -347,7 +379,7 @@ Step 10 is to save the stock price data structure to a file so it can be loaded 
 def save_stock_prices():
 
 	logging.info('Saving stock price data structure')
-	print 'Saving stock prices'
+	print('Saving stock prices')
 
 	file = open('./data/stock_price_data.txt', 'w')
 
@@ -381,12 +413,12 @@ stored by letter which will hopefully make it more efficient.
 def load_all_word_weights(option):
 	
 	logging.info('Loading word weights for weighting option: ' + option)
-	print 'Loading word weights'
+	print('Loading word weights')
 
-	# For each letter, add a 1000 word array of 28 characters each with the last 8 characters for a float (weight of the word) and int (number of occurences)
+	# For each letter, add a MAX_WORDS_PER_LETTER word array of 28 characters each with the last 8 characters for a float (weight of the word) and int (number of occurences)
 	# - abcdefghijklmnopq0.32########
 	for letters in range(0, 26):
-		letter_words = bytearray(28*1000)
+		letter_words = bytearray(28*MAX_WORDS_PER_LETTER)
 		words_by_letter.append(letter_words)
 		num_words_by_letter.append(0)
 
@@ -394,7 +426,7 @@ def load_all_word_weights(option):
 	# Open the file to be loaded
 	try:
 		file = open('./data/word_weight_data_' + option + '.txt', 'r+')
-	except IOError, error:
+	except IOError as error:
 		logging.warning('- Could not load word weights, Error: ' + str(error))
 		return
 
@@ -413,7 +445,7 @@ def load_all_word_weights(option):
 			data = lines.split()
 
 			# Store the data
-			struct.pack_into('16s f i i', words_by_letter[letter_index], num_words_by_letter[letter_index]*28, data[1], float(data[2]), int(data[3]), int(data[4]))
+			struct.pack_into('16s f i i', words_by_letter[letter_index], num_words_by_letter[letter_index]*28, data[1].encode('utf-8'), float(data[2]), int(data[3]), int(data[4]))
 			num_words_by_letter[letter_index] += 1
 
 	file.close()
@@ -436,17 +468,17 @@ def update_all_word_weights(option, day):
 	'''
 
 	logging.info('Updating word weights for: ' + day + ' with option: ' + option)
-	print 'Updating word weights'
+	print('Updating word weights')
 
 	# If the weighting arrays are empty, create them 
 	if len(words_by_letter) == 0 or words_by_letter == 0:
 
 		logging.debug('- Could not find data structure for word weights so creating it')
 
-		# For each letter, add a 1000 word array of 28 characters each with the last 8 characters for a float (weight of the word) and int (number of occurences)
+		# For each letter, add a MAX_WORDS_PER_LETTER word array of 28 characters each with the last 8 characters for a float (weight of the word) and int (number of occurences)
 		# - abcdefghijklmnopq0.32####
 		for letters in range(0, 26):
-			letter_words = bytearray(28*1000)
+			letter_words = bytearray(28*MAX_WORDS_PER_LETTER)
 			words_by_letter.append(letter_words)
 			num_words_by_letter.append(0)
 
@@ -522,9 +554,10 @@ def update_word(ticker, option, word_upper, day):
 		
 		# Get the current word data to be compared
 		test_data = struct.unpack_from('16s f i i', letter_words, ii * 28)
+		temp_word = test_data[0].decode('utf_8')
 
 		# Check if the word is the same
-		if test_data[0][:len(test_data[0].split('\0', 1)[0])] == word :
+		if temp_word[:len(temp_word.split('\0', 1)[0])] == word :
 			
 			# If it is the same, mark it as found and update its values
 			# weight = (weight * value + increase)/(value + increase)
@@ -550,7 +583,7 @@ def update_word(ticker, option, word_upper, day):
 					extra1 = test_data[2] + 1
 					extra2 = test_data[3]
 
-			struct.pack_into('16s f i i', letter_words, ii * 28, word, weight, extra1, extra2)
+			struct.pack_into('16s f i i', letter_words, ii * 28, word.encode('utf-8'), weight, extra1, extra2)
 
 			logging.debug('-- Updated ' + word + ' using ' + option + ' with weight of ' + str(weight) + ' and occurences of ' + str(extra1) + ', ' + str(extra2))
 			break
@@ -571,7 +604,7 @@ def update_word(ticker, option, word_upper, day):
 				extra2 = 0
 
 		# Pack the data into the array
-		struct.pack_into('16s f i i', letter_words, num_letter_words*28, word, weight, extra1, extra2)
+		struct.pack_into('16s f i i', letter_words, num_letter_words*28, word.encode('utf-8'), weight, extra1, extra2)
 		num_words_by_letter[index] += 1
 
 		logging.debug('-- Added ' + word + ' with weight of ' + str(weight) + ' and occurences of ' + str(extra1) + ', ' + str(extra2))
@@ -583,7 +616,7 @@ Step 11 is to save all the word weights to a file so it can be loaded in later t
 def save_all_word_weights(option):
 
 	logging.info('Saving word weights for weighting option ' + option)
-	print 'Saving word weights'
+	print('Saving word weights')
 
 	file = open('./data/word_weight_data_' + option + '.txt', 'w')
 
@@ -600,9 +633,10 @@ def save_all_word_weights(option):
 
 			# For each word, unpack the word from the buffer
 			raw_data = struct.unpack_from('16s f i i', words_by_letter[first_letter], words * 28)
+			temp_word = raw_data[0].decode('utf-8')
 
 			# Write the data to the file
-			file.write('- ' + raw_data[0].split('\0', 1)[0] + ' ' + str(raw_data[1]) + ' ' + str(raw_data[2]) + ' ' + str(raw_data[3]) + '\n')
+			file.write('- ' + temp_word.split('\0', 1)[0] + ' ' + str(raw_data[1]) + ' ' + str(raw_data[2]) + ' ' + str(raw_data[3]) + '\n')
 
 	file.close()
 
@@ -623,7 +657,7 @@ weight_count
 def analyze_weights():
 
 	logging.info('Analyzing weights for distribution')
-	print 'Analyzing weights'
+	print('Analyzing weights')
 
 	global weight_average
 	global weight_stdev
@@ -707,9 +741,10 @@ def get_word_weight(word_upper):
 		
 		# Get the current word data to be compared
 		test_data = struct.unpack_from('16s f i i', letter_words, ii * 28)
+		temp_word = test_data[0].decode('utf_8')
 
 		# Check if the word is the same
-		if test_data[0][:len(test_data[0].split('\0', 1)[0])] == word :
+		if temp_word[:len(temp_word.split('\0', 1)[0])] == word:
 			
 			# If it is the same, return its value
 			return test_data[1]
@@ -723,7 +758,7 @@ Morning Prediction Step
 Step 4 is to run through the words in the mornings articles and come up with a prediction for what they will do later in the day. The data is recorded so it 
 can be looked at later to see how the algorithm is improving (if at all).
 '''
-def predict_movement():
+def predict_movement(day):
 
 	global weight_average
 	global weight_stdev
@@ -733,14 +768,12 @@ def predict_movement():
 	global weight_count
 
 	logging.info('Prediction stock movement')
-	print 'PREDICTIONS BASED ON:'
-	print '\t- AVG: ', weight_average
-	print '\t- STD: ', weight_stdev
+	print('PREDICTIONS BASED ON:')
+	print('\t- AVG: ', weight_average)
+	print('\t- STD: ', weight_stdev)
 
 	# Open file to store todays predictions in
-	today = datetime.datetime.now()
-	today_str = str(today.month) + '-' + str(today.day) + '-' + str(today.year)
-	file = open('./output/prediction-' + today_str + '.txt', 'w')
+	file = open('./output/prediction-' + day + '.txt', 'w')
 
 	file.write('Predictions Based On Weighting Stats: \n')
 	file.write('- Avg: ' + str(weight_average) + '\n')
@@ -816,11 +849,11 @@ def predict_movement():
 		else:
 			rating = 'undecided'
 
-		print 'RATING FOR: ', tickers
-		print '\t- STD ABOVE MEAN: ', std_above_avg
-		print '\t- RAW VAL RATING: ', stock_rating
-		print '\t- PROBABILITY IS: ', probability
-		print '\t- CORRESPONDS TO: ', rating
+		print('RATING FOR: ', tickers)
+		print('\t- STD ABOVE MEAN: ', std_above_avg)
+		print('\t- RAW VAL RATING: ', stock_rating)
+		print('\t- PROBABILITY IS: ', probability)
+		print('\t- CORRESPONDS TO: ', rating)
 
 		file.write('Prediction for: ' + tickers + ' \n')
 		file.write('- Std above mean: ' + str(std_above_avg) + '\n')
@@ -830,7 +863,7 @@ def predict_movement():
 
 	file.close()
 
-def predict_movement2():
+def predict_movement2(day):
 
 	global weight_average
 	global weight_stdev
@@ -840,14 +873,12 @@ def predict_movement2():
 	global weight_count
 
 	logging.info('Prediction stock movements with method 2 -> do not use stock weights within a standard deviation of the mean')
-	print 'PREDICTIONS BASED ON:'
-	print '\t- AVG: ', weight_average
-	print '\t- STD: ', weight_stdev
+	print('PREDICTIONS BASED ON:')
+	print('\t- AVG: ', weight_average)
+	print('\t- STD: ', weight_stdev)
 
 	# Open file to store todays predictions in
-	today = datetime.datetime.now()
-	today_str = str(today.month) + '-' + str(today.day) + '-' + str(today.year)
-	file = open('./output/prediction2-' + today_str + '.txt', 'w')
+	file = open('./output/prediction2-' + day + '.txt', 'w')
 
 	file.write('Predictions Based On Weighting Stats: \n')
 	file.write('- Avg: ' + str(weight_average) + '\n')
@@ -925,11 +956,11 @@ def predict_movement2():
 		else:
 			rating = 'undecided'
 
-		print 'RATING FOR: ', tickers
-		print '\t- STD ABOVE MEAN: ', std_above_avg
-		print '\t- RAW VAL RATING: ', stock_rating
-		print '\t- PROBABILITY IS: ', probability
-		print '\t- CORRESPONDS TO: ', rating
+		print('RATING FOR: ', tickers)
+		print('\t- STD ABOVE MEAN: ', std_above_avg)
+		print('\t- RAW VAL RATING: ', stock_rating)
+		print('\t- PROBABILITY IS: ', probability)
+		print('\t- CORRESPONDS TO: ', rating)
 
 		file.write('Prediction for: ' + tickers + ' \n')
 		file.write('- Std above mean: ' + str(std_above_avg) + '\n')
@@ -939,7 +970,7 @@ def predict_movement2():
 
 	file.close()
 
-def predict_movement3():
+def predict_movement3(day):
 
 	global weight_average
 	global weight_stdev
@@ -949,14 +980,12 @@ def predict_movement3():
 	global weight_count
 
 	logging.info('Prediction stock movements with method 3 -> If rating is above mean, buy, below mean, sell')
-	print 'PREDICTIONS BASED ON:'
-	print '\t- AVG: ', weight_average
-	print '\t- STD: ', weight_stdev
+	print('PREDICTIONS BASED ON:')
+	print('\t- AVG: ', weight_average)
+	print('\t- STD: ', weight_stdev)
 
 	# Open file to store todays predictions in
-	today = datetime.datetime.now()
-	today_str = str(today.month) + '-' + str(today.day) + '-' + str(today.year)
-	file = open('./output/prediction3-' + today_str + '.txt', 'w')
+	file = open('./output/prediction3-' + day + '.txt', 'w')
 
 	file.write('Predictions Based On Weighting Stats: \n')
 	file.write('- Avg: ' + str(weight_average) + '\n')
@@ -1032,11 +1061,11 @@ def predict_movement3():
 		else:
 			rating = 'undecided'
 
-		print 'RATING FOR: ', tickers
-		print '\t- STD ABOVE MEAN: ', std_above_avg
-		print '\t- RAW VAL RATING: ', stock_rating
-		print '\t- PROBABILITY IS: ', probability
-		print '\t- CORRESPONDS TO: ', rating
+		print('RATING FOR: ', tickers)
+		print('\t- STD ABOVE MEAN: ', std_above_avg)
+		print('\t- RAW VAL RATING: ', stock_rating)
+		print('\t- PROBABILITY IS: ', probability)
+		print('\t- CORRESPONDS TO: ', rating)
 
 		file.write('Prediction for: ' + tickers + ' \n')
 		file.write('- Std above mean: ' + str(std_above_avg) + '\n')
@@ -1053,20 +1082,20 @@ def print_help():
 
 	logging.debug('Displaying help and exiting')
 
-	print 'To predict stock price based on articles for the current day, use (must have already pulled articles): '
-	print '\t ./stock_market_prediction.py -p\n'
-	print 'To predict stock price based on articles for a specific day, use (must have already pulled articles): '
-	print '\t ./stock_market_prediction.py -p -d mm-dd-yyyy\n'
-	print 'To pull articles for the current day, use (currently no support for pulling articles for previous days):'
-	print '\t ./stock_market_prediction.py -a\n'
-	print 'To pull stock prices for the current day, use (currently no support for pulling prices for previous days):'
-	print '\t ./stock_market_prediction.py -s\n'
-	print 'To update word weights for articles and prices from the current day, use (must have already pulled weights and prices):'
-	print '\t ./stock_market_prediction.py -u\n'
-	print 'To update word weights for articles and prices from a specifc day, use (must have already pulled weights and prices):'
-	print '\t ./stock_market_prediction.py -u -d mm-dd-yyyy\n'
-	print 'To update word weights for articles and prices from a date range, use (must have already pulled weights and prices):'
-	print '\t ./stock_market_prediction.py -u -b mm-dd-yyyy -e mm-dd-yyyy\n'
+	print('To predict stock price based on articles for the current day, use (must have already pulled articles): ')
+	print('\t ./stock_market_prediction.py -p\n')
+	print('To predict stock price based on articles for a specific day, use (must have already pulled articles): ')
+	print('\t ./stock_market_prediction.py -p -d mm-d-yyyy\n')
+	print('To pull articles for the current day, use (currently no support for pulling articles for previous days):')
+	print('\t ./stock_market_prediction.py -a\n')
+	print('To pull stock prices for the current day, use (currently no support for pulling prices for previous days):')
+	print('\t ./stock_market_prediction.py -s\n')
+	print('To update word weights for articles and prices from the current day, use (must have already pulled weights and prices):')
+	print('\t ./stock_market_prediction.py -u\n')
+	print('To update word weights for articles and prices from a specifc day, use (must have already pulled weights and prices):')
+	print('\t ./stock_market_prediction.py -u -d mm-d-yyyy\n')
+	print('To update word weights for articles and prices from a date range, use (must have already pulled weights and prices):')
+	print('\t ./stock_market_prediction.py -u -b mm-d-yyyy -e mm-d-yyyy\n')
 
 	sys.exit(2)
 
@@ -1082,7 +1111,7 @@ def verify_date(date):
 		return False
 
 	try:
-		test_date = datetime.datetime(int(date_parts[2]), int(date_parts[0]), int(date_parts[1]))
+		test_date = datetime.date(int(date_parts[2]), int(date_parts[0]), int(date_parts[1]))
 	except:
 		return False
 
@@ -1149,14 +1178,14 @@ def main():
 		# Call the proper functions
 		load_all_word_weights('opt1')
 		if not load_articles(specified_day):
-			print 'Error: Could not load articles for: ', specified_day
+			print('Error: Could not load articles for: ', specified_day)
 			sys.exit(-1)
 		if not analyze_weights():
-			print 'Error: Unable to analyze weights'
+			print('Error: Unable to analyze weights')
 			sys.exit(-1)
-		predict_movement()
-		predict_movement2()
-		predict_movement3()
+		predict_movement(specified_day)
+		predict_movement2(specified_day)
+		predict_movement3(specified_day)
 
 		logging.info('Predicting complete')
 
@@ -1227,217 +1256,7 @@ def main():
 		
 		logging.info('Updating word weights complete')
 
-	print 'Done'
-
-
-
-'''
-Analysis Function Failures: Get the frequency of all words and generate two histograms. The first is a histogram of word occurances ignoring 
-the most common words (500+ occurences). The second is a histogram in order from greatest to least with all words.
-'''
-def generate_histograms(directory):
-
-	if not os.path.exists(directory):
-		os.makedirs(directory)
-		logging.debug('Created histogram directory: ' + directory)
-
-	logging.info('Generating word frequencies and creating histograms')
-
-	words = {}
-
-	# Iterate through all the stocks
-	for ticker in STOCK_TAGS:
-
-		# For each stock iterate through the articles
-		for articles in stock_data[ticker]:
-
-			# For each article, we first set the splice beginning to 0
-			start = 0
-			word_in_progress = False
-
-			# For the article we iterate through the characters 
-			for ii, chars in enumerate(articles[1]):
-
-				# If there is no word in progress and a letter is found, start a word
-				if chars.isalpha() and not word_in_progress:
-					word_in_progress = True
-					start = ii
-				# If there is a word in progress and a letter is not found, end the word
-				elif word_in_progress and not chars.isalpha():
-					new_word = articles[1][start:ii]
-					word_in_progress = False
-					
-					# If it is longer than one character, add the word to the word array or update the count
-					if len(new_word) > 1:
-
-						if new_word in words:
-							words[new_word] += 1
-						else:
-							words[new_word] = 1
-
-	# Print the word frequency to a file as a histogram
-	file = open(directory + 'word_frequencies.txt', 'w')
-
-	words_total = 0
-	words_unique = 0
-
-	for key, value in words.iteritems():
-
-		if value > 500:
-			print 'Word: ', key, ' has value: ', value
-
-		else:
-			# Write the key so it can be seen easily and all are in line
-			file.write(key)
-			if len(key) < 8:
-				file.write('\t\t\t|')
-			elif len(key) < 16:
-				file.write('\t\t|')
-			else:
-				file.write('\t|')
-
-			# For each time it is seen, write one dot
-			for ii in range(0, value):
-				file.write('.')
-				words_total += 1
-
-			# At the end of the word, write a newline
-			file.write('\n')
-			words_unique += 1
-
-	file.close()
-
-	print 'Avg occurance: ', words_total/words_unique
-	print 'Total words: ', words_unique
-
-
-	# Print the word frequency to a file as a histogram
-	file = open(directory + 'word_frequencies_ordered.txt', 'w')
-
-	max_value = 0
-	max_key = ''
-
-	for items in words.iteritems():
-		for key, value in words.iteritems():
-			if value > max_value:
-				max_value = value
-				max_key = key
-
-		file.write(max_key)
-		if len(max_key) < 8:
-			file.write('\t\t\t|')
-		elif len(key) < 16:
-			file.write('\t\t|')
-		else:
-			file.write('\t|')
-
-		# For each time it is seen, write one dot
-		for ii in range(0, max_value):
-			file.write('.')
-		file.write('\n')
-
-		words[max_key] = -1
-		max_value = 0
-		max_key = ''
-
-	file.close()
-
-	logging.info('Histograms have been generated')
-
-def find_sentences(article, sentences):
-
-	sentence_started = False
-	index = 0
-	num = 0
-	for ii, chars in enumerate(article):
-
-		if chars.isalpha() and not sentence_started:
-			sentence_started = True
-			sentences[index] = ii
-			index += 1
-
-		if (chars == '.' or chars == '\n') and sentence_started:
-			sentence_started = False
-			sentences[index] = ii
-			index += 1
-			num += 1
-
-	return num
-
-def compare_sentences(article, sentences, num):
-
-	compare_sentence = article[sentences[0]:sentences[1]]
-	word_indices = []
-	num_compare = 0
-	index = 0
-	word_in_progress = False
-	for ii, chars in enumerate(compare_sentence):
-
-		if not word_in_progress and chars.isalpha():
-			word_in_progress = True
-			word_indices.append(ii)
-
-		if not chars.isalpha() and word_in_progress:
-			word_in_progress = False
-			word_indices.append(ii)
-			num_compare += 1
-
-		if ii == len(compare_sentence) and word_in_progress:
-			word_indices.append(len(compare_sentence))
-			num_compare += 1
-	print word_indices
-	print compare_sentence
-
-	ss = 2
-	for ii in range(0, num):
-		similar = 0
-		total = 0
-
-		current = article[sentences[ss]:sentences[ss+1]]
-		ss += 2
-		#print current
-
-		new_indices = []
-		new_index = 0
-		num_test = 0
-		new_word_in_progress = False
-		for jj, chars in enumerate(current):
-
-			if not new_word_in_progress and chars.isalpha():
-				new_word_in_progress = True
-				new_indices.append(jj)
-
-			if not chars.isalpha() and new_word_in_progress:
-				new_word_in_progress = False
-				new_indices.append(jj)
-				num_test += 1
-
-			if jj == len(current) and new_word_in_progress:
-				new_indices.append(len(current))
-				num_test += 1
-
-		ww = 0
-		ww2 = 0
-		#print new_indices
-		for each in range(0, num_test):
-			word = current[new_indices[ww]:new_indices[ww+1]]
-			#print '----- ', new_indices[ww], ', ', new_indices[ww+1], ' - ', word
-			for comp in range(0, num_compare):
-				#print '-------- ', comp, ', ', word_indices[ww2], ', ', word_indices[ww2+1], ' - ', compare_sentence[word_indices[ww2]:word_indices[ww2+1]]
-				if word == compare_sentence[word_indices[ww2]:word_indices[ww2 + 1]]:
-					similar += 1
-					#print word, ' is in ', compare_sentence
-					break
-				ww2 += 2
-			ww2 = 0
-			ww+=2
-			total += 1
-
-		print 'Sentence ', ii, ' has ', similar, '/', total
-
-
-
-
+	print('Done')
 
 
 

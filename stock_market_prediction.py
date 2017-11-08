@@ -64,6 +64,12 @@ weight_max = 0
 weight_min = 1
 weight_count = 0
 
+weights_all_o = []
+weight_average_o = 0
+weight_stdev_o = 0
+weight_sum_o = 0
+weight_count_o = 0
+
 # Global Configurations
 if not os.path.exists('./data/'):
 	os.makedirs('./data/')
@@ -653,6 +659,8 @@ weight_sum
 weight_max
 weight_min
 weight_count
+
+_o -> Based on occurences, not frequencies
 '''
 def analyze_weights():
 
@@ -665,6 +673,11 @@ def analyze_weights():
 	global weight_max
 	global weight_min
 	global weight_count
+
+	global weight_average_o
+	global weight_stdev_o
+	global weight_sum_o
+	global weight_count_o
 
 	# Iterate through each letter
 	for letter in range(0, 26):
@@ -680,10 +693,15 @@ def analyze_weights():
 
 			# Add it to the list of weights to be analyzed later (for standard deviation)
 			weights_all.append(weight)
+			for n in range(0, raw_data[2]):
+				weights_all_o.append(weight)
 
 			# Update sum, max, min, and count
 			weight_count += 1
 			weight_sum += weight
+
+			weight_count_o += raw_data[2]
+			weight_sum_o += weight * raw_data[2]
 
 			if weight > weight_max:
 				weight_max = weight
@@ -698,12 +716,18 @@ def analyze_weights():
 
 	# Once all weights have been iterated through, calculate the average
 	weight_average = weight_sum / weight_count
+	weight_average_o = weight_sum_o / weight_count_o
 
 	# Calculate the standard deviation
 	running_sum = 0
 	for weights in weights_all:
 		running_sum += ((weights - weight_average) * (weights - weight_average))
 	weight_stdev = math.sqrt(running_sum / (weight_count - 1))
+
+	running_sum_o = 0
+	for weights in weights_all_o:
+		running_sum_o += ((weights - weight_average_o) * (weights - weight_average_o))
+	weight_stdev_o = math.sqrt(running_sum_o / (weight_count_o - 1))
 
 	logging.debug('- Analysis finished with:')
 	logging.debug('-- avg: ' + str(weight_average))
@@ -712,6 +736,10 @@ def analyze_weights():
 	logging.debug('-- cnt: ' + str(weight_count))
 	logging.debug('-- max: ' + str(weight_max))
 	logging.debug('-- min: ' + str(weight_min))
+	logging.debug('-- avg_o: ' + str(weight_average_o))
+	logging.debug('-- std_o: ' + str(weight_stdev_o))
+	logging.debug('-- sum_o: ' + str(weight_sum_o))
+	logging.debug('-- cnt_o: ' + str(weight_count_o))
 
 	return True
 
@@ -774,6 +802,11 @@ def predict_movement(day):
 
 	# Open file to store todays predictions in
 	file = open('./output/prediction-' + day + '.txt', 'w')
+
+	file.write('Prediction Method 3: \n')
+	file.write('Using all weights in prediciton.\n')
+	file.write('Buy if 0.5 std above mean, sell if 0.5 std below mean. Otherwise undecided.\n')
+	file.write('Weighting stats based on unique words. \n\n')
 
 	file.write('Predictions Based On Weighting Stats: \n')
 	file.write('- Avg: ' + str(weight_average) + '\n')
@@ -872,13 +905,18 @@ def predict_movement2(day):
 	global weight_min
 	global weight_count
 
-	logging.info('Prediction stock movements with method 2 -> do not use stock weights within a standard deviation of the mean')
+	logging.info('Prediction stock movements with method 2 -> do not use stock weights within a standard deviation of the mean, buy/sell if more than 0.5 std away from mean')
 	print('PREDICTIONS BASED ON:')
 	print('\t- AVG: ', weight_average)
 	print('\t- STD: ', weight_stdev)
 
 	# Open file to store todays predictions in
 	file = open('./output/prediction2-' + day + '.txt', 'w')
+
+	file.write('Prediction Method 2: \n')
+	file.write('Not using weights within one standard deviation of the mean in prediciton.\n')
+	file.write('Buy if 0.5 std above mean, sell if 0.5 std below mean. Otherwise undecided.\n')
+	file.write('Weighting stats based on unique words. \n\n')
 
 	file.write('Predictions Based On Weighting Stats: \n')
 	file.write('- Avg: ' + str(weight_average) + '\n')
@@ -987,6 +1025,11 @@ def predict_movement3(day):
 	# Open file to store todays predictions in
 	file = open('./output/prediction3-' + day + '.txt', 'w')
 
+	file.write('Prediction Method 3: \n')
+	file.write('Using all weights in prediciton.\n')
+	file.write('Buy if above mean, sell if below mean. \n\n')
+	file.write('Weighting stats based on unique words.')
+
 	file.write('Predictions Based On Weighting Stats: \n')
 	file.write('- Avg: ' + str(weight_average) + '\n')
 	file.write('- Std: ' + str(weight_stdev) + '\n')
@@ -1075,6 +1118,338 @@ def predict_movement3(day):
 
 	file.close()
 
+def predict_movement4(day):
+
+	global weight_average_o
+	global weight_stdev_o
+	global weight_sum_o
+	global weight_max
+	global weight_min
+	global weight_count_o
+
+	logging.info('Prediction stock movement,  weight stats on each occurence')
+	print('PREDICTIONS BASED ON:')
+	print('\t- AVG: ', weight_average_o)
+	print('\t- STD: ', weight_stdev_o)
+
+	# Open file to store todays predictions in
+	file = open('./output/prediction4-' + day + '.txt', 'w')
+
+	file.write('Prediction Method 4: \n')
+	file.write('Using all weights in prediciton.\n')
+	file.write('Buy if 0.5 std above mean, sell if 0.5 std below mean. Otherwise undecided.\n')
+	file.write('Weighting stats based on each occurence of each words. \n\n')
+
+	file.write('Predictions Based On Weighting Stats: \n')
+	file.write('- Avg: ' + str(weight_average_o) + '\n')
+	file.write('- Std: ' + str(weight_stdev_o) + '\n')
+	file.write('- Sum: ' + str(weight_sum_o) + '\n')
+	file.write('- Cnt: ' + str(weight_count_o) + '\n')
+	file.write('- Max: ' + str(weight_max) + '\n')
+	file.write('- Min: ' + str(weight_min) + '\n\n')
+
+
+	# Iterate through stocks as predictions are seperate for each
+	for tickers in STOCK_TAGS:
+
+		logging.debug('- Finding prediction for: ' + tickers)
+
+		stock_rating_sum = 0
+		stock_rating_cnt = 0
+
+		if not tickers in stock_data:
+			logging.warning('- Could not find articles loaded for ' + tickers)
+			continue
+
+		# Iterate through each article for the stock
+		for articles in stock_data[tickers]:
+
+			# Get the text (ignore link)
+			text = articles[1]
+
+			# Variables to keep track of words
+			word_in_progress = False
+			word_number = 0
+			word_start_index = 0
+
+			# Iterate through the characters to find words
+			for ii, chars in enumerate(text):
+
+				# If there is a word being found and non-character pops up, word is over
+				if word_in_progress and (not chars.isalpha() or ii == len(text)):
+
+					# Reset word variables
+					word_in_progress = False
+					word_number += 1
+
+					# Get the found word
+					found_word = text[word_start_index:ii]
+
+					# Add the word to the word arrays or update its current value
+					if len(found_word) > 1:
+						
+						stock_rating_sum += get_word_weight(found_word)
+						stock_rating_cnt += 1
+
+
+				# If a word is not being found and letter pops up, start the word
+				elif not word_in_progress and chars.isalpha():
+
+					# Start the word
+					word_in_progress = True
+					word_start_index = ii
+
+		# After each word in every article has been examined for that stock, find the average rating
+		stock_rating = stock_rating_sum / stock_rating_cnt
+
+		# Calculate the number of standard deviations above the mean and find the probability of that for a 'normal' distribution 
+		# - Assuming normal because as the word library increases, it should be able to be modeled as normal
+		std_above_avg = (stock_rating - weight_average_o) / weight_stdev_o
+		probability = norm(weight_average_o, weight_stdev_o).cdf(stock_rating)
+
+		if std_above_avg > 0.5:
+			rating = 'buy'
+		elif std_above_avg < -0.5:
+			rating = 'sell'
+		else:
+			rating = 'undecided'
+
+		print('RATING FOR: ', tickers)
+		print('\t- STD ABOVE MEAN: ', std_above_avg)
+		print('\t- RAW VAL RATING: ', stock_rating)
+		print('\t- PROBABILITY IS: ', probability)
+		print('\t- CORRESPONDS TO: ', rating)
+
+		file.write('Prediction for: ' + tickers + ' \n')
+		file.write('- Std above mean: ' + str(std_above_avg) + '\n')
+		file.write('- Raw val rating: ' + str(stock_rating) + '\n')
+		file.write('- probability is: ' + str(probability) + '\n')
+		file.write('- Corresponds to: ' + str(rating) + '\n\n')
+
+	file.close()
+
+def predict_movement5(day):
+
+	global weight_average_o
+	global weight_stdev_o
+	global weight_sum_o
+	global weight_max
+	global weight_min
+	global weight_count_o
+
+	logging.info('Prediction stock movements with method 2 -> do not use stock weights within a standard deviation of the mean, buy/sell if more than 0.5 std away from mean, weight stats on each occurence')
+	print('PREDICTIONS BASED ON:')
+	print('\t- AVG: ', weight_average_o)
+	print('\t- STD: ', weight_stdev_o)
+
+	# Open file to store todays predictions in
+	file = open('./output/prediction5-' + day + '.txt', 'w')
+
+	file.write('Prediction Method 5: \n')
+	file.write('Not using weights within one standard deviation of the mean in prediciton.\n')
+	file.write('Buy if 0.5 std above mean, sell if 0.5 std below mean. Otherwise undecided.\n')
+	file.write('Weighting stats based on each occurence of each words. \n\n')
+
+	file.write('Predictions Based On Weighting Stats: \n')
+	file.write('- Avg: ' + str(weight_average_o) + '\n')
+	file.write('- Std: ' + str(weight_stdev_o) + '\n')
+	file.write('- Sum: ' + str(weight_sum_o) + '\n')
+	file.write('- Cnt: ' + str(weight_count_o) + '\n')
+	file.write('- Max: ' + str(weight_max) + '\n')
+	file.write('- Min: ' + str(weight_min) + '\n\n')
+
+
+	# Iterate through stocks as predictions are seperate for each
+	for tickers in STOCK_TAGS:
+
+		logging.debug('- Finding prediction for: ' + tickers)
+
+		stock_rating_sum = 0
+		stock_rating_cnt = 0
+
+		if not tickers in stock_data:
+			logging.warning('- Could not find articles loaded for ' + tickers)
+			continue
+
+		# Iterate through each article for the stock
+		for articles in stock_data[tickers]:
+
+			# Get the text (ignore link)
+			text = articles[1]
+
+			# Variables to keep track of words
+			word_in_progress = False
+			word_number = 0
+			word_start_index = 0
+
+			# Iterate through the characters to find words
+			for ii, chars in enumerate(text):
+
+				# If there is a word being found and non-character pops up, word is over
+				if word_in_progress and (not chars.isalpha() or ii == len(text)):
+
+					# Reset word variables
+					word_in_progress = False
+					word_number += 1
+
+					# Get the found word
+					found_word = text[word_start_index:ii]
+
+					# Add the word to the word arrays or update its current value
+					if len(found_word) > 1:
+						
+						weight = get_word_weight(found_word)
+						if weight > weight_stdev_o + weight_average_o or weight < weight_average_o - weight_stdev_o:
+							stock_rating_sum += weight
+							stock_rating_cnt += 1
+
+
+				# If a word is not being found and letter pops up, start the word
+				elif not word_in_progress and chars.isalpha():
+
+					# Start the word
+					word_in_progress = True
+					word_start_index = ii
+
+		# After each word in every article has been examined for that stock, find the average rating
+		stock_rating = stock_rating_sum / stock_rating_cnt
+
+		# Calculate the number of standard deviations above the mean and find the probability of that for a 'normal' distribution 
+		# - Assuming normal because as the word library increases, it should be able to be modeled as normal
+		std_above_avg = (stock_rating - weight_average_o) / weight_stdev_o
+		probability = norm(weight_average_o, weight_stdev_o).cdf(stock_rating)
+
+		if std_above_avg > 0.5:
+			rating = 'buy'
+		elif std_above_avg < -0.5:
+			rating = 'sell'
+		else:
+			rating = 'undecided'
+
+		print('RATING FOR: ', tickers)
+		print('\t- STD ABOVE MEAN: ', std_above_avg)
+		print('\t- RAW VAL RATING: ', stock_rating)
+		print('\t- PROBABILITY IS: ', probability)
+		print('\t- CORRESPONDS TO: ', rating)
+
+		file.write('Prediction for: ' + tickers + ' \n')
+		file.write('- Std above mean: ' + str(std_above_avg) + '\n')
+		file.write('- Raw val rating: ' + str(stock_rating) + '\n')
+		file.write('- probability is: ' + str(probability) + '\n')
+		file.write('- Corresponds to: ' + str(rating) + '\n\n')
+
+	file.close()
+
+def predict_movement6(day):
+
+	global weight_average_o
+	global weight_stdev_o
+	global weight_sum_o
+	global weight_max
+	global weight_min
+	global weight_count_o
+
+	logging.info('Prediction stock movements with method 6 -> If rating is above mean, buy, below mean, sell, weight stats on each occurence')
+	print('PREDICTIONS BASED ON:')
+	print('\t- AVG: ', weight_average_o)
+	print('\t- STD: ', weight_stdev_o)
+
+	# Open file to store todays predictions in
+	file = open('./output/prediction6-' + day + '.txt', 'w')
+
+	file.write('Prediction Method 6: \n')
+	file.write('Using all weights in prediciton.\n')
+	file.write('Buy if above mean, sell if below mean. \n\n')
+	file.write('Weighting stats based on each occurence of each words. \n\n')
+
+	file.write('Predictions Based On Weighting Stats: \n')
+	file.write('- Avg: ' + str(weight_average_o) + '\n')
+	file.write('- Std: ' + str(weight_stdev_o) + '\n')
+	file.write('- Sum: ' + str(weight_sum_o) + '\n')
+	file.write('- Cnt: ' + str(weight_count_o) + '\n')
+	file.write('- Max: ' + str(weight_max) + '\n')
+	file.write('- Min: ' + str(weight_min) + '\n\n')
+
+
+	# Iterate through stocks as predictions are seperate for each
+	for tickers in STOCK_TAGS:
+
+		logging.debug('- Finding prediction for: ' + tickers)
+
+		stock_rating_sum = 0
+		stock_rating_cnt = 0
+
+		if not tickers in stock_data:
+			logging.warning('- Could not find articles loaded for ' + tickers)
+			continue
+
+		# Iterate through each article for the stock
+		for articles in stock_data[tickers]:
+
+			# Get the text (ignore link)
+			text = articles[1]
+
+			# Variables to keep track of words
+			word_in_progress = False
+			word_number = 0
+			word_start_index = 0
+
+			# Iterate through the characters to find words
+			for ii, chars in enumerate(text):
+
+				# If there is a word being found and non-character pops up, word is over
+				if word_in_progress and (not chars.isalpha() or ii == len(text)):
+
+					# Reset word variables
+					word_in_progress = False
+					word_number += 1
+
+					# Get the found word
+					found_word = text[word_start_index:ii]
+
+					# Add the word to the word arrays or update its current value
+					if len(found_word) > 1:
+						
+						stock_rating_sum += get_word_weight(found_word)
+						stock_rating_cnt += 1
+
+
+				# If a word is not being found and letter pops up, start the word
+				elif not word_in_progress and chars.isalpha():
+
+					# Start the word
+					word_in_progress = True
+					word_start_index = ii
+
+		# After each word in every article has been examined for that stock, find the average rating
+		stock_rating = stock_rating_sum / stock_rating_cnt
+
+		# Calculate the number of standard deviations above the mean and find the probability of that for a 'normal' distribution 
+		# - Assuming normal because as the word library increases, it should be able to be modeled as normal
+		std_above_avg = (stock_rating - weight_average_o) / weight_stdev_o
+		probability = norm(weight_average_o, weight_stdev_o).cdf(stock_rating)
+
+		if stock_rating > weight_average_o:
+			rating = 'buy'
+		elif stock_rating < weight_average_o:
+			rating = 'sell'
+		else:
+			rating = 'undecided'
+
+		print('RATING FOR: ', tickers)
+		print('\t- STD ABOVE MEAN: ', std_above_avg)
+		print('\t- RAW VAL RATING: ', stock_rating)
+		print('\t- PROBABILITY IS: ', probability)
+		print('\t- CORRESPONDS TO: ', rating)
+
+		file.write('Prediction for: ' + tickers + ' \n')
+		file.write('- Std above mean: ' + str(std_above_avg) + '\n')
+		file.write('- Raw val rating: ' + str(stock_rating) + '\n')
+		file.write('- probability is: ' + str(probability) + '\n')
+		file.write('- Corresponds to: ' + str(rating) + '\n\n')
+
+	file.close()
+
 '''
 Display help and exit
 '''
@@ -1121,6 +1496,28 @@ def verify_date(date):
 	return True
 
 '''
+Simply prints the analysis of the weights (does not analyze them, just prints)
+- Primarily for debugging
+'''
+def print_weight_analysis():
+	print('')
+	print('Weight Stats (Based on number of words):')
+	print('- Avg: ' + str(weight_average))
+	print('- Std: ' + str(weight_stdev))
+	print('- Sum: ' + str(weight_sum))
+	print('- Cnt: ' + str(weight_count))
+	print('- Max: ' + str(weight_max))
+	print('- Min: ' + str(weight_min) + '\n')
+
+	print('Weight Stats (Based on occurences of words):')
+	print('- Avg: ' + str(weight_average_o))
+	print('- Std: ' + str(weight_stdev_o))
+	print('- Sum: ' + str(weight_sum_o))
+	print('- Cnt: ' + str(weight_count_o))
+	print('- Max: ' + str(weight_max))
+	print('- Min: ' + str(weight_min) + '\n')
+
+'''
 Main Execution
 - Part 1: Parsing Inputs and Pulling, Storing, and Loading Articles
 '''
@@ -1136,7 +1533,7 @@ def main():
 
 	# First get any command line arguments to edit actions
 	try:
-		opts, args = getopt.getopt(sys.argv[1:], 'hpsaud:b:e:')
+		opts, args = getopt.getopt(sys.argv[1:], 'hpsauzd:b:e:')
 	except getopt.GetoptError:
 		print_help()
 	for opt, arg in opts:
@@ -1164,6 +1561,14 @@ def main():
 		# Command line argument for specifying the End of a date range (only for update)
 		elif opt == '-e':
 			end_day = arg
+		# Command line argument for printing current weight stats
+		elif opt == '-z':
+			load_all_word_weights('opt1')
+			if not analyze_weights():
+				print('Error: Unable to analyze weights')
+				sys.exit(-1)
+			print_weight_analysis()
+			sys.exit(0)
 
 	# Depending on the input type, preform the proper action
 	# Predict
@@ -1186,6 +1591,9 @@ def main():
 		predict_movement(specified_day)
 		predict_movement2(specified_day)
 		predict_movement3(specified_day)
+		predict_movement4(specified_day)
+		predict_movement5(specified_day)
+		predict_movement6(specified_day)
 
 		logging.info('Predicting complete')
 

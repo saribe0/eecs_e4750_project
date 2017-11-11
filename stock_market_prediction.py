@@ -300,6 +300,9 @@ data from the stock price data file and loads it up so that new prices can be ad
 '''
 def load_stock_prices():
 
+	global total_up
+	global total_down
+
 	logging.info('Loading past stock prices')
 	print('Loading stock prices')
 
@@ -339,6 +342,9 @@ Step 8 is to pull all stock data for the current day and add it to the stock pri
 for this and open and close prices are all thats kept.
 '''
 def pull_stock_prices():
+
+	global total_up
+	global total_down
 
 	today = datetime.datetime.now()
 	today_str = str(today.month) + '-' + str(today.day) + '-' + str(today.year)
@@ -438,6 +444,11 @@ stored by letter which will hopefully make it more efficient.
 '''
 def load_all_word_weights(option):
 	
+	global total_up
+	global total_down
+	global total_words_up
+	global total_words_down
+
 	logging.info('Loading word weights for weighting option: ' + option)
 	print('Loading word weights')
 
@@ -462,7 +473,12 @@ def load_all_word_weights(option):
 	for lines in file:
 
 		# If its the first line and option 2, load the total words up or down
-		if first == 0:
+		if first == 0 and option == 'opt2':
+			temp = lines.split()
+			total_up = int(temp[0])
+			total_down = int(temp[1])
+			first = 1
+		elif first == 1 and option == 'opt2':
 			temp = lines.split()
 			total_words_up = int(temp[0])
 			total_words_down = int(temp[1])
@@ -568,9 +584,14 @@ their weights or adds them to the list.
 '''
 def update_word(ticker, option, word_upper, day):
 	
+	global total_words_up
+	global total_words_down
+
 	# Make the word lowercase and get the length of the word
 	word = word_upper.lower()
 	len_word = len(word)
+	if len_word > 16:
+		len_word = 16
 
 	# Find the letter index for the words array
 	index = ord(word[:1]) - 97
@@ -688,6 +709,7 @@ def save_all_word_weights(option):
 
 	# First write the global data to the file
 	if option == 'opt2':
+		file.write(str(total_up) + ' ' + str(total_down) + '\n')
 		file.write(str(total_words_up) + ' ' + str(total_words_down) + '\n')
 
 	# Iterate through all letters and words in each letter and write them to a file
@@ -1564,6 +1586,8 @@ def predict_movement7(day):
 
 	global total_up
 	global total_down
+	global total_words_up
+	global total_words_down
 	global c
 
 	logging.info('Prediction stock movements with method 7 -> Naive Bayes Classifier')
@@ -1578,9 +1602,11 @@ def predict_movement7(day):
 	file.write('Label (Up or Down) with the greatest value is chosen.\n\n')
 
 	file.write('Predictions Based On: \n')
-	file.write('- Total Up Words  : ' + str(total_up) + '\n')
-	file.write('- Total Down Words: ' + str(total_down) + '\n')
-	file.write('- Value for C     : ' + str(c) + '\n')
+	file.write('- Total Up Days    : ' + str(total_up) + '\n')
+	file.write('- Total Down Days  : ' + str(total_down) + '\n')
+	file.write('- Total Up Words   : ' + str(total_words_up) + '\n')
+	file.write('- Total Down Words : ' + str(total_words_down) + '\n')
+	file.write('- Value for C      : ' + str(c) + '\n\n')
 
 
 	# Iterate through stocks as predictions are seperate for each
@@ -1666,19 +1692,30 @@ def print_help():
 
 	print('To predict stock price based on articles for the current day, use (must have already pulled articles): ')
 	print('\t ./stock_market_prediction.py -p\n')
+	print('To predict stock price based on articles for the current day with a specific weighting option, use (must have already pulled articles): ')
+	print('\t ./stock_market_prediction.py -p -o option\n')
 	print('To predict stock price based on articles for a specific day, use (must have already pulled articles): ')
 	print('\t ./stock_market_prediction.py -p -d mm-d-yyyy\n')
+	print('To predict stock price based on articles for a specific day with a specific weighting option, use (must have already pulled articles): ')
+	print('\t ./stock_market_prediction.py -p -d mm-d-yyyy -o option\n')
 	print('To pull articles for the current day, use (currently no support for pulling articles for previous days):')
 	print('\t ./stock_market_prediction.py -a\n')
 	print('To pull stock prices for the current day, use (currently no support for pulling prices for previous days):')
 	print('\t ./stock_market_prediction.py -s\n')
 	print('To update word weights for articles and prices from the current day, use (must have already pulled weights and prices):')
 	print('\t ./stock_market_prediction.py -u\n')
+	print('To update word weights for articles and prices from the current day with a specific weighting option, use (must have already pulled weights and prices):')
+	print('\t ./stock_market_prediction.py -u -o option\n')
 	print('To update word weights for articles and prices from a specifc day, use (must have already pulled weights and prices):')
 	print('\t ./stock_market_prediction.py -u -d mm-d-yyyy\n')
+	print('To update word weights for articles and prices from a specifc day with a specific weighting option, use (must have already pulled weights and prices):')
+	print('\t ./stock_market_prediction.py -u -d mm-d-yyyy -o option\n')
 	print('To update word weights for articles and prices from a date range, use (must have already pulled weights and prices):')
 	print('\t ./stock_market_prediction.py -u -b mm-d-yyyy -e mm-d-yyyy\n')
+	print('To update word weights for articles and prices from a date range with a specific weighting option, use (must have already pulled weights and prices):')
+	print('\t ./stock_market_prediction.py -u -b mm-d-yyyy -e mm-d-yyyy -o option\n')
 
+	print('\nCurrently available weighting options are opt1 and opt2. opt1 uses average with 1 for a word seen with up and 0 with a word seen with down.\n opt2 uses a Naive Bayes classifier.\n')
 	sys.exit(2)
 
 '''
@@ -1704,7 +1741,7 @@ def verify_date(date):
 
 '''
 Simply prints the analysis of the weights (does not analyze them, just prints)
-- Primarily for debugging
+- Only for weighting option opt1
 '''
 def print_weight_analysis():
 	print('')
@@ -1725,6 +1762,74 @@ def print_weight_analysis():
 	print('- Min: ' + str(weight_min) + '\n')
 
 '''
+Looks over Predictions and determines accuracy
+'''
+def determine_accuracy():
+
+	# Loop over all prediction files
+	for filename in os.listdir('./output/'):
+
+		# Open the file
+		try:
+			file = open('./output/' + filename, 'r+')
+		except IOError as error:
+			print('Could not open: ' + filename)
+			continue
+
+		num_correct = 0
+		num_wrong = 0
+		num_undecided = 0
+		current_stock = ''
+		found = False
+
+		# Get the day the prediction was made
+		try:
+			ii = filename.index('-')
+			prediction_date = filename[ii+1:-4]
+		except:
+			continue
+
+		# Iterate through the file
+		for lines in file:
+
+			# Find a prediction
+			if lines[:len('Prediction for:')] == 'Prediction for:' and found == False:
+
+				# Record the stock
+				current_stock = lines[len('Prediction for:') + 1:-2]
+
+				# Set found to true to look for the rating
+				found = True
+
+			# Find a rating
+			if lines[:len('- Corresponds to:')] == '- Corresponds to:' and found == True:
+
+				# Get the rating
+				rating = lines[len('- Corresponds to:') + 1:-1]
+
+				# Get the chane in the stock price for that day
+				change = stock_prices[current_stock][prediction_date][1] - stock_prices[current_stock][prediction_date][0]
+
+				# Check if the prediction was correct
+				if change > 0 and rating == 'buy':
+					num_correct += 1
+				elif change < 0 and rating == 'sell':
+					num_correct += 1
+				elif rating == 'undecided':
+					num_undecided += 1
+				else:
+					num_wrong += 1
+
+				# Set found back to false to find evaluate the next stock
+				found = False
+
+		# At the end of the file, state the statistics
+		if num_correct + num_wrong != 0:
+			print(filename + '\t: Correct: ' + str(float(num_correct) / (num_wrong + num_correct) * 100) + '%')
+		else:
+			print(filename + '\t: All undecided')
+
+'''
 Main Execution
 - Part 1: Parsing Inputs and Pulling, Storing, and Loading Articles
 '''
@@ -1741,7 +1846,7 @@ def main():
 
 	# First get any command line arguments to edit actions
 	try:
-		opts, args = getopt.getopt(sys.argv[1:], 'hpsauzd:b:e:o:')
+		opts, args = getopt.getopt(sys.argv[1:], 'hpsauzvd:b:e:o:')
 	except getopt.GetoptError:
 		print_help()
 	for opt, arg in opts:
@@ -1780,6 +1885,10 @@ def main():
 				print('Error: Unable to analyze weights')
 				sys.exit(-1)
 			print_weight_analysis()
+			sys.exit(0)
+		elif opt == '-v':
+			load_stock_prices()
+			determine_accuracy()
 			sys.exit(0)
 
 	# Depending on the input type, preform the proper action

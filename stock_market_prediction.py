@@ -45,7 +45,7 @@ STOCK_TAGS = [	'amzn',
 
 ARTICLES_PER_STOCK = 10
 SUCCESS_THREASHOLD = 5
-MAX_WORDS_PER_LETTER = 1500
+MAX_WORDS_PER_LETTER = 2000
 
 # Global Stock Data
 stock_data = {}
@@ -69,6 +69,13 @@ weight_average_o = 0
 weight_stdev_o = 0
 weight_sum_o = 0
 weight_count_o = 0
+
+# Global Variables for Bayesion Prediction
+total_up = 0
+total_words_up = 0
+total_down = 0
+total_words_down = 0
+c = 0.01
 
 # Global Configurations
 if not os.path.exists('./data/'):
@@ -304,6 +311,7 @@ def load_stock_prices():
 
 	# Iterate through the lines in the file
 	current_stock = ''
+	first = 0
 	for lines in file:
 
 		# If the first character is not a '-', is a ticker, add it to the dictionary (w/o the newline)
@@ -316,6 +324,12 @@ def load_stock_prices():
 		else:
 			data = lines.split()
 			stock_prices[current_stock][data[1]] = (float(data[2]), float(data[3]))
+
+			# Update up or down occurences
+			if float(data[2]) > float(data[3]):
+				total_down += 1
+			elif float(data[2]) < float(data[3]):
+				total_up += 1
 
 	file.close()
 
@@ -343,6 +357,12 @@ def pull_stock_prices():
 
 		# Get todays stock open and close
 		open_p, close_p = get_price(tickers)
+
+		# Update up and down occurences
+		if open_p > close_p:
+			total_down += 1
+		elif open_p < close_p:
+			total_up += 1
 
 		logging.debug('-- Price for: ' + tickers + ' is open: ' + str(open_p) + ', close: ' + str(close_p))
 
@@ -438,7 +458,15 @@ def load_all_word_weights(option):
 
 	# Iterate over all the lines in the file
 	letter_index = 0
+	first = 0
 	for lines in file:
+
+		# If its the first line and option 2, load the total words up or down
+		if first == 0:
+			temp = lines.split()
+			total_words_up = int(temp[0])
+			total_words_down = int(temp[1])
+			first = 2
 
 		# If the first character is not a '-', it indicates a letter change
 		if lines[:1] != '-':
@@ -578,6 +606,10 @@ def update_word(ticker, option, word_upper, day):
 
 			change = stock_prices[ticker][day][1] - stock_prices[ticker][day][0]
 
+			# Option 1: 1 for up, 0 for down, average the ups and downs for weights
+			# weight = num_up / total
+			# extra1 = total
+			# extra2 => unused
 			if option == 'opt1':
 				if change > 0:
 					weight = (test_data[1] * test_data[2] + 1) / (test_data[2] + 1)
@@ -588,6 +620,22 @@ def update_word(ticker, option, word_upper, day):
 					weight = (test_data[1] * test_data[2]) / (test_data[2] + 1)
 					extra1 = test_data[2] + 1
 					extra2 = test_data[3]
+
+			# Option 2: Bayesian classifier, probability of word given a label
+			# weight => Unused, calculated seperately
+			# extra1 = num_up
+			# extra2 = num_down
+			elif option == 'opt2':
+				if change > 0:
+					weight = test_data[1]
+					extra1 = test_data[2] + 1
+					extra2 = test_data[3]
+					total_words_up += 1
+				else:
+					weight = test_data[1]
+					extra1 = test_data[2]
+					extra2 = test_data[3] + 1
+					total_words_down += 1
 
 			struct.pack_into('16s f i i', letter_words, ii * 28, word.encode('utf-8'), weight, extra1, extra2)
 
@@ -608,6 +656,18 @@ def update_word(ticker, option, word_upper, day):
 				weight = 1
 				extra1 = 1
 				extra2 = 0
+		
+		elif option == 'opt2':
+			if change > 0:
+				weight = 0
+				extra1 = 1
+				extra2 = 0
+				total_words_up += 1
+			else:
+				weight = 0
+				extra1 = 0
+				extra2 = 1
+				total_words_down += 1
 
 		# Pack the data into the array
 		struct.pack_into('16s f i i', letter_words, num_letter_words*28, word.encode('utf-8'), weight, extra1, extra2)
@@ -625,6 +685,10 @@ def save_all_word_weights(option):
 	print('Saving word weights')
 
 	file = open('./data/word_weight_data_' + option + '.txt', 'w')
+
+	# First write the global data to the file
+	if option == 'opt2':
+		file.write(str(total_words_up) + ' ' + str(total_words_down) + '\n')
 
 	# Iterate through all letters and words in each letter and write them to a file
 	for first_letter in range(0, 26):
@@ -780,6 +844,52 @@ def get_word_weight(word_upper):
 	# Could not find the word so returning the current average
 	return weight_average
 
+'''
+Morning Prediction Step Helper: Naive Bayes
+Step 4.6 is to find the probability of a word given the stock going up and down. Uses Laplacian smoothing using value c.
+'''
+def get_word_probability_given_label(word_upper, c):
+
+	global total_words_up
+	global total_words_down
+
+	# Make the word lowercase and get the length of the word
+	word = word_upper.lower()
+	len_word = len(word)
+
+	# Calculate the total number of words
+	num_words = 0
+	for ii in range(0, 26):
+		num_words += num_words_by_letter[ii]
+
+	# Find the letter index for the words array
+	index = ord(word[:1]) - 97
+	if index < 0 or index > 25:
+		logging.warning('-- Could not find the following word in the database: ' + word)
+		return None, None
+
+	# Get the array containing words of the right letter
+	letter_words = words_by_letter[index]
+	num_letter_words = num_words_by_letter[index]
+
+	# Search that array for the current word
+	found = False
+	for ii in range(0, num_letter_words):
+		
+		# Get the current word data to be compared
+		test_data = struct.unpack_from('16s f i i', letter_words, ii * 28)
+		temp_word = test_data[0].decode('utf_8')
+
+		# Check if the word is the same
+		if temp_word[:len(temp_word.split('\0', 1)[0])] == word:
+			
+			# If it is the same, calculate and return the probabilities
+			up = (float(test_data[2]) + c) / (total_words_up + c * num_words)
+			down = (float(test_data[3]) + c) / (total_words_down + c * num_words)
+			return up, down
+
+	# Could not find the word so returning None
+	return None, None
 
 '''
 Morning Prediction Step
@@ -1027,8 +1137,8 @@ def predict_movement3(day):
 
 	file.write('Prediction Method 3: \n')
 	file.write('Using all weights in prediciton.\n')
-	file.write('Buy if above mean, sell if below mean. \n\n')
-	file.write('Weighting stats based on unique words.')
+	file.write('Buy if above mean, sell if below mean. \n')
+	file.write('Weighting stats based on unique words.\n\n')
 
 	file.write('Predictions Based On Weighting Stats: \n')
 	file.write('- Avg: ' + str(weight_average) + '\n')
@@ -1359,7 +1469,7 @@ def predict_movement6(day):
 
 	file.write('Prediction Method 6: \n')
 	file.write('Using all weights in prediciton.\n')
-	file.write('Buy if above mean, sell if below mean. \n\n')
+	file.write('Buy if above mean, sell if below mean. \n')
 	file.write('Weighting stats based on each occurence of each words. \n\n')
 
 	file.write('Predictions Based On Weighting Stats: \n')
@@ -1450,6 +1560,103 @@ def predict_movement6(day):
 
 	file.close()
 
+def predict_movement7(day):
+
+	global total_up
+	global total_down
+	global c
+
+	logging.info('Prediction stock movements with method 7 -> Naive Bayes Classifier')
+
+	# Open file to store todays predictions in
+	file = open('./output/prediction7-' + day + '.txt', 'w')
+
+	file.write('Prediction Method 7: \n')
+	file.write('Naive Bayes Classifier -> Requires word weight option 2 is loaded.\n')
+	file.write('P(Word=w|Label=y) = (count(w,y)+c) / ([total number of words with label y] + c * vocabulary size). \n')
+	file.write('Value for label: log(P(y, word1, word2, ... wordn)) = log(P(y)) + log(P(word1 | y)) + log(P(word2 | y)) + ... + log(P(wordn | y)). \n')
+	file.write('Label (Up or Down) with the greatest value is chosen.\n\n')
+
+	file.write('Predictions Based On: \n')
+	file.write('- Total Up Words  : ' + str(total_up) + '\n')
+	file.write('- Total Down Words: ' + str(total_down) + '\n')
+	file.write('- Value for C     : ' + str(c) + '\n')
+
+
+	# Iterate through stocks as predictions are seperate for each
+	for tickers in STOCK_TAGS:
+
+		logging.debug('- Finding prediction for: ' + tickers)
+
+		# Initialize the up and down probabilities with the probability of it happening
+		stock_rating_up = math.log(float(total_up) / (total_up + total_down))
+		stock_rating_down = math.log(float(total_down) / (total_up + total_down))
+
+		if not tickers in stock_data:
+			logging.warning('- Could not find articles loaded for ' + tickers)
+			continue
+
+		# Iterate through each article for the stock
+		for articles in stock_data[tickers]:
+
+			# Get the text (ignore link)
+			text = articles[1]
+
+			# Variables to keep track of words
+			word_in_progress = False
+			word_number = 0
+			word_start_index = 0
+
+			# Iterate through the characters to find words
+			for ii, chars in enumerate(text):
+
+				# If there is a word being found and non-character pops up, word is over
+				if word_in_progress and (not chars.isalpha() or ii == len(text)):
+
+					# Reset word variables
+					word_in_progress = False
+					word_number += 1
+
+					# Get the found word
+					found_word = text[word_start_index:ii]
+
+					# Add the word to the word arrays or update its current value
+					if len(found_word) > 1:
+
+						up, down = get_word_probability_given_label(found_word, c)
+						
+						if up != None and down != None:
+							stock_rating_up += math.log(up)
+							stock_rating_down += math.log(down)
+
+
+				# If a word is not being found and letter pops up, start the word
+				elif not word_in_progress and chars.isalpha():
+
+					# Start the word
+					word_in_progress = True
+					word_start_index = ii
+
+		# If the up value is greater, rating is a buy, else sell
+		if stock_rating_up > stock_rating_down:
+			rating = 'buy'
+		elif stock_rating_up < stock_rating_down:
+			rating = 'sell'
+		else:
+			rating = 'undecided'
+
+		print('RATING FOR: ', tickers)
+		print('\t- UP RATING IS  : ', stock_rating_up)
+		print('\t- DOWN RATING IS: ', stock_rating_down)
+		print('\t- CORRESPONDS TO: ', rating)
+
+		file.write('Prediction for: ' + tickers + ' \n')
+		file.write('- Up rating is  : ' + str(stock_rating_up) + '\n')
+		file.write('- Down rating is: ' + str(stock_rating_down) + '\n')
+		file.write('- Corresponds to: ' + str(rating) + '\n\n')
+
+	file.close()
+
 '''
 Display help and exit
 '''
@@ -1527,13 +1734,14 @@ def main():
 	specified_day = ''
 	start_day = ''
 	end_day = ''
+	weight_opt = 'opt1'
 
 	today = datetime.date.today()
 	today_str = str(today.month) + '-' + str(today.day) + '-' + str(today.year)
 
 	# First get any command line arguments to edit actions
 	try:
-		opts, args = getopt.getopt(sys.argv[1:], 'hpsauzd:b:e:')
+		opts, args = getopt.getopt(sys.argv[1:], 'hpsauzd:b:e:o:')
 	except getopt.GetoptError:
 		print_help()
 	for opt, arg in opts:
@@ -1561,6 +1769,10 @@ def main():
 		# Command line argument for specifying the End of a date range (only for update)
 		elif opt == '-e':
 			end_day = arg
+		# Command for specifying which weighting system to use
+		elif opt == '-o':
+			if arg == 'opt1' or arg == 'opt2':
+				weight_opt = arg
 		# Command line argument for printing current weight stats
 		elif opt == '-z':
 			load_all_word_weights('opt1')
@@ -1581,19 +1793,24 @@ def main():
 		logging.info('Predicting price movement for: ' + specified_day)
 
 		# Call the proper functions
-		load_all_word_weights('opt1')
+		load_all_word_weights(weight_opt)
 		if not load_articles(specified_day):
 			print('Error: Could not load articles for: ', specified_day)
 			sys.exit(-1)
 		if not analyze_weights():
 			print('Error: Unable to analyze weights')
 			sys.exit(-1)
-		predict_movement(specified_day)
-		predict_movement2(specified_day)
-		predict_movement3(specified_day)
-		predict_movement4(specified_day)
-		predict_movement5(specified_day)
-		predict_movement6(specified_day)
+
+		if weight_opt == 'opt1':
+			predict_movement(specified_day)
+			predict_movement2(specified_day)
+			predict_movement3(specified_day)
+			predict_movement4(specified_day)
+			predict_movement5(specified_day)
+			predict_movement6(specified_day)
+		
+		elif weight_opt == 'opt2':
+			predict_movement7(specified_day)
 
 		logging.info('Predicting complete')
 
@@ -1625,9 +1842,6 @@ def main():
 		# Load non-day specific values
 		logging.info('Loading non-day specific data before updating word weights')
 
-		load_all_word_weights('opt1')
-		load_stock_prices()
-
 		# Prepare the days to update word weights for
 		days = []
 
@@ -1649,18 +1863,21 @@ def main():
 				temp_day = date1 + datetime.timedelta(days = each_day)
 				days.append(str(temp_day.month) + '-' + str(temp_day.day) + '-' + str(temp_day.year))
 
+		load_all_word_weights(weight_opt)
+		load_stock_prices()
+
 		for each in days:
 
 			logging.info('Updating word weights for: ' + each)
 
 			# Call the proper functions
 			if load_articles(each):
-				update_all_word_weights('opt1', each)
+				update_all_word_weights(weight_opt, each)
 			stock_data.clear() # To prepare for the next set of articles
 
 		# Save data
 		logging.info('Saving word weights')
-		save_all_word_weights('opt1')
+		save_all_word_weights(weight_opt)
 		
 		logging.info('Updating word weights complete')
 

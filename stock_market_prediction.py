@@ -126,7 +126,7 @@ def pull_recent_articles():
 
 		# Make the request to google news for the ticker and get its raw html
 		try:
-			r = requests.get('https://www.google.com/search?biw=1366&bih=671&tbm=nws&ei=HRDyWcDlJoa-jwSuwZCYBg&q=' + ticker)
+			r = requests.get('https://www.google.com/search?biw=1366&bih=671&tbm=nws&ei=HRDyWcDlJoa-jwSuwZCYBg&q=' + ticker, timeout=2)
 		except requests.exceptions.RequestException as error:
 			logging.warning('- Could not pull articles for: ' + ticker + ', Error: ' + str(error))
 			continue
@@ -151,7 +151,7 @@ def pull_recent_articles():
 
 				# Once the link as been found, make a request for its html content
 				try:
-					r = requests.get(link)
+					r = requests.get(link, timeout=2)
 				except requests.exceptions.RequestException as error:
 					logging.warning('-- Could not pull article for: ' + link + ', Error: ' + str(error))
 					continue

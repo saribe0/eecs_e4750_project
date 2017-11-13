@@ -1,0 +1,113 @@
+Prediction Method 7: 
+Naive Bayes Classifier -> Requires word weight option 2 is loaded.
+P(Word=w|Label=y) = (count(w,y)+c) / ([total number of words with label y] + c * vocabulary size). 
+Value for label: log(P(y, word1, word2, ... wordn)) = log(P(y)) + log(P(word1 | y)) + log(P(word2 | y)) + ... + log(P(wordn | y)). 
+Label (Up or Down) with the greatest value is chosen.
+
+Predictions Based On: 
+- Total Up Days    : 1053
+- Total Down Days  : 873
+- Total Up Words   : 468484
+- Total Down Words : 422868
+- Value for C      : 0.01
+
+Prediction for: amzn 
+- Up rating is  : -41211.04655460827
+- Down rating is: -41479.70736391747
+- Corresponds to: buy
+
+Prediction for: amat 
+- Up rating is  : -37020.85991023643
+- Down rating is: -37453.437488173404
+- Corresponds to: buy
+
+Prediction for: agn 
+- Up rating is  : -42806.65211202137
+- Down rating is: -42027.83645428908
+- Corresponds to: sell
+
+Prediction for: goog 
+- Up rating is  : -35073.347660186904
+- Down rating is: -35994.24456937314
+- Corresponds to: buy
+
+Prediction for: hd 
+- Up rating is  : -34455.35042603317
+- Down rating is: -34343.48252235802
+- Corresponds to: sell
+
+Prediction for: lmt 
+- Up rating is  : -27495.364207995848
+- Down rating is: -27654.94926117337
+- Corresponds to: buy
+
+Prediction for: data 
+- Up rating is  : -44935.20937690243
+- Down rating is: -45089.49549485892
+- Corresponds to: buy
+
+Prediction for: nflx 
+- Up rating is  : -32504.731612779706
+- Down rating is: -32775.90103717486
+- Corresponds to: buy
+
+Prediction for: aapl 
+- Up rating is  : -31209.85403453214
+- Down rating is: -31670.20621414635
+- Corresponds to: buy
+
+Prediction for: ge 
+- Up rating is  : -30864.962109086722
+- Down rating is: -29705.380621895685
+- Corresponds to: sell
+
+Prediction for: tsla 
+- Up rating is  : -31050.10155789724
+- Down rating is: -31039.770616045327
+- Corresponds to: sell
+
+Prediction for: bac 
+- Up rating is  : -33247.731297420454
+- Down rating is: -33050.749186580884
+- Corresponds to: sell
+
+Prediction for: nvda 
+- Up rating is  : -25367.473941078177
+- Down rating is: -25273.92384221423
+- Corresponds to: sell
+
+Prediction for: baba 
+- Up rating is  : -22510.927144264428
+- Down rating is: -22095.72952144531
+- Corresponds to: sell
+
+Prediction for: wmt 
+- Up rating is  : -27246.12113623435
+- Down rating is: -27964.035738724084
+- Corresponds to: buy
+
+Prediction for: jpm 
+- Up rating is  : -44267.63473354035
+- Down rating is: -42110.40883060732
+- Corresponds to: sell
+
+Prediction for: mu 
+- Up rating is  : -41169.841559167835
+- Down rating is: -42490.04185362109
+- Corresponds to: buy
+
+Prediction for: uaa 
+- Up rating is  : -32544.588926162087
+- Down rating is: -33056.67820959197
+- Corresponds to: buy
+
+Prediction for: gild 
+- Up rating is  : -37998.78345045683
+- Down rating is: -37861.35800982144
+- Corresponds to: sell
+
+Prediction for: xom 
+- Up rating is  : -38308.54265001529
+- Down rating is: -38325.737168458014
+- Corresponds to: buy
+

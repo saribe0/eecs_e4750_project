@@ -1,0 +1,2104 @@
+https://www.nytimes.com/2017/11/14/business/dealbook/taxing-companies-for-using-our-personal-data.html
+
+By SAADIA MADSBJERGNOV. 14, 2017
+ Our data is valuable. Each year, it generates hundreds of billions of dollars’ worth of economic activity, mostly between and within corporations — all on the back of information about each of us. It’s this transaction — between you, the user, giving up details of yourself to a company in exchange for a product like a photo app or email, or a whole ecosystem like Facebook — that’s worth by some estimates $1,000 per person per year, a number that is quickly rising. The value of our personal data is primarily locked up in the revenues of large corporations. Some, like data brokerages, exist solely to buy and sell sets of that data. Why should companies be the major, and often the only, beneficiaries of this largess? They shouldn’t. Those financial benefits need to be shared, and the best way to do it is to impose a small tax on this revenue and use the proceeds to build a better, more equitable internet and society that benefit us all. Advertisement The data tax could be a minor cost, less than 1 percent of the revenue companies earn from selling our personal data, spread out over an entire industry. Individually, no company’s bottom line would substantially suffer; collectively, the tax would pull money back to the public, from an industry profiting from material and labor that is, at its very core, our own. Advertisement This idea is not new. It is, essentially, a sales tax, among the oldest taxes that exist, but it hasn’t been done because assigning a fixed monetary value to our data can be very difficult. For a lot of internet businesses, our personal data either primarily flows through the business or remains locked within. The flow-through type of business is an internet provider, like AT&T, Comcast and Verizon; the latter is a platform provider, like Facebook or Twitter. Google mostly makes platforms, like its search function and Gmail, but it also lays fiber-optic cable, providing the internet to some municipalities. The company also is making self-driving cars. It’s perhaps easiest to consider your data as something real and physical, like a car, which, in a sense, it is. It moves around a real, physical infrastructure, owned and operated by the internet providers, and the information is also stored — or parked — on millions of hard drives in vast buildings in usually cold climes. These are owned and operated by the platform makers, including Amazon, which has a very lucrative arm that does nothing but rent out its server space. When you use the internet, your information travels through the providers’ pipes (roads) and into and out of the platform makers’ servers (parking lots). For the most part, the platform makers rely on your data to improve their products. Google uses its immense trove of real human searches to make better artificial intelligence like transcriptions, translations and self-driving cars.  Please verify you're not a robot by clicking the box. Invalid email address. Please re-enter. You must select a newsletter to subscribe to. View all New York Times newsletters. How much, exactly, these new and innovative businesses are worth is unclear even to Google. But it, and all the platform makers, don’t just improve products with our data. The companies invite advertisers into the platforms, offering to deliver advertisements to exactly the right kind of person, at exactly the right time, based off the platform makers’ intimate knowledge of us, via our data. The internet providers are less nuanced: We pay a monthly fee for access to the pipes the companies lay and the upkeep on them, but the companies also sell our data to brokers, who bundle and sell it to advertisers. It’s this data brokerage industry that should be the primary, initial focus of the data tax. This industry exists solely to collect our information and sell it as a commodity to retailers, advertisers, marketers, even other data brokerages and government agencies. It’s this marketplace that traffics in the actual monetary value of our data, and from it we can begin to map just how much that data might be worth overall. The data brokerage industry generates more than $150 billion in revenue each year, but revenue is reportedly growing so fast that it’s expected to reach $250 billion by 2018. A small tax, say 0.8 percent, on data brokerages based in the United States would generate about $2 billion annually. Advertisement Microlevies like this one have been issued successfully before. Over the last decade, the governments of 10 countries, including Chile, France and Niger, have successfully raised more than 1 billion euros in funding from a tax on airline tickets of €1 to €40 depending on the class of ticket. The money generated has gone toward global H.I.V./AIDS, tuberculosis and malaria eradication programs. In Austria, the government was considering imposing a value-added tax on the big data transactions of social media companies that benefit from personal data, but has been stymied by the complications of assigning a fixed value to such transactions. Our data is ours, but it also is not ours. We trade it away for so much of our experience on the internet. Money from a data tax could begin to counter this trade imbalance. The money should go toward improving privacy of our information on the internet, countering identity theft, improving connectivity and internet literacy, all causes that would help create a more equitable internet for all. Saadia Madsbjerg is managing director of the Rockefeller Foundation A version of this article appears in print on November 14, 2017, on Page F17 of the New York edition with the headline: Let’s Tax Firms for Using Our Personal Data.  Order Reprints| Today's Paper|Subscribe
+
+ We’re interested in your feedback on this page. Tell us what you think. See More » 
+
+https://www.nytimes.com/2017/11/14/business/dealbook/taxing-companies-for-using-our-personal-data.html
+
+Advertisement Supported by By Saadia Madsbjerg Our data is valuable. Each year, it generates hundreds of billions of dollars’ worth of economic activity, mostly between and within corporations — all on the back of information about each of us. It’s this transaction — between you, the user, giving up details of yourself to a company in exchange for a product like a photo app or email, or a whole ecosystem like Facebook — that’s worth by some estimates $1,000 per person per year, a number that is quickly rising. The value of our personal data is primarily locked up in the revenues of large corporations. Some, like data brokerages, exist solely to buy and sell sets of that data. Why should companies be the major, and often the only, beneficiaries of this largess? They shouldn’t. Those financial benefits need to be shared, and the best way to do it is to impose a small tax on this revenue and use the proceeds to build a better, more equitable internet and society that benefit us all. The data tax could be a minor cost, less than 1 percent of the revenue companies earn from selling our personal data, spread out over an entire industry. Individually, no company’s bottom line would substantially suffer; collectively, the tax would pull money back to the public, from an industry profiting from material and labor that is, at its very core, our own. This idea is not new. It is, essentially, a sales tax, among the oldest taxes that exist, but it hasn’t been done because assigning a fixed monetary value to our data can be very difficult. For a lot of internet businesses, our personal data either primarily flows through the business or remains locked within. The flow-through type of business is an internet provider, like AT&T, Comcast and Verizon; the latter is a platform provider, like Facebook or Twitter. Google mostly makes platforms, like its search function and Gmail, but it also lays fiber-optic cable, providing the internet to some municipalities. The company also is making self-driving cars. It’s perhaps easiest to consider your data as something real and physical, like a car, which, in a sense, it is. It moves around a real, physical infrastructure, owned and operated by the internet providers, and the information is also stored — or parked — on millions of hard drives in vast buildings in usually cold climes. These are owned and operated by the platform makers, including Amazon, which has a very lucrative arm that does nothing but rent out its server space. When you use the internet, your information travels through the providers’ pipes (roads) and into and out of the platform makers’ servers (parking lots). For the most part, the platform makers rely on your data to improve their products. Google uses its immense trove of real human searches to make better artificial intelligence like transcriptions, translations and self-driving cars. How much, exactly, these new and innovative businesses are worth is unclear even to Google. But it, and all the platform makers, don’t just improve products with our data. The companies invite advertisers into the platforms, offering to deliver advertisements to exactly the right kind of person, at exactly the right time, based off the platform makers’ intimate knowledge of us, via our data. The internet providers are less nuanced: We pay a monthly fee for access to the pipes the companies lay and the upkeep on them, but the companies also sell our data to brokers, who bundle and sell it to advertisers. It’s this data brokerage industry that should be the primary, initial focus of the data tax. This industry exists solely to collect our information and sell it as a commodity to retailers, advertisers, marketers, even other data brokerages and government agencies. It’s this marketplace that traffics in the actual monetary value of our data, and from it we can begin to map just how much that data might be worth overall. The data brokerage industry generates more than $150 billion in revenue each year, but revenue is reportedly growing so fast that it’s expected to reach $250 billion by 2018. A small tax, say 0.8 percent, on data brokerages based in the United States would generate about $2 billion annually. Microlevies like this one have been issued successfully before. Over the last decade, the governments of 10 countries, including Chile, France and Niger, have successfully raised more than 1 billion euros in funding from a tax on airline tickets of €1 to €40 depending on the class of ticket. The money generated has gone toward global H.I.V./AIDS, tuberculosis and malaria eradication programs. In Austria, the government was considering imposing a value-added tax on the big data transactions of social media companies that benefit from personal data, but has been stymied by the complications of assigning a fixed value to such transactions. Our data is ours, but it also is not ours. We trade it away for so much of our experience on the internet. Money from a data tax could begin to counter this trade imbalance. The money should go toward improving privacy of our information on the internet, countering identity theft, improving connectivity and internet literacy, all causes that would help create a more equitable internet for all. Saadia Madsbjerg is managing director of the Rockefeller Foundation Our columnist Andrew Ross Sorkin and his Times colleagues help you make sense of major business and policy headlines — and the power-brokers who shape them. Please verify you’re not a robot by clicking the box. Invalid email address. Please re-enter. You must select a newsletter to subscribe to. * Required field View all New York Times newsletters. View all New York Times newsletters. The insurgent media company has built a devoted following of what it sees as “average” sports fans: unruly, occasionally toxic and aggressively male. The former vice president sharply criticized President Trump, but declined to say whether he himself would run for president in 2020. It explains most of the dysfunctional group behavior these days, on left and right. Advertisement Advertisement 
+
+http://abcnews.go.com/Business/wireStory/asia-shares-lower-nikkei-flat-china-data-disappoints-51131768
+
+
+ 
+Global stocks mostly fell on Tuesday as investors watched for tax reform developments in the U.S. and digested weak manufacturing data from China. 
+KEEPING SCORE: France's CAC 40 shed 0.3 percent to 5,325 and Germany's DAX fell 0.2 percent to 13,053. Britain's FTSE 100 added nearly 0.1 percent to 7,420. U.S. shares were set to drift lower, with Dow and S&P; 500 futures both down 0.2 percent. 
+DATA WATCH: Economic growth figures were upbeat for Italy and Germany, which saw growth accelerate to a quarterly 0.8 percent in the third quarter, from 0.6 percent in the previous three-month period. But new data for China disappointed. Its growth in industrial value-added output slowed to an annual rate of 6.2 percent in October, from 6.6-percent in September. China's private fixed-asset investment increased 5.8 percent on year in the first 10 months of this year, lower than the 6-percent increase for the first nine months. The Chinese economy is still growing but the focus is on assessing whether that pace is slowing. 
+ANALYST VIEWPOINT: "Risk appetite was . dithering," analysts from Mizuho Bank Ltd. said in a commentary. "The mood is certainly nowhere near the exuberance earlier this year." 
+U.S. TAXES: The fate of U.S. tax overhaul legislation remains uncertain. It would deeply cut corporate taxes, double the standard deduction used by most Americans, and limit or repeal completely the federal deduction for state and local property, income and sales taxes. It carries high political stakes for President Donald Trump and Republican leaders in Congress. 
+ASIA'S DAY: Japan's Nikkei 225 stock index was flat to finish at 22,380.01 after trading in a narrow margin. Hong Kong's Hang Seng index was nearly unchanged at 29,154.01, down 0.1 percent, and Australia's S&P;/ASX 200 fell 0.9 percent to 5,968.70. South Korea's Kospi edged down 0.2 percent to 2,526.64. The Shanghai Composite index lost 0.5 percent to 3,429.55. But shares in Taiwan and Southeast Asia were mostly higher. 
+ENERGY: Benchmark U.S. crude lost 31 cents to $56.45 per barrel in electronic trading on the New York Mercantile Exchange. It gained 2 cents on Monday. Brent crude, used to price international oils, slipped 33 cents to $62.83 a barrel in London. 
+CURRENCIES: The dollar rose to 113.60 yen from 113.30 yen on Friday, while the euro strengthened to $1.1742 from $1.1656 on the back of the upbeat economic growth figures. 
+——— 
+AP Business Writer Yuri Kageyama can be reached at https://twitter.com/yurikageyama  
+Her work can be found at https://www.apnews.com/search/yuri%20kageyama  
+
+http://abcnews.go.com/Business/wireStory/asia-shares-lower-nikkei-flat-china-data-disappoints-51131768
+
+
+ 
+Global stocks mostly fell on Tuesday as investors watched for tax reform developments in the U.S. and digested weak manufacturing data from China. 
+KEEPING SCORE: France's CAC 40 shed 0.3 percent to 5,325 and Germany's DAX fell 0.2 percent to 13,053. Britain's FTSE 100 added nearly 0.1 percent to 7,420. U.S. shares were set to drift lower, with Dow and S&P; 500 futures both down 0.2 percent. 
+DATA WATCH: Economic growth figures were upbeat for Italy and Germany, which saw growth accelerate to a quarterly 0.8 percent in the third quarter, from 0.6 percent in the previous three-month period. But new data for China disappointed. Its growth in industrial value-added output slowed to an annual rate of 6.2 percent in October, from 6.6-percent in September. China's private fixed-asset investment increased 5.8 percent on year in the first 10 months of this year, lower than the 6-percent increase for the first nine months. The Chinese economy is still growing but the focus is on assessing whether that pace is slowing. 
+ANALYST VIEWPOINT: "Risk appetite was . dithering," analysts from Mizuho Bank Ltd. said in a commentary. "The mood is certainly nowhere near the exuberance earlier this year." 
+U.S. TAXES: The fate of U.S. tax overhaul legislation remains uncertain. It would deeply cut corporate taxes, double the standard deduction used by most Americans, and limit or repeal completely the federal deduction for state and local property, income and sales taxes. It carries high political stakes for President Donald Trump and Republican leaders in Congress. 
+ASIA'S DAY: Japan's Nikkei 225 stock index was flat to finish at 22,380.01 after trading in a narrow margin. Hong Kong's Hang Seng index was nearly unchanged at 29,154.01, down 0.1 percent, and Australia's S&P;/ASX 200 fell 0.9 percent to 5,968.70. South Korea's Kospi edged down 0.2 percent to 2,526.64. The Shanghai Composite index lost 0.5 percent to 3,429.55. But shares in Taiwan and Southeast Asia were mostly higher. 
+ENERGY: Benchmark U.S. crude lost 31 cents to $56.45 per barrel in electronic trading on the New York Mercantile Exchange. It gained 2 cents on Monday. Brent crude, used to price international oils, slipped 33 cents to $62.83 a barrel in London. 
+CURRENCIES: The dollar rose to 113.60 yen from 113.30 yen on Friday, while the euro strengthened to $1.1742 from $1.1656 on the back of the upbeat economic growth figures. 
+——— 
+AP Business Writer Yuri Kageyama can be reached at https://twitter.com/yurikageyama  
+Her work can be found at https://www.apnews.com/search/yuri%20kageyama  
+
+https://www.aol.com/article/news/2017/11/14/new-fbi-data-shows-rise-in-hate-crimes-in-2016-states-most-reported-cases/23276262/
+
+New data released by the FBI on Monday revealed an increase in hate crimes of about 5 percent over the last year in the United States.  The data from the Hate Crimes Division found that there were approximately 5,800 hate crimes reported in 2015 -- and the number jumped up to 6,121 in 2016.  Of the reported crimes, about 60 percent were motivated by of race, ethnicity, or ancestry. Another 21 percent were motivated by religious bias, and 18 percent by sexual orientation.  The state level data -- although incomplete because only some agencies in each state contributed data -- also suggested some states have a higher incidence or reported hate crimes than others. Scroll through the gallery below to see which states had the most hate crimes: 
+
+
+
+
+
+51 PHOTOS
+Hate crimes reported by states in 2016
+See Gallery
+
+
+
+
+
+
+
+Hate crimes reported by states in 2016
+
+
+
+
+
+
+
+50. Wyoming: 3 incidents reported
+(Photo via Getty Images)
+
+
+
+
+
+
+
+49. Mississippi: 7 incidents reported
+(Photo via Getty Images)
+
+
+
+
+
+
+
+48. North Dakota: 8 incidents reported
+(Photo via Getty Images)
+
+
+
+
+
+
+
+47. Alaska: 11 incidents reported
+(Photo via Getty Images)
+
+
+
+
+
+
+
+46. Rhode Island: 12 incidents reported
+(Photo via Getty Images)
+
+
+
+
+
+
+
+45. Arkansas: 12 incidents reported
+(Photo via Getty Images)
+
+
+
+
+
+
+
+44. Alabama: 14 incidents reported
+(Photo via Getty Images)
+
+
+
+
+
+
+
+43. Delaware: 15 incidents reported
+(Photo via Getty Images)
+
+
+
+
+
+
+
+42. Iowa: 17 incidents reported
+(Photo via Getty Images)
+
+
+
+
+
+
+
+41. South Dakota: 18 incidents reported
+(Photo via Getty Images)
+
+
+
+
+
+
+
+40. Montana: 20 incidents reported
+(Photo via Getty Images)
+
+
+
+
+
+
+
+39. South Carolina: 23 incidents reported
+(Photo via Shutterstock)
+
+
+
+
+
+
+
+38. Vermont: 25 incidents reported
+(Photo via Getty Images)
+
+
+
+
+
+
+
+37. New Mexico: 26 incidents reported
+(Photo via Getty Images)
+
+
+
+
+
+
+
+36. Louisiana: 26 incidents reported
+(Photo via Getty Images)
+
+
+
+
+
+
+
+35. Idaho: 27 incidents reported
+(Photo via Getty Images)
+
+
+
+
+
+
+
+34. New Hampshire: 28 incidents reported
+(Photo via Alamy)
+
+
+
+
+
+
+
+33. Nebraska: 31 incidents reported
+(Photo via Getty Images)
+
+
+
+
+
+
+
+32. Oklahoma: 33 incidents reported
+(Photo via Getty Images)
+
+
+
+
+
+
+
+31. Wisconsin: 34 incidents reported
+(Photo via Getty Images)
+
+
+
+
+
+
+
+30. Maryland: 37 incidents reported
+(Photo via Getty Images)
+
+
+
+
+
+
+
+29. Georgia: 39 incidents reported
+(Photo via Getty Images)
+
+
+
+
+
+
+
+28. Maine: 40 incidents reported
+(Photo via Getty Images)
+
+
+
+
+
+
+
+27. West Virginia: 41 incidents reported
+(Photo via Alamy)
+
+
+
+
+
+
+
+26. Nevada: 41 incidents reported
+(Photo via Getty Images)
+
+
+
+
+
+
+
+25. Kansas: 49 incidents reported
+(Photo via Getty Images)
+
+
+
+
+
+
+
+24. Pennsylvania: 61 incidents reported
+(Photo via Getty Images)
+
+
+
+
+
+
+
+23. Utah: 66 incidents reported
+(Photo via Shutterstock)
+
+
+
+
+
+
+
+22. Indiana: 78 incidents reported
+(Photo via Getty Images)
+
+
+
+
+
+
+
+21. Missouri: 88 incidents reported
+(Photo via Getty Images)
+
+
+
+
+
+
+
+20. Florida: 96 incidents reported
+(Photo via Getty Images)
+
+
+
+
+
+
+
+19. Oregon: 104 incidents reported
+(Photo via Getty Images)
+
+
+
+
+
+
+
+18. Colorado: 104 incidents reported
+(Photo via )
+
+
+
+
+
+
+
+17. Connecticut: 106 incidents reported
+(Photo via Getty Images)
+
+
+
+
+
+
+
+16. Illinois: 111 incidents reported
+(Photo via Getty Images)
+
+
+
+
+
+
+
+15. Washington, D.C.: 115 incidents reported
+(Photo via Getty Images)
+
+
+
+
+
+
+
+14. Minnesota: 119 incidents reported
+(Photo via Getty Images)
+
+
+
+
+
+
+
+13. Virginia: 122 incidents reported
+(Photo via Getty Images)
+
+
+
+
+
+
+
+12. Tennessee: 142 incidents reported
+(Photo via Getty Images)
+
+
+
+
+
+
+
+11. North Carolina: 148 incidents reported
+(Photo via Getty Images)
+
+
+
+
+
+
+
+10. Texas: 178 incidents reported
+(Photo via Getty Images)
+
+
+
+
+
+
+
+9. Kentucky: 206 incidents reported
+(Photo via Getty Images)
+
+
+
+
+
+
+
+8. Arizona: 213 incidents reported
+(Photo via Getty Images)
+
+
+
+
+
+
+
+7. New Jersey: 282 incidents reported
+(Photo via Getty Images)
+
+
+
+
+
+
+
+6. Washington: 387 incidents reported
+(Photo via Getty Images)
+
+
+
+
+
+
+
+5. Massachusetts: 391 incidents reported
+(Photo via Corbis)
+
+
+
+
+
+
+
+4. Michigan: 399 incidents reported
+(Photo via Getty Images)
+
+
+
+
+
+
+
+3. Ohio: 442 incidents reported
+(Photo via Getty Images)
+
+
+
+
+
+
+
+2. New York: 595 incidents reported
+(Photo via Getty Images)
+
+
+
+
+
+
+
+1. California: 931 incidents reported
+(Photo via Getty Images)
+
+
+
+
+
+
+
+
+
+Up Next
+
+See Gallery
+
+
+
+
+Discover More Like This
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+HIDE CAPTION
+SHOW CAPTION
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ of 
+
+
+
+SEE ALL
+
+
+
+BACK TO SLIDE 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 50. Wyoming: 3 incidents reported (Photo via Getty Images) 49. Mississippi: 7 incidents reported (Photo via Getty Images) 48. North Dakota: 8 incidents reported (Photo via Getty Images) 47. Alaska: 11 incidents reported (Photo via Getty Images) 46. Rhode Island: 12 incidents reported (Photo via Getty Images) 45. Arkansas: 12 incidents reported (Photo via Getty Images) 44. Alabama: 14 incidents reported (Photo via Getty Images) 43. Delaware: 15 incidents reported (Photo via Getty Images) 42. Iowa: 17 incidents reported (Photo via Getty Images) 41. South Dakota: 18 incidents reported (Photo via Getty Images) 40. Montana: 20 incidents reported (Photo via Getty Images) 39. South Carolina: 23 incidents reported (Photo via Shutterstock) 38. Vermont: 25 incidents reported (Photo via Getty Images) 37. New Mexico: 26 incidents reported (Photo via Getty Images) 36. Louisiana: 26 incidents reported (Photo via Getty Images) 35. Idaho: 27 incidents reported (Photo via Getty Images) 34. New Hampshire: 28 incidents reported (Photo via Alamy) 33. Nebraska: 31 incidents reported (Photo via Getty Images) 32. Oklahoma: 33 incidents reported (Photo via Getty Images) 31. Wisconsin: 34 incidents reported (Photo via Getty Images) 30. Maryland: 37 incidents reported (Photo via Getty Images) 29. Georgia: 39 incidents reported (Photo via Getty Images) 28. Maine: 40 incidents reported (Photo via Getty Images) 27. West Virginia: 41 incidents reported (Photo via Alamy) 26. Nevada: 41 incidents reported (Photo via Getty Images) 25. Kansas: 49 incidents reported (Photo via Getty Images) 24. Pennsylvania: 61 incidents reported (Photo via Getty Images) 23. Utah: 66 incidents reported (Photo via Shutterstock) 22. Indiana: 78 incidents reported (Photo via Getty Images) 21. Missouri: 88 incidents reported (Photo via Getty Images) 20. Florida: 96 incidents reported (Photo via Getty Images) 19. Oregon: 104 incidents reported (Photo via Getty Images) 18. Colorado: 104 incidents reported (Photo via ) 17. Connecticut: 106 incidents reported (Photo via Getty Images) 16. Illinois: 111 incidents reported (Photo via Getty Images) 15. Washington, D.C.: 115 incidents reported (Photo via Getty Images) 14. Minnesota: 119 incidents reported (Photo via Getty Images) 13. Virginia: 122 incidents reported (Photo via Getty Images) 12. Tennessee: 142 incidents reported (Photo via Getty Images) 11. North Carolina: 148 incidents reported (Photo via Getty Images) 10. Texas: 178 incidents reported (Photo via Getty Images) 9. Kentucky: 206 incidents reported (Photo via Getty Images) 8. Arizona: 213 incidents reported (Photo via Getty Images) 7. New Jersey: 282 incidents reported (Photo via Getty Images) 6. Washington: 387 incidents reported (Photo via Getty Images) 5. Massachusetts: 391 incidents reported (Photo via Corbis) 4. Michigan: 399 incidents reported (Photo via Getty Images) 3. Ohio: 442 incidents reported (Photo via Getty Images) 2. New York: 595 incidents reported (Photo via Getty Images) 1. California: 931 incidents reported (Photo via Getty Images) See Gallery Five of the nation's more populous states -- California, New York, Ohio, Michigan and Massachusetts -- had the highest number of hate crimes reported.  But when factoring in the relative populations of each state, the picture changes somewhat. Washington, D.C., with its relatively small population and 115 reported hate crimes, comes in first. Massachusetts, Washington, Kentucky and Ohio round out the top five ranked by population. By the same measure, Arkansas, South Carolina and Georgia had the lowest rate.  But the data is not fully comprehensive, and earlier this year former FBI director James Comey said that the FBI must “do a better job of tracking and reporting hate crime.” But the increase in hate crimes does track along with an increase in hate groups. Data provided by the Southern Poverty Law Center found that the number of hate groups in the U.S. jumped from 892 in 2015 to 917 in 2016 -- a three percent uptick. 
+
+
+
+
+
+44 PHOTOS
+Charlottesville violence erupts as protesters and counterprotesters clash
+See Gallery
+
+
+
+
+
+
+
+Charlottesville violence erupts as protesters and counterprotesters clash
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+CHARLOTTESVILLE, USA - August 12: A White Supremacist kicks back a smoke bomb thrown by counter protestors during clashes at Emancipation Park where the White Nationalists are protesting the removal of the Robert E. Lee monument in Charlottesville, Va., USA on August 12, 2017. (Photo by Samuel Corum/Anadolu Agency/Getty Images)
+
+
+
+
+
+
+CHARLOTTESVILLE, USA - August 12: A White Supremacist tries to strike a counter protestor with a White Nationalist flag during clashes at Emancipation Park where the White Nationalists are protesting the removal of the Robert E. Lee monument in Charlottesville, Va., USA on August 12, 2017. (Photo by Samuel Corum/Anadolu Agency/Getty Images)
+
+
+
+
+
+
+Rescue workers assist people who were injured when a car drove through a group of counter protestors at the "Unite the Right" rally Charlottesville, Virginia, U.S., August 12, 2017.   REUTERS/Joshua Roberts
+
+
+
+
+
+
+People receive first-aid after a car accident ran into a crowd of protesters in Charlottesville, VA on August 12, 2017. 
+A vehicle plowed into a crowd of people Saturday at a Virginia rally where violence erupted between white nationalist demonstrators and counter-protesters, witnesses said, causing an unclear number of injuries. / AFP PHOTO / PAUL J. RICHARDS        (Photo credit should read PAUL J. RICHARDS/AFP/Getty Images)
+
+
+
+
+
+
+CHARLOTTESVILLE, USA - August 12: Police, medical personnel, and other protestors attend to the injured people after a car rammed into a crowd of anti-White Supremacy protestors in Charlottesville, Va., USA on August 12, 2017. (Photo by Samuel Corum/Anadolu Agency/Getty Images)
+
+
+
+
+
+
+A woman who was injured when a car drove through a group of counter protestors at the "Unite the Right" rally is helped in Charlottesville, Virginia, U.S., August 12, 2017.   REUTERS/Joshua Roberts?
+
+
+
+
+
+
+Rescue workers assist people who were injured when a car drove through a group of counter protestors at the "Unite the Right" rally Charlottesville, Virginia, U.S., August 12, 2017.   REUTERS/Joshua Roberts
+
+
+
+
+
+
+Rescue workers transport a victim who was injured when a car drove through a group of counter protestors at the "Unite the Right" rally Charlottesville, Virginia, U.S., August 12, 2017.   REUTERS/Joshua Roberts
+
+
+
+
+
+
+A woman is received first-aid after a car accident ran into a crowd of protesters in Charlottesville, VA on August 12, 2017. A picturesque Virginia city braced Saturday for a flood of white nationalist demonstrators as well as counter-protesters, declaring a local emergency as law enforcement attempted to quell early violent clashes. / AFP PHOTO / PAUL J. RICHARDS (Photo credit should read PAUL J. RICHARDS/AFP/Getty Images)
+
+
+
+
+
+
+People receive first-aid after a car accident ran into a crowd of protesters in Charlottesville, VA on August 12, 2017. A picturesque Virginia city braced Saturday for a flood of white nationalist demonstrators as well as counter-protesters, declaring a local emergency as law enforcement attempted to quell early violent clashes. / AFP PHOTO / PAUL J. RICHARDS (Photo credit should read PAUL J. RICHARDS/AFP/Getty Images)
+
+
+
+
+
+
+Rescue workers assist people who were injured when a car drove through a group of counter protestors at the "Unite the Right" rally Charlottesville, Virginia, U.S., August 12, 2017. REUTERS/Joshua Roberts
+
+
+
+
+
+
+A woman is received first-aid after a car accident ran into a crowd of protesters in Charlottesville, VA on August 12, 2017. A picturesque Virginia city braced Saturday for a flood of white nationalist demonstrators as well as counter-protesters, declaring a local emergency as law enforcement attempted to quell early violent clashes. / AFP PHOTO / PAUL J. RICHARDS (Photo credit should read PAUL J. RICHARDS/AFP/Getty Images)
+
+
+
+
+
+
+CHARLOTTESVILLE, USA - August 12: A White Supremacist helps a friend after he was punched in the face during clashes with counter protestors at Emancipation Park where the White Nationalists are protesting the removal of the Robert E. Lee monument in Charlottesville, Va., USA on August 12, 2017. (Photo by Samuel Corum/Anadolu Agency/Getty Images)
+
+
+
+
+
+
+CHARLOTTESVILLE, USA - August 12: A counter protestor strikes a White Nationalist with a baton during clashes at Emancipation Park where the White Nationalists are protesting the removal of the Robert E. Lee monument in Charlottesville, Va., USA on August 12, 2017. (Photo by Samuel Corum/Anadolu Agency/Getty Images)
+
+
+
+
+
+
+CHARLOTTESVILLE, USA - August 12: White Supremacists and counter protestors clash at Emancipation Park where the White Nationalists are protesting the removal of the Robert E. Lee monument in Charlottesville, Va., USA on August 12, 2017. (Photo by Samuel Corum/Anadolu Agency/Getty Images)
+
+
+
+
+
+
+A man is seen with an injury during a clash between members of white nationalist protesters against a group of counter-protesters in Charlottesville, Virginia, U.S., August 12, 2017.   REUTERS/Joshua Roberts
+
+
+
+
+
+
+Virginia State Police move in as members of white nationalist protesters clash against a group of counter-protesters in Charlottesville, Virginia, U.S., August 12, 2017.   REUTERS/Joshua Roberts
+
+
+
+
+
+
+People struggle with a Confederate flag as a crowd of white nationalists are met by a group of counter-protesters in Charlottesville, Virginia, U.S., August 12, 2017.  REUTERS/Justin Ide
+
+
+
+
+
+
+CHARLOTTESVILLE, USA - August 12: White Supremacists rush forward with shields and sticks during clashes with counter protestors at Emancipation Park where the White Nationalists are protesting the removal of the Robert E. Lee monument in Charlottesville, Va., USA on August 12, 2017. (Photo by Samuel Corum/Anadolu Agency/Getty Images)
+
+
+
+
+
+
+A white supremacists stands behind militia members after he scuffled with a counter demonstrator in Charlottesville, Virginia, U.S., August 12, 2017.   REUTERS/Joshua Roberts
+
+
+
+
+
+
+A white supremacists stands with militia members after he scuffled with a counter demonstrator in Charlottesville, Virginia, U.S., August 12, 2017.   REUTERS/Joshua Roberts
+
+
+
+
+
+
+A white supremacists stands behind militia members after he scuffled with a counter demonstrator in Charlottesville, Virginia, U.S., August 12, 2017.   REUTERS/Joshua Roberts
+
+
+
+
+
+
+CHARLOTTESVILLE, VA - AUGUST 12:  White nationalists, neo-Nazis and members of the 'alt-right' take refuge in an alleyway after being hit with pepper spray after the 'Unite the Right' rally was declared an unlawful gathering August 12, 2017 in Charlottesville, Virginia. After clashes with anti-facist protesters and police the rally was declared an unlawful gathering and people were forced out of Lee Park, where a statue of Confederate General Robert E. Lee is slated to be removed.  (Photo by Chip Somodevilla/Getty Images)
+
+
+
+
+
+
+Members of white nationalists are met by a group of counter-protesters in Charlottesville, Virginia, U.S., August 12, 2017.   REUTERS/Joshua Roberts     TPX IMAGES OF THE DAY
+
+
+
+
+
+
+Members of white nationalists clash against a group of counter-protesters in Charlottesville, Virginia, U.S., August 12, 2017.   REUTERS/Joshua Roberts
+
+
+
+
+
+
+A white supremacists carries the Confederate flag as he arrives for a rally in Charlottesville, Virginia, U.S., August 12, 2017.   REUTERS/Joshua Roberts
+
+
+
+
+
+
+Virginia State Troopers stand under a statue of Robert E. Lee before a white supremacists rally in Charlottesville, Virginia, U.S., August 12, 2017.   REUTERS/Joshua Roberts
+
+
+
+
+
+
+A white supremacist holds a flag during a rally in Charlottesville, Virginia, U.S., August 12, 2017.   REUTERS/Joshua Roberts
+
+
+
+
+
+
+A member of a white supremacists militia stands near a rally in Charlottesville, Virginia, U.S., August 12, 2017.   REUTERS/Joshua Roberts
+
+
+
+
+
+
+Virginia State Police officer aims during clash protests in Charlottesville, VA on August 12, 2017. 
+A picturesque Virginia city braced Saturday for a flood of white nationalist demonstrators as well as counter-protesters, declaring a local emergency as law enforcement attempted to quell early violent clashes.
+ / AFP PHOTO / PAUL J. RICHARDS        (Photo credit should read PAUL J. RICHARDS/AFP/Getty Images)
+
+
+
+
+
+
+CHARLOTTESVILLE, USA - August 12: White Supremacists and counter protestors clash at Emancipation Park where the White Nationalists are protesting the removal of the Robert E. Lee monument in Charlottesville, Va., USA on August 12, 2017. (Photo by Samuel Corum/Anadolu Agency/Getty Images)
+
+
+
+
+
+
+CHARLOTTESVILLE, USA - August 12: A White Supremacist with a White Nationalist flag during clashes with counter protestors at Emancipation Park where the White Nationalists are protesting the removal of the Robert E. Lee monument in Charlottesville, Va., USA on August 12, 2017. (Photo by Samuel Corum/Anadolu Agency/Getty Images)
+
+
+
+
+
+
+Rescue workers assist people who were injured when a car drove through a group of counter protestors at the "Unite the Right" rally Charlottesville, Virginia, U.S., August 12, 2017.   REUTERS/Joshua Roberts
+
+
+
+
+
+
+First responders stand by a car that was struck when a car drove through a group of counter protesters at the "Unite the Right" rally Charlottesville, Virginia, U.S., August 12, 2017.   REUTERS/Justin Ide
+
+
+
+
+
+
+Rescue workers transport a victim who was injured when a car drove through a group of counter protestors at the "Unite the Right" rally Charlottesville, Virginia, U.S., August 12, 2017.   REUTERS/Joshua Roberts
+
+
+
+
+
+
+Rescue workers assist people who were injured when a car drove through a group of counter protestors at the "Unite the Right" rally Charlottesville, Virginia, U.S., August 12, 2017.   REUTERS/Joshua Roberts
+
+
+
+
+
+
+A man who was hit with pepper spray reacts during a clash between a crowd of white supremacist protesters against a group of counter-protesters in Charlottesville, Virginia, U.S., August 12, 2017.  REUTERS/Justin Ide
+
+
+
+
+
+
+White supremacists clash with counter protesters during a rally in Charlottesville, Virginia, U.S., August 12, 2017.   REUTERS/Joshua Roberts
+
+
+
+
+
+
+A white supremacist militia member stands in front of clergy counter protesting during rally in Charlottesville, Virginia, U.S., August 12, 2017.   REUTERS/Joshua Roberts
+
+
+
+
+
+
+A counter protest yells at white supremacists during a rally in Charlottesville, Virginia, U.S., August 12, 2017.   REUTERS/Joshua Roberts
+
+
+
+
+
+
+A Virginia State Trooper stands guard at the crime scene where a vehicle plowed into a crowd of counter protesters and two other vehicles (rear) near the "Unite the Right" rally organized by white nationalists in Charlottesville, Virginia, U.S., August 12, 2017. REUTERS/Jim Bourg
+
+
+
+
+
+
+White supremacists stand behind their shields at a rally in Charlottesville, Virginia, U.S., August 12, 2017.   REUTERS/Joshua Roberts
+
+
+
+
+
+
+
+
+Up Next
+
+See Gallery
+
+
+
+
+Discover More Like This
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+HIDE CAPTION
+SHOW CAPTION
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ of 
+
+
+
+SEE ALL
+
+
+
+BACK TO SLIDE 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ See Gallery 
+More from Aol.com:
+FBI may have lost critical time unlocking Texas shooter's iPhone
+Lapse in background check database allowed Texas shooter to buy weapons
+Family strife, threats preceded Texas church massacre by former US airman
+Texas church shooter claimed he used dogs as target practice, says former colleague
+Racist messages posted at Air Force Academy discovered to be written by one of the targeted victims
+ 
+
+http://www.baltimoresun.com/news/maryland/investigations/bs-md-sun-investigates-hate-crime-fbi-20171113-story.html
+
+The number of hate crimes rose nearly 5 percent across the country in 2016, according to new data released by the FBI on Monday. It marks the second year in a row hate crimes have increased. Hate crimes in Maryland, however, have decreased 14 percent, according to the data. Experts caution there is a big caveat with FBI data: It’s based on voluntary reporting from more than 15,000 police agencies across the country. Furthermore, hate crimes are generally underreported to police. Dozens of cities with more than 100,000 residents either reported zero hate crimes or did not submit their hate crime data, according to an analysis by the Anti-Defamation League, a civil rights organization, which has called for better reporting. “Hate crimes demand priority attention because of their special impact. They not only hurt one victim, but they also intimidate and isolate a victim’s whole community and weaken the bonds of our society,” said ADL chief Jonathan A. Greenblatt. 
+
+Reports of hate and bias incidents in Maryland surged 40 percent last year, the Maryland State Police reported Friday. 
+
+Law enforcement agencies received 285 such reports in 2016, up from 203 in 2015. 
+
+There were more than 50 reports in November, the month of the presidential election. That was far... 
+
+Reports of hate and bias incidents in Maryland surged 40 percent last year, the Maryland State Police reported Friday. 
+
+Law enforcement agencies received 285 such reports in 2016, up from 203 in 2015. 
+
+There were more than 50 reports in November, the month of the presidential election. That was far... FBI data show hate crimes increased across the country from 5,850 in 2015 to 6,121 crimes in 2016. In Maryland, such crimes declined from 43 in 2015 to 37 in 2016. However, a report issued last month by the Maryland State Police showed a 40 percent increase in hate “incidents” in the state in 2016. Hate incidents increased from 203 in 2015 to 285 in 2016. Maryland State Police report not just hate “crimes,” but also “incidents,” which could include things such as intimidation, which may not be considered a crime. Some agencies also may not determine an incident is a hate crime until after the FBI’s deadline to report. In addition, only “verified” crimes are reported to the FBI. Many incidents included in the Maryland State Police report were not able to be verified because they involved anonymous letters or other suspects or had not yet been fully investigated in time for the FBI report. Brian Levin, director of the Center for the Study of Hate and Extremism at California State University, said the increase in hate crimes nationally reflects an increase in hate crimes around the 2016 presidential election, a big increase in some large jurisdictions, a sustained level of crimes against large groups including African Americans who have long been the the top target of hate crimes, and a jump in crimes against Latinos, whites, Muslims and transgender people. The Baltimore Sun is partnering with newsrooms around the country in a ProPublica-led project to collect recent and reliable data on hate crimes in the U.S. If you have been the victim of a hate crime, please use this form to contribute to this database. crentz@baltsun.com twitter.com/cdrentz 
+
+https://www.aei.org/publication/2016-fbi-data-jews-were-3x-more-likely-than-blacks-1-5x-more-likely-than-muslims-to-be-a-hate-crime-victim/
+
+
+November 13, 2017 5:58 pm
+| AEIdeas
+  Mark J. Perry @Mark_J_Perry 
+
+https://news.vice.com/story/anti-muslim-hate-crimes-skyrocketed-again-in-2016-fbi-data-says
+
+FBI data shows another big increase in 2016  FBI data shows another big increase in 2016  
+
+http://www.nbc15.com/content/news/FBI-data-shows-hate-crimes-appeared-to-drop-in-Wisconsin-457354903.html
+
+MADISON, Wis. (AP) --  Hate crimes in Wisconsin appeared to decrease for the second straight year in 2016. The FBI released its 2016 hate crime statistics report Monday. Wisconsin reported 34 hate crimes last year. That's down from 43 in 2015 and 51 in 2014. The bulk of the crimes in 2016 were motivated by the victim's race or ethnicity. The yearly report is the most comprehensive accounting of hate crimes in the U.S. But authorities warn it's incomplete, partly because it's based on voluntary reporting by police agencies. The number of participating agencies also varies from year to year, so simple year-by-year comparisons are cautioned against. Wisconsin's 2016 figures were reported by 18 -- or roughly 4 percent -- of a total of 414 agencies participating in the program statewide. 
+
+https://www.aol.com/article/news/2017/11/14/new-fbi-data-shows-rise-in-hate-crimes-in-2016-states-most-reported-cases/23276262/
+
+New data released by the FBI on Monday revealed an increase in hate crimes of about 5 percent over the last year in the United States.  The data from the Hate Crimes Division found that there were approximately 5,800 hate crimes reported in 2015 -- and the number jumped up to 6,121 in 2016.  Of the reported crimes, about 60 percent were motivated by of race, ethnicity, or ancestry. Another 21 percent were motivated by religious bias, and 18 percent by sexual orientation.  The state level data -- although incomplete because only some agencies in each state contributed data -- also suggested some states have a higher incidence or reported hate crimes than others. Scroll through the gallery below to see which states had the most hate crimes: 
+
+
+
+
+
+51 PHOTOS
+Hate crimes reported by states in 2016
+See Gallery
+
+
+
+
+
+
+
+Hate crimes reported by states in 2016
+
+
+
+
+
+
+
+50. Wyoming: 3 incidents reported
+(Photo via Getty Images)
+
+
+
+
+
+
+
+49. Mississippi: 7 incidents reported
+(Photo via Getty Images)
+
+
+
+
+
+
+
+48. North Dakota: 8 incidents reported
+(Photo via Getty Images)
+
+
+
+
+
+
+
+47. Alaska: 11 incidents reported
+(Photo via Getty Images)
+
+
+
+
+
+
+
+46. Rhode Island: 12 incidents reported
+(Photo via Getty Images)
+
+
+
+
+
+
+
+45. Arkansas: 12 incidents reported
+(Photo via Getty Images)
+
+
+
+
+
+
+
+44. Alabama: 14 incidents reported
+(Photo via Getty Images)
+
+
+
+
+
+
+
+43. Delaware: 15 incidents reported
+(Photo via Getty Images)
+
+
+
+
+
+
+
+42. Iowa: 17 incidents reported
+(Photo via Getty Images)
+
+
+
+
+
+
+
+41. South Dakota: 18 incidents reported
+(Photo via Getty Images)
+
+
+
+
+
+
+
+40. Montana: 20 incidents reported
+(Photo via Getty Images)
+
+
+
+
+
+
+
+39. South Carolina: 23 incidents reported
+(Photo via Shutterstock)
+
+
+
+
+
+
+
+38. Vermont: 25 incidents reported
+(Photo via Getty Images)
+
+
+
+
+
+
+
+37. New Mexico: 26 incidents reported
+(Photo via Getty Images)
+
+
+
+
+
+
+
+36. Louisiana: 26 incidents reported
+(Photo via Getty Images)
+
+
+
+
+
+
+
+35. Idaho: 27 incidents reported
+(Photo via Getty Images)
+
+
+
+
+
+
+
+34. New Hampshire: 28 incidents reported
+(Photo via Alamy)
+
+
+
+
+
+
+
+33. Nebraska: 31 incidents reported
+(Photo via Getty Images)
+
+
+
+
+
+
+
+32. Oklahoma: 33 incidents reported
+(Photo via Getty Images)
+
+
+
+
+
+
+
+31. Wisconsin: 34 incidents reported
+(Photo via Getty Images)
+
+
+
+
+
+
+
+30. Maryland: 37 incidents reported
+(Photo via Getty Images)
+
+
+
+
+
+
+
+29. Georgia: 39 incidents reported
+(Photo via Getty Images)
+
+
+
+
+
+
+
+28. Maine: 40 incidents reported
+(Photo via Getty Images)
+
+
+
+
+
+
+
+27. West Virginia: 41 incidents reported
+(Photo via Alamy)
+
+
+
+
+
+
+
+26. Nevada: 41 incidents reported
+(Photo via Getty Images)
+
+
+
+
+
+
+
+25. Kansas: 49 incidents reported
+(Photo via Getty Images)
+
+
+
+
+
+
+
+24. Pennsylvania: 61 incidents reported
+(Photo via Getty Images)
+
+
+
+
+
+
+
+23. Utah: 66 incidents reported
+(Photo via Shutterstock)
+
+
+
+
+
+
+
+22. Indiana: 78 incidents reported
+(Photo via Getty Images)
+
+
+
+
+
+
+
+21. Missouri: 88 incidents reported
+(Photo via Getty Images)
+
+
+
+
+
+
+
+20. Florida: 96 incidents reported
+(Photo via Getty Images)
+
+
+
+
+
+
+
+19. Oregon: 104 incidents reported
+(Photo via Getty Images)
+
+
+
+
+
+
+
+18. Colorado: 104 incidents reported
+(Photo via )
+
+
+
+
+
+
+
+17. Connecticut: 106 incidents reported
+(Photo via Getty Images)
+
+
+
+
+
+
+
+16. Illinois: 111 incidents reported
+(Photo via Getty Images)
+
+
+
+
+
+
+
+15. Washington, D.C.: 115 incidents reported
+(Photo via Getty Images)
+
+
+
+
+
+
+
+14. Minnesota: 119 incidents reported
+(Photo via Getty Images)
+
+
+
+
+
+
+
+13. Virginia: 122 incidents reported
+(Photo via Getty Images)
+
+
+
+
+
+
+
+12. Tennessee: 142 incidents reported
+(Photo via Getty Images)
+
+
+
+
+
+
+
+11. North Carolina: 148 incidents reported
+(Photo via Getty Images)
+
+
+
+
+
+
+
+10. Texas: 178 incidents reported
+(Photo via Getty Images)
+
+
+
+
+
+
+
+9. Kentucky: 206 incidents reported
+(Photo via Getty Images)
+
+
+
+
+
+
+
+8. Arizona: 213 incidents reported
+(Photo via Getty Images)
+
+
+
+
+
+
+
+7. New Jersey: 282 incidents reported
+(Photo via Getty Images)
+
+
+
+
+
+
+
+6. Washington: 387 incidents reported
+(Photo via Getty Images)
+
+
+
+
+
+
+
+5. Massachusetts: 391 incidents reported
+(Photo via Corbis)
+
+
+
+
+
+
+
+4. Michigan: 399 incidents reported
+(Photo via Getty Images)
+
+
+
+
+
+
+
+3. Ohio: 442 incidents reported
+(Photo via Getty Images)
+
+
+
+
+
+
+
+2. New York: 595 incidents reported
+(Photo via Getty Images)
+
+
+
+
+
+
+
+1. California: 931 incidents reported
+(Photo via Getty Images)
+
+
+
+
+
+
+
+
+
+Up Next
+
+See Gallery
+
+
+
+
+Discover More Like This
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+HIDE CAPTION
+SHOW CAPTION
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ of 
+
+
+
+SEE ALL
+
+
+
+BACK TO SLIDE 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 50. Wyoming: 3 incidents reported (Photo via Getty Images) 49. Mississippi: 7 incidents reported (Photo via Getty Images) 48. North Dakota: 8 incidents reported (Photo via Getty Images) 47. Alaska: 11 incidents reported (Photo via Getty Images) 46. Rhode Island: 12 incidents reported (Photo via Getty Images) 45. Arkansas: 12 incidents reported (Photo via Getty Images) 44. Alabama: 14 incidents reported (Photo via Getty Images) 43. Delaware: 15 incidents reported (Photo via Getty Images) 42. Iowa: 17 incidents reported (Photo via Getty Images) 41. South Dakota: 18 incidents reported (Photo via Getty Images) 40. Montana: 20 incidents reported (Photo via Getty Images) 39. South Carolina: 23 incidents reported (Photo via Shutterstock) 38. Vermont: 25 incidents reported (Photo via Getty Images) 37. New Mexico: 26 incidents reported (Photo via Getty Images) 36. Louisiana: 26 incidents reported (Photo via Getty Images) 35. Idaho: 27 incidents reported (Photo via Getty Images) 34. New Hampshire: 28 incidents reported (Photo via Alamy) 33. Nebraska: 31 incidents reported (Photo via Getty Images) 32. Oklahoma: 33 incidents reported (Photo via Getty Images) 31. Wisconsin: 34 incidents reported (Photo via Getty Images) 30. Maryland: 37 incidents reported (Photo via Getty Images) 29. Georgia: 39 incidents reported (Photo via Getty Images) 28. Maine: 40 incidents reported (Photo via Getty Images) 27. West Virginia: 41 incidents reported (Photo via Alamy) 26. Nevada: 41 incidents reported (Photo via Getty Images) 25. Kansas: 49 incidents reported (Photo via Getty Images) 24. Pennsylvania: 61 incidents reported (Photo via Getty Images) 23. Utah: 66 incidents reported (Photo via Shutterstock) 22. Indiana: 78 incidents reported (Photo via Getty Images) 21. Missouri: 88 incidents reported (Photo via Getty Images) 20. Florida: 96 incidents reported (Photo via Getty Images) 19. Oregon: 104 incidents reported (Photo via Getty Images) 18. Colorado: 104 incidents reported (Photo via ) 17. Connecticut: 106 incidents reported (Photo via Getty Images) 16. Illinois: 111 incidents reported (Photo via Getty Images) 15. Washington, D.C.: 115 incidents reported (Photo via Getty Images) 14. Minnesota: 119 incidents reported (Photo via Getty Images) 13. Virginia: 122 incidents reported (Photo via Getty Images) 12. Tennessee: 142 incidents reported (Photo via Getty Images) 11. North Carolina: 148 incidents reported (Photo via Getty Images) 10. Texas: 178 incidents reported (Photo via Getty Images) 9. Kentucky: 206 incidents reported (Photo via Getty Images) 8. Arizona: 213 incidents reported (Photo via Getty Images) 7. New Jersey: 282 incidents reported (Photo via Getty Images) 6. Washington: 387 incidents reported (Photo via Getty Images) 5. Massachusetts: 391 incidents reported (Photo via Corbis) 4. Michigan: 399 incidents reported (Photo via Getty Images) 3. Ohio: 442 incidents reported (Photo via Getty Images) 2. New York: 595 incidents reported (Photo via Getty Images) 1. California: 931 incidents reported (Photo via Getty Images) See Gallery Five of the nation's more populous states -- California, New York, Ohio, Michigan and Massachusetts -- had the highest number of hate crimes reported.  But when factoring in the relative populations of each state, the picture changes somewhat. Washington, D.C., with its relatively small population and 115 reported hate crimes, comes in first. Massachusetts, Washington, Kentucky and Ohio round out the top five ranked by population. By the same measure, Arkansas, South Carolina and Georgia had the lowest rate.  But the data is not fully comprehensive, and earlier this year former FBI director James Comey said that the FBI must “do a better job of tracking and reporting hate crime.” But the increase in hate crimes does track along with an increase in hate groups. Data provided by the Southern Poverty Law Center found that the number of hate groups in the U.S. jumped from 892 in 2015 to 917 in 2016 -- a three percent uptick. 
+
+
+
+
+
+44 PHOTOS
+Charlottesville violence erupts as protesters and counterprotesters clash
+See Gallery
+
+
+
+
+
+
+
+Charlottesville violence erupts as protesters and counterprotesters clash
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+CHARLOTTESVILLE, USA - August 12: A White Supremacist kicks back a smoke bomb thrown by counter protestors during clashes at Emancipation Park where the White Nationalists are protesting the removal of the Robert E. Lee monument in Charlottesville, Va., USA on August 12, 2017. (Photo by Samuel Corum/Anadolu Agency/Getty Images)
+
+
+
+
+
+
+CHARLOTTESVILLE, USA - August 12: A White Supremacist tries to strike a counter protestor with a White Nationalist flag during clashes at Emancipation Park where the White Nationalists are protesting the removal of the Robert E. Lee monument in Charlottesville, Va., USA on August 12, 2017. (Photo by Samuel Corum/Anadolu Agency/Getty Images)
+
+
+
+
+
+
+Rescue workers assist people who were injured when a car drove through a group of counter protestors at the "Unite the Right" rally Charlottesville, Virginia, U.S., August 12, 2017.   REUTERS/Joshua Roberts
+
+
+
+
+
+
+People receive first-aid after a car accident ran into a crowd of protesters in Charlottesville, VA on August 12, 2017. 
+A vehicle plowed into a crowd of people Saturday at a Virginia rally where violence erupted between white nationalist demonstrators and counter-protesters, witnesses said, causing an unclear number of injuries. / AFP PHOTO / PAUL J. RICHARDS        (Photo credit should read PAUL J. RICHARDS/AFP/Getty Images)
+
+
+
+
+
+
+CHARLOTTESVILLE, USA - August 12: Police, medical personnel, and other protestors attend to the injured people after a car rammed into a crowd of anti-White Supremacy protestors in Charlottesville, Va., USA on August 12, 2017. (Photo by Samuel Corum/Anadolu Agency/Getty Images)
+
+
+
+
+
+
+A woman who was injured when a car drove through a group of counter protestors at the "Unite the Right" rally is helped in Charlottesville, Virginia, U.S., August 12, 2017.   REUTERS/Joshua Roberts?
+
+
+
+
+
+
+Rescue workers assist people who were injured when a car drove through a group of counter protestors at the "Unite the Right" rally Charlottesville, Virginia, U.S., August 12, 2017.   REUTERS/Joshua Roberts
+
+
+
+
+
+
+Rescue workers transport a victim who was injured when a car drove through a group of counter protestors at the "Unite the Right" rally Charlottesville, Virginia, U.S., August 12, 2017.   REUTERS/Joshua Roberts
+
+
+
+
+
+
+A woman is received first-aid after a car accident ran into a crowd of protesters in Charlottesville, VA on August 12, 2017. A picturesque Virginia city braced Saturday for a flood of white nationalist demonstrators as well as counter-protesters, declaring a local emergency as law enforcement attempted to quell early violent clashes. / AFP PHOTO / PAUL J. RICHARDS (Photo credit should read PAUL J. RICHARDS/AFP/Getty Images)
+
+
+
+
+
+
+People receive first-aid after a car accident ran into a crowd of protesters in Charlottesville, VA on August 12, 2017. A picturesque Virginia city braced Saturday for a flood of white nationalist demonstrators as well as counter-protesters, declaring a local emergency as law enforcement attempted to quell early violent clashes. / AFP PHOTO / PAUL J. RICHARDS (Photo credit should read PAUL J. RICHARDS/AFP/Getty Images)
+
+
+
+
+
+
+Rescue workers assist people who were injured when a car drove through a group of counter protestors at the "Unite the Right" rally Charlottesville, Virginia, U.S., August 12, 2017. REUTERS/Joshua Roberts
+
+
+
+
+
+
+A woman is received first-aid after a car accident ran into a crowd of protesters in Charlottesville, VA on August 12, 2017. A picturesque Virginia city braced Saturday for a flood of white nationalist demonstrators as well as counter-protesters, declaring a local emergency as law enforcement attempted to quell early violent clashes. / AFP PHOTO / PAUL J. RICHARDS (Photo credit should read PAUL J. RICHARDS/AFP/Getty Images)
+
+
+
+
+
+
+CHARLOTTESVILLE, USA - August 12: A White Supremacist helps a friend after he was punched in the face during clashes with counter protestors at Emancipation Park where the White Nationalists are protesting the removal of the Robert E. Lee monument in Charlottesville, Va., USA on August 12, 2017. (Photo by Samuel Corum/Anadolu Agency/Getty Images)
+
+
+
+
+
+
+CHARLOTTESVILLE, USA - August 12: A counter protestor strikes a White Nationalist with a baton during clashes at Emancipation Park where the White Nationalists are protesting the removal of the Robert E. Lee monument in Charlottesville, Va., USA on August 12, 2017. (Photo by Samuel Corum/Anadolu Agency/Getty Images)
+
+
+
+
+
+
+CHARLOTTESVILLE, USA - August 12: White Supremacists and counter protestors clash at Emancipation Park where the White Nationalists are protesting the removal of the Robert E. Lee monument in Charlottesville, Va., USA on August 12, 2017. (Photo by Samuel Corum/Anadolu Agency/Getty Images)
+
+
+
+
+
+
+A man is seen with an injury during a clash between members of white nationalist protesters against a group of counter-protesters in Charlottesville, Virginia, U.S., August 12, 2017.   REUTERS/Joshua Roberts
+
+
+
+
+
+
+Virginia State Police move in as members of white nationalist protesters clash against a group of counter-protesters in Charlottesville, Virginia, U.S., August 12, 2017.   REUTERS/Joshua Roberts
+
+
+
+
+
+
+People struggle with a Confederate flag as a crowd of white nationalists are met by a group of counter-protesters in Charlottesville, Virginia, U.S., August 12, 2017.  REUTERS/Justin Ide
+
+
+
+
+
+
+CHARLOTTESVILLE, USA - August 12: White Supremacists rush forward with shields and sticks during clashes with counter protestors at Emancipation Park where the White Nationalists are protesting the removal of the Robert E. Lee monument in Charlottesville, Va., USA on August 12, 2017. (Photo by Samuel Corum/Anadolu Agency/Getty Images)
+
+
+
+
+
+
+A white supremacists stands behind militia members after he scuffled with a counter demonstrator in Charlottesville, Virginia, U.S., August 12, 2017.   REUTERS/Joshua Roberts
+
+
+
+
+
+
+A white supremacists stands with militia members after he scuffled with a counter demonstrator in Charlottesville, Virginia, U.S., August 12, 2017.   REUTERS/Joshua Roberts
+
+
+
+
+
+
+A white supremacists stands behind militia members after he scuffled with a counter demonstrator in Charlottesville, Virginia, U.S., August 12, 2017.   REUTERS/Joshua Roberts
+
+
+
+
+
+
+CHARLOTTESVILLE, VA - AUGUST 12:  White nationalists, neo-Nazis and members of the 'alt-right' take refuge in an alleyway after being hit with pepper spray after the 'Unite the Right' rally was declared an unlawful gathering August 12, 2017 in Charlottesville, Virginia. After clashes with anti-facist protesters and police the rally was declared an unlawful gathering and people were forced out of Lee Park, where a statue of Confederate General Robert E. Lee is slated to be removed.  (Photo by Chip Somodevilla/Getty Images)
+
+
+
+
+
+
+Members of white nationalists are met by a group of counter-protesters in Charlottesville, Virginia, U.S., August 12, 2017.   REUTERS/Joshua Roberts     TPX IMAGES OF THE DAY
+
+
+
+
+
+
+Members of white nationalists clash against a group of counter-protesters in Charlottesville, Virginia, U.S., August 12, 2017.   REUTERS/Joshua Roberts
+
+
+
+
+
+
+A white supremacists carries the Confederate flag as he arrives for a rally in Charlottesville, Virginia, U.S., August 12, 2017.   REUTERS/Joshua Roberts
+
+
+
+
+
+
+Virginia State Troopers stand under a statue of Robert E. Lee before a white supremacists rally in Charlottesville, Virginia, U.S., August 12, 2017.   REUTERS/Joshua Roberts
+
+
+
+
+
+
+A white supremacist holds a flag during a rally in Charlottesville, Virginia, U.S., August 12, 2017.   REUTERS/Joshua Roberts
+
+
+
+
+
+
+A member of a white supremacists militia stands near a rally in Charlottesville, Virginia, U.S., August 12, 2017.   REUTERS/Joshua Roberts
+
+
+
+
+
+
+Virginia State Police officer aims during clash protests in Charlottesville, VA on August 12, 2017. 
+A picturesque Virginia city braced Saturday for a flood of white nationalist demonstrators as well as counter-protesters, declaring a local emergency as law enforcement attempted to quell early violent clashes.
+ / AFP PHOTO / PAUL J. RICHARDS        (Photo credit should read PAUL J. RICHARDS/AFP/Getty Images)
+
+
+
+
+
+
+CHARLOTTESVILLE, USA - August 12: White Supremacists and counter protestors clash at Emancipation Park where the White Nationalists are protesting the removal of the Robert E. Lee monument in Charlottesville, Va., USA on August 12, 2017. (Photo by Samuel Corum/Anadolu Agency/Getty Images)
+
+
+
+
+
+
+CHARLOTTESVILLE, USA - August 12: A White Supremacist with a White Nationalist flag during clashes with counter protestors at Emancipation Park where the White Nationalists are protesting the removal of the Robert E. Lee monument in Charlottesville, Va., USA on August 12, 2017. (Photo by Samuel Corum/Anadolu Agency/Getty Images)
+
+
+
+
+
+
+Rescue workers assist people who were injured when a car drove through a group of counter protestors at the "Unite the Right" rally Charlottesville, Virginia, U.S., August 12, 2017.   REUTERS/Joshua Roberts
+
+
+
+
+
+
+First responders stand by a car that was struck when a car drove through a group of counter protesters at the "Unite the Right" rally Charlottesville, Virginia, U.S., August 12, 2017.   REUTERS/Justin Ide
+
+
+
+
+
+
+Rescue workers transport a victim who was injured when a car drove through a group of counter protestors at the "Unite the Right" rally Charlottesville, Virginia, U.S., August 12, 2017.   REUTERS/Joshua Roberts
+
+
+
+
+
+
+Rescue workers assist people who were injured when a car drove through a group of counter protestors at the "Unite the Right" rally Charlottesville, Virginia, U.S., August 12, 2017.   REUTERS/Joshua Roberts
+
+
+
+
+
+
+A man who was hit with pepper spray reacts during a clash between a crowd of white supremacist protesters against a group of counter-protesters in Charlottesville, Virginia, U.S., August 12, 2017.  REUTERS/Justin Ide
+
+
+
+
+
+
+White supremacists clash with counter protesters during a rally in Charlottesville, Virginia, U.S., August 12, 2017.   REUTERS/Joshua Roberts
+
+
+
+
+
+
+A white supremacist militia member stands in front of clergy counter protesting during rally in Charlottesville, Virginia, U.S., August 12, 2017.   REUTERS/Joshua Roberts
+
+
+
+
+
+
+A counter protest yells at white supremacists during a rally in Charlottesville, Virginia, U.S., August 12, 2017.   REUTERS/Joshua Roberts
+
+
+
+
+
+
+A Virginia State Trooper stands guard at the crime scene where a vehicle plowed into a crowd of counter protesters and two other vehicles (rear) near the "Unite the Right" rally organized by white nationalists in Charlottesville, Virginia, U.S., August 12, 2017. REUTERS/Jim Bourg
+
+
+
+
+
+
+White supremacists stand behind their shields at a rally in Charlottesville, Virginia, U.S., August 12, 2017.   REUTERS/Joshua Roberts
+
+
+
+
+
+
+
+
+Up Next
+
+See Gallery
+
+
+
+
+Discover More Like This
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+HIDE CAPTION
+SHOW CAPTION
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ of 
+
+
+
+SEE ALL
+
+
+
+BACK TO SLIDE 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ See Gallery 
+More from Aol.com:
+FBI may have lost critical time unlocking Texas shooter's iPhone
+Lapse in background check database allowed Texas shooter to buy weapons
+Family strife, threats preceded Texas church massacre by former US airman
+Texas church shooter claimed he used dogs as target practice, says former colleague
+Racist messages posted at Air Force Academy discovered to be written by one of the targeted victims
+ 
+

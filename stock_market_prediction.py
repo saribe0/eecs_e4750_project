@@ -6,7 +6,7 @@
 ####################################################################################################
 
 # Specifies GPU/CPU calculations will be prepformed
-GPU = False
+GPU = True
 
 if GPU:
 	import pyopencl as cl
@@ -125,8 +125,10 @@ __kernel void analyze_weights_1(__global int* words_by_letter, __global int* num
 	unsigned int group_size = get_local_size(0);
 
 	// Create local arrays to store the data in
+	// The value 512 must be equal to the group size. This is the only value in the kernel
+        // - that must be updated when the group size is changed.
 
-	volatile __local float local_out[6 * group_size];
+	volatile __local float local_out[6 * 512];
 
 	// Get the weight and frequency for the current thread
 
@@ -190,8 +192,10 @@ __kernel void analyze_weights_2(__global float* words_by_letter, __global int* n
 	unsigned int group_size = get_local_size(0);
 
 	// Create local arrays to store the data in
+	// The value 512 must be equal to the group size. This is the only value in the kernel
+	// - that must be updated when the group size is changed.
 
-	volatile __local float local_out[2 * group_size];
+	volatile __local float local_out[2 * 512];
 
 	// Get the weight and frequency for the current thread
 
@@ -238,7 +242,8 @@ __kernel void analyze_weights_2(__global float* words_by_letter, __global int* n
 """
 
 # Build the kernel
-#prg = cl.Program(ctx, analysis_kernel).build()
+if GPU:
+	prg = cl.Program(ctx, analysis_kernel).build()
 
 
 '''
@@ -1039,7 +1044,7 @@ def analyze_weights_gpu():
 
 	# Prepare the GPU buffers for the standard deviation calculation
 	# [sum of avg-weight, weighted sum of avg-weight]
-	out_std_sum = np.zeros((128,2), dtype = np.float32)
+	out_std_sum = np.zeros((130,2), dtype = np.float32)
 	out_std_sum_buff = cl.Buffer(ctx, mf.WRITE_ONLY, out_std_sum.nbytes)
 
 	# Call the kernel

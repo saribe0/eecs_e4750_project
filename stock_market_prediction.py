@@ -14,7 +14,7 @@ import time
 import logging
 import sys, getopt
 import numpy as np
-from bs4 import BeautifulSoup as BS
+#from bs4 import BeautifulSoup as BS
 import struct
 import binascii
 import math
@@ -123,16 +123,23 @@ queue = cl.CommandQueue(ctx)
 
 analysis_kernel = """
 
-__kernel void analyze_weights_1(__global float* words_by_letter, __global int* num_words_by_letter, volatile __global unsigned float* out_stats, int max_words_per_letter) {
+__kernel void analyze_weights_1(__global float* words_by_letter, __global int* num_words_by_letter, volatile __global float* out_stats, int max_words_per_letter) {
 	
 	// Get the word for the current work-item to focus on
 
 	unsigned int word_id = get_global_id(0);
 	unsigned int letter_id = get_global_id(1);
+	unsigned int work_item_id = get_local_id(0);
 
 	// Create local arrays to store the data in
 
-	volatile __local unsigned float local_out[6] = {0, 0, 0, 1, 0, 0};
+	volatile __local float local_out[6];
+	if (work_item_id < 6 && work_item_id != 3) {
+		local_out[work_item_id] = 0;
+	}
+	if (work_item_id == 3) {
+		local_out[work_item_id] = 1;
+	}
 
 	// Sync all threads to ensure they all have the local array initialized
 
@@ -162,7 +169,7 @@ __kernel void analyze_weights_1(__global float* words_by_letter, __global int* n
 
 	// If its the first thread in the group, update the global values
 	// Also bad for performance but much better than loops
-	if (get_local_id(0) == 0) {
+	if (work_item_id == 0) {
 
 		atomic_add(out_stats + 0, local_out[0]);
 		atomic_add(out_stats + 1, local_out[1]);
@@ -173,16 +180,20 @@ __kernel void analyze_weights_1(__global float* words_by_letter, __global int* n
 	}
 }
 
-__kernel void analyze_weights_2(__global float* words_by_letter, __global int* num_words_by_letter, volatile __global unsigned float* out_stats, int max_words_per_letter, int average, int weighted_average) {
+__kernel void analyze_weights_2(__global float* words_by_letter, __global int* num_words_by_letter, volatile __global float* out_stats, int max_words_per_letter, int average, int weighted_average) {
 	
 	// Get the word for the current work-item to focus on
 
 	unsigned int word_id = get_global_id(0);
 	unsigned int letter_id = get_global_id(1);
+	unsigned int work_item_id = get_local_id(0);
 
 	// Create local arrays to store the data in
 
-	volatile __local unsigned float local_out[2] = {0, 0};
+	volatile __local float local_out[2];
+	if (work_item_id < 2) {
+                local_out[work_item_id] = 0;
+        }
 
 	// Sync all threads to ensure they all have the local array initialized
 
@@ -208,7 +219,7 @@ __kernel void analyze_weights_2(__global float* words_by_letter, __global int* n
 
 	// If its the first thread in the group, update the global values
 	// Also bad for performance but much better than loops
-	if (get_local_id(0) == 0) {
+	if (work_item_id == 0) {
 
 		atomic_add(out_stats + 0, local_out[0]);
 		atomic_add(out_stats + 1, local_out[1]);
@@ -216,6 +227,9 @@ __kernel void analyze_weights_2(__global float* words_by_letter, __global int* n
 }
 
 """
+
+# Build the kernel
+prg = cl.Program(ctx, analysis_kernel).build()
 
 
 '''
@@ -984,8 +998,8 @@ def analyze_weights_gpu():
 
 	#Prepare GPU buffers
 	mf = cl.mem_flags
-	words_by_letter_buff = cl.Buffer(ctx, mf.READ_ONLY, | mf.COPY_HOST_PTR, hostbuf = words_by_letter.flatten())
-	num_words_by_letter_buff = cl.Buffer(ctx, mf.READ_ONLY, | mf.COPY_HOST_PTR, hostbuf = num_words_by_letter)
+	words_by_letter_buff = cl.Buffer(ctx, mf.READ_ONLY | mf.COPY_HOST_PTR, hostbuf = words_by_letter.flatten())
+	num_words_by_letter_buff = cl.Buffer(ctx, mf.READ_ONLY | mf.COPY_HOST_PTR, hostbuf = num_words_by_letter)
 	out_stats_buff = cl.Buffer(ctx, mf.WRITE_ONLY, out_stats.nbytes)
 
 	# Call the kernel
@@ -1009,7 +1023,7 @@ def analyze_weights_gpu():
 	# Prepare the GPU buffers for the standard deviation calculation
 	# [sum of avg-weight, weighted sum of avg-weight]
 	out_std_sum = np.zeros((2,), dtype = np.float32)
-	out_std_sum_buff = cl.Buffer(ctx, mf.WRITE_ONLY, out_std_sum.nbytes)
+	out_std_sum_buff = cl.Buffer(ctx, mf.WRITE_ONLY | mf.COPY_HOST_PTR, out_std_sum.nbytes)
 
 	# Call the kernel
 	prg.analyze_weights_2(queue, words_by_letter.shape, (64, 1), words_by_letter_buff, num_words_by_letter_buff, out_std_sum_buff, np.uint32(MAX_WORDS_PER_LETTER), np.uint32(weight_average), np.uint32(weight_average_o))

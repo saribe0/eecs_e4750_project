@@ -646,8 +646,10 @@ def load_all_word_weights(option):
 			data = lines.split()
 
 			# Store the data
-			#struct.pack_into('16s f i i', words_by_letter[letter_index], num_words_by_letter[letter_index]*28, data[1].decode('ascii', 'ignore').encode('utf-8'), float(data[2]), int(data[3]), int(data[4]))
-			struct.pack_into('16s f i i', words_by_letter[letter_index], num_words_by_letter[letter_index]*28, data[1].encode('utf-8'), float(data[2]), int(data[3]), int(data[4]))
+			if GPU: 
+				struct.pack_into('16s f i i', words_by_letter[letter_index], num_words_by_letter[letter_index]*28, data[1].decode('ascii', 'ignore').encode('utf-8'), float(data[2]), int(data[3]), int(data[4]))
+			else:
+				struct.pack_into('16s f i i', words_by_letter[letter_index], num_words_by_letter[letter_index]*28, data[1].encode('utf-8'), float(data[2]), int(data[3]), int(data[4]))
 			num_words_by_letter[letter_index] += 1
 
 	file.close()
@@ -822,11 +824,11 @@ def update_word(ticker, option, word_upper, day):
 
 		if option == 'opt1':
 			if change > 0:
-				weight = 1
+				weight = 0
 				extra1 = 1
-				extra2 = 0
+				extra2 = 1
 			else:
-				weight = 1
+				weight = 0
 				extra1 = 1
 				extra2 = 0
 		

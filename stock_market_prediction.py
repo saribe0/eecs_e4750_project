@@ -198,7 +198,7 @@ __kernel void analyze_weights_2(__global int* words_by_letter, __global int* num
 	volatile __local float local_out[2 * 512];
 
 	// Get the weight and frequency for the current thread
-	if (word_id < 2 && letter_id < 1) { printf("max: %d", max_words_per_letter); }
+
 	float weight = 0;	
 	int frequency = 0;
 	if (word_id < num_words_by_letter[letter_id]) {
@@ -210,7 +210,7 @@ __kernel void analyze_weights_2(__global int* words_by_letter, __global int* num
 
 	local_out[group_size * 0 + work_item_id] =  (weight - average) * (weight - average);
 	local_out[group_size * 1 + work_item_id] =  (weight - weighted_average) * (weight - weighted_average) * frequency;
-if (word_id < 4 && letter_id < 1) { printf("[ weight: %f, freq: %d, avg: %f, w_avg: %f, %f, %f ]", weight, frequency, average, weighted_average, (weight - average) * (weight - average), (weight - average) * (weight - average) * frequency); }
+
 	// Preform reduction
 
 	for (unsigned int stride = 1; stride < group_size; stride *= 2) {
@@ -1053,12 +1053,8 @@ def analyze_weights_gpu():
 	out_std = 0
 	out_std_w = 0
 	for each in out_std_sum:
-		print(each[0], ' and ', each[1])
 		out_std += each[0]
 		out_std_w += each[1]
-
-	print(out_std)
-	print(out_std_w)
 
 	weight_stdev = math.sqrt(out_std / (weight_count - 1))
 	weight_stdev_o = math.sqrt(out_std_w / (weight_count_o - 1))

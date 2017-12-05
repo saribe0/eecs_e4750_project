@@ -2123,9 +2123,14 @@ def main():
 		# Command line argument for printing current weight stats
 		elif opt == '-z':
 			load_all_word_weights('opt1')
-			if not analyze_weights_gpu():
-				print('Error: Unable to analyze weights')
-				sys.exit(-1)
+			if GPU:
+				if not analyze_weights_gpu():
+					print('Error: Unable to analyze weights')
+					sys.exit(-1)
+			else:
+				 if not analyze_weights():
+                                        print('Error: Unable to analyze weights')
+                                        sys.exit(-1)
 			print_weight_analysis()
 			sys.exit(0)
 		elif opt == '-v':

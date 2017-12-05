@@ -5,7 +5,13 @@
 ##
 ####################################################################################################
 
-import pyopencl as cl
+# Specifies GPU/CPU calculations will be prepformed
+GPU = False
+
+if GPU:
+	import pyopencl as cl
+else:
+	from bs4 import BeautifulSoup as BS
 
 import requests
 import os
@@ -14,7 +20,6 @@ import time
 import logging
 import sys, getopt
 import numpy as np
-#from bs4 import BeautifulSoup as BS
 import struct
 import binascii
 import math
@@ -23,7 +28,6 @@ import re
 
 ########### Global Variables and Configurations ###########
 # Global Constants
-GPU = False
 STOCK_TAGS = [	'amzn',
 				'amat',
 				'agn',
@@ -91,151 +95,150 @@ if not os.path.exists('./output/'):
 
 
 # Get the correct opencl platform (taken from instructor sample code)
-NAME = 'NVIDIA CUDA'
-platforms = cl.get_platforms()
-devs = None
-for platform in platforms:
-	if platform.name == NAME:
-		devs = platform.get_devices()
+if GPU:
+	NAME = 'NVIDIA CUDA'
+	platforms = cl.get_platforms()
+	devs = None
+	for platform in platforms:
+		if platform.name == NAME:
+			devs = platform.get_devices()
 
-# Set up command queue
-ctx = cl.Context(devs)
-queue = cl.CommandQueue(ctx)
+	# Set up command queue
+	ctx = cl.Context(devs)
+	queue = cl.CommandQueue(ctx)
 
-'''
-# Create array that will be used for output, structure looks like:
-	# [sum of weights, weighted sum of weights, max, min, count, weighted count]
-	# Length is 6
-	out_stats = np.zeros((6,), dtype = np.uint32)
-
-	# First part is to calculate these 6 outputs 
-
-	#Prepare GPU buffers
-	mf = cl.mem_flags
-	words_by_letter_buff = cl.Buffer(ctx, mf.READ_ONLY, | mf.COPY_HOST_PTR, hostbuf = words_by_letter.flatten())
-	num_words_by_letter_buff = cl.Buffer(ctx, mf.READ_ONLY, | mf.COPY_HOST_PTR, hostbuf = num_words_by_letter)
-	out_stats_buff = cl.Buffer(ctx, mf.WRITE_ONLY, out_stats.nbytes)
-
-	# Call the kernel
-	prg.analyze_weights_1(queue, words_by_letter.shape, (512, 1), words_by_letter_buff, num_words_by_letter_buff, out_stats_buff)
-
-'''
 
 analysis_kernel = """
 
-__kernel void analyze_weights_1(__global float* words_by_letter, __global int* num_words_by_letter, volatile __global float* out_stats, int max_words_per_letter) {
+__kernel void analyze_weights_1(__global int* words_by_letter, __global int* num_words_by_letter, volatile __global float* out_stats, int max_words_per_letter) {
 	
 	// Get the word for the current work-item to focus on
 
 	unsigned int word_id = get_global_id(0);
 	unsigned int letter_id = get_global_id(1);
-unsigned int groupx = get_group_id(0);
-unsigned int groupy = get_group_id(1);
-	// Create local arrays to store the data in
-
-	volatile __local float local_out[6 * 512];
 
 	// Prepare the indices for the reduction
 
 	unsigned int work_item_id = get_local_id(0);
+	unsigned int work_group_x = get_group_id(0);
+	unsigned int work_group_y = get_group_id(1);
+	unsigned int group_size = get_local_size(0);
+
+	// Create local arrays to store the data in
+
+	volatile __local float local_out[6 * group_size];
 
 	// Get the weight and frequency for the current thread
+
 	float weight = 0;	
 	int frequency = 0;
 	if (word_id < num_words_by_letter[letter_id]) {
-		weight = words_by_letter[letter_id * max_words_per_letter * 7 + word_id * 7 + 4];
-		frequency = as_int(words_by_letter[letter_id * max_words_per_letter * 7 + word_id * 7 + 5]);
+		frequency = words_by_letter[letter_id * max_words_per_letter * 7 + word_id * 7 + 5];
+		weight = (float)words_by_letter[letter_id * max_words_per_letter * 7 + word_id * 7 + 6] / frequency;
 	}
 
-	if (word_id < 8 && letter_id == 1) { printf("[ word: %d, has weight %f, freq %d ]", word_id, weight, frequency); }
-//	if (word_id == 0) { printf("[ letter %d, num %d ]", letter_id, num_words_by_letter[letter_id]); }
 	// Each thread loads initial data into its own space in local memory
 
-	local_out[512 * 0 + work_item_id] =  weight;
-	local_out[512 * 1 + work_item_id] =  frequency * weight;
-	local_out[512 * 2 + work_item_id] =  weight;
-	local_out[512 * 3 + work_item_id] =  (word_id < num_words_by_letter[letter_id]) ? weight : 1;
-	local_out[512 * 4 + work_item_id] =  (word_id < num_words_by_letter[letter_id]) ? 1 : 0;
-	local_out[512 * 5 + work_item_id] =  frequency;
+	local_out[group_size * 0 + work_item_id] =  weight;
+	local_out[group_size * 1 + work_item_id] =  frequency * weight;
+	local_out[group_size * 2 + work_item_id] =  weight;
+	local_out[group_size * 3 + work_item_id] =  (word_id < num_words_by_letter[letter_id]) ? weight : 1;
+	local_out[group_size * 4 + work_item_id] =  (word_id < num_words_by_letter[letter_id]) ? 1 : 0;
+	local_out[group_size * 5 + work_item_id] =  frequency;
 
-	for (unsigned int stride = 1; stride < 512; stride *= 2) {
+
+	// Preform reduction
+
+	for (unsigned int stride = 1; stride < group_size; stride *= 2) {
 
 		barrier(CLK_GLOBAL_MEM_FENCE | CLK_LOCAL_MEM_FENCE);
 
-		if ( work_item_id % stride == 0 && work_item_id < 256) {
+		if ( work_item_id % stride == 0 && work_item_id < group_size / 2) {
 
-			local_out[512 * 0 + work_item_id * 2] +=  local_out[512 * 0 + work_item_id * 2 + stride];
-			local_out[512 * 1 + work_item_id * 2] +=  local_out[512 * 1 + work_item_id * 2 + stride];
-			local_out[512 * 2 + work_item_id * 2] =  local_out[512 * 2 + work_item_id * 2 + stride] > local_out[512 * 2 + work_item_id * 2] ? local_out[512 * 2 + work_item_id * 2 + stride] : local_out[512 * 2 + work_item_id * 2];
-			local_out[512 * 3 + work_item_id * 2] =  local_out[512 * 3 + work_item_id * 2 + stride] < local_out[512 * 3 + work_item_id * 2] ? local_out[512 * 3 + work_item_id * 2 + stride] : local_out[512 * 3 + work_item_id * 2];
-			local_out[512 * 4 + work_item_id * 2] +=  local_out[512 * 4 + work_item_id * 2 + stride];
-			local_out[512 * 5 + work_item_id * 2] +=  local_out[512 * 5 + work_item_id * 2 + stride];
-		
-
-			if (word_id < 8 && letter_id == 1) { printf("[ stride: %d, item: %d, value: %f ]", stride, word_id, local_out[512 * 0 + work_item_id * 2]); }
+			local_out[group_size * 0 + work_item_id * 2] +=  local_out[group_size * 0 + work_item_id * 2 + stride];
+			local_out[group_size * 1 + work_item_id * 2] +=  local_out[group_size * 1 + work_item_id * 2 + stride];
+			local_out[group_size * 2 + work_item_id * 2] =   local_out[group_size * 2 + work_item_id * 2 + stride] > local_out[group_size * 2 + work_item_id * 2] ? local_out[group_size * 2 + work_item_id * 2 + stride] : local_out[group_size * 2 + work_item_id * 2];
+			local_out[group_size * 3 + work_item_id * 2] =   local_out[group_size * 3 + work_item_id * 2 + stride] < local_out[group_size * 3 + work_item_id * 2] ? local_out[group_size * 3 + work_item_id * 2 + stride] : local_out[group_size * 3 + work_item_id * 2];
+			local_out[group_size * 4 + work_item_id * 2] +=  local_out[group_size * 4 + work_item_id * 2 + stride];
+			local_out[group_size * 5 + work_item_id * 2] +=  local_out[group_size * 5 + work_item_id * 2 + stride];
 		}
 	}
-//	if (word_id == 0 && letter_id == 0) { printf("Final group sum: %f", local_out[0] );}
+
+	// Synchronize work items again to ensure all are done reduction before writeback
+
 	barrier(CLK_GLOBAL_MEM_FENCE | CLK_LOCAL_MEM_FENCE);
-//if (word_id == 0 && letter_id == 0) { printf("Final group sum: %f", local_out[0] );}
+
+	// Writeback to output
+
 	if (work_item_id < 6) {
-//		if( letter_id < 1) { printf("ID: %d -> %f", work_item_id, local_out[512 * work_item_id]);}
-		out_stats[ (groupy * 5 + groupx)*6 + work_item_id] = local_out[512 * work_item_id];
-//		if (letter_id < 1) { printf("[ work item %d, %u, %f ]", word_id, (groupy*5+groupx)*6, local_out[512 * work_item_id]); }
+		out_stats[ (work_group_y * 5 + work_group_x) * 6 + work_item_id] = local_out[group_size * work_item_id];
 	}
 }
 
 __kernel void analyze_weights_2(__global float* words_by_letter, __global int* num_words_by_letter, volatile __global float* out_stats, int max_words_per_letter, int average, int weighted_average) {
 	
-	// Get the word for the current work-item to focus on
+		// Get the word for the current work-item to focus on
 
 	unsigned int word_id = get_global_id(0);
 	unsigned int letter_id = get_global_id(1);
 
-	// Create local arrays to store the data in
-
-	volatile __local float local_out[2 * 512];
-
 	// Prepare the indices for the reduction
 
 	unsigned int work_item_id = get_local_id(0);
+	unsigned int work_group_x = get_group_id(0);
+	unsigned int work_group_y = get_group_id(1);
+	unsigned int group_size = get_local_size(0);
 
-	// Get the weight and frequency for the current thread	
+	// Create local arrays to store the data in
+
+	volatile __local float local_out[2 * group_size];
+
+	// Get the weight and frequency for the current thread
+
 	float weight = 0;	
 	int frequency = 0;
-	if (word_id < max_words_per_letter) {
-		weight = words_by_letter[letter_id * max_words_per_letter + word_id * 7 + 4];
-		frequency = as_int(words_by_letter[letter_id * max_words_per_letter + word_id * 7 + 5]);
+	if (word_id < num_words_by_letter[letter_id]) {
+		frequency = words_by_letter[letter_id * max_words_per_letter * 7 + word_id * 7 + 5];
+		weight = (float)words_by_letter[letter_id * max_words_per_letter * 7 + word_id * 7 + 6] / frequency;
 	}
 
 	// Each thread loads initial data into its own space in local memory
 
-	local_out[512 * 0 + work_item_id] =  (weight - average) * (weight - average);
-	local_out[512 * 1 + work_item_id] =  (weight - weighted_average) * (weight - weighted_average) * frequency;
+	local_out[group_size * 0 + work_item_id] =  (weight - average) * (weight - average);
+	local_out[group_size * 1 + work_item_id] =  (weight - weighted_average) * (weight - weighted_average) * frequency;
 
-	for (unsigned int stride = 1; stride <= 512; stride *= 2) {
+	// Preform reduction
+
+	for (unsigned int stride = 1; stride < group_size; stride *= 2) {
 
 		barrier(CLK_GLOBAL_MEM_FENCE | CLK_LOCAL_MEM_FENCE);
 
-		if ( work_item_id % stride == 0 && work_item_id < 256 && word_id < max_words_per_letter) {
+		if ( work_item_id % stride == 0 && work_item_id < group_size / 2) {
 
-			local_out[512 * 0 + work_item_id * 2] +=  local_out[512 * 0 + work_item_id * 2 + stride];
-			local_out[512 * 1 + work_item_id * 2] +=  local_out[512 * 1 + work_item_id * 2 + stride];
+			local_out[group_size * 0 + work_item_id * 2] +=  local_out[group_size * 0 + work_item_id * 2 + stride];
+			local_out[group_size * 1 + work_item_id * 2] +=  local_out[group_size * 1 + work_item_id * 2 + stride];
+			local_out[group_size * 2 + work_item_id * 2] =   local_out[group_size * 2 + work_item_id * 2 + stride] > local_out[group_size * 2 + work_item_id * 2] ? local_out[group_size * 2 + work_item_id * 2 + stride] : local_out[group_size * 2 + work_item_id * 2];
+			local_out[group_size * 3 + work_item_id * 2] =   local_out[group_size * 3 + work_item_id * 2 + stride] < local_out[group_size * 3 + work_item_id * 2] ? local_out[group_size * 3 + work_item_id * 2 + stride] : local_out[group_size * 3 + work_item_id * 2];
+			local_out[group_size * 4 + work_item_id * 2] +=  local_out[group_size * 4 + work_item_id * 2 + stride];
+			local_out[group_size * 5 + work_item_id * 2] +=  local_out[group_size * 5 + work_item_id * 2 + stride];
 		}
 	}
 
+	// Synchronize work items again to ensure all are done reduction before writeback
+
 	barrier(CLK_GLOBAL_MEM_FENCE | CLK_LOCAL_MEM_FENCE);
 
-	if (work_item_id < 2) {
+	// Writeback to output
 
-		out_stats[ (get_group_id(1) * get_num_groups(1) + get_group_id(0)) + work_item_id] = local_out[512 * work_item_id];
+	if (work_item_id < 2) {
+		out_stats[ (work_group_y * 5 + work_group_x) * 2 + work_item_id] = local_out[group_size * work_item_id];
 	}
 }
 
 """
 
 # Build the kernel
-prg = cl.Program(ctx, analysis_kernel).build()
+#prg = cl.Program(ctx, analysis_kernel).build()
 
 
 '''
@@ -643,7 +646,8 @@ def load_all_word_weights(option):
 			data = lines.split()
 
 			# Store the data
-			struct.pack_into('16s f i i', words_by_letter[letter_index], num_words_by_letter[letter_index]*28, data[1].decode('ascii', 'ignore').encode('utf-8'), float(data[2]), int(data[3]), int(data[4]))
+			#struct.pack_into('16s f i i', words_by_letter[letter_index], num_words_by_letter[letter_index]*28, data[1].decode('ascii', 'ignore').encode('utf-8'), float(data[2]), int(data[3]), int(data[4]))
+			struct.pack_into('16s f i i', words_by_letter[letter_index], num_words_by_letter[letter_index]*28, data[1].encode('utf-8'), float(data[2]), int(data[3]), int(data[4]))
 			num_words_by_letter[letter_index] += 1
 
 	file.close()
@@ -781,12 +785,12 @@ def update_word(ticker, option, word_upper, day):
 			# extra2 => unused
 			if option == 'opt1':
 				if change > 0:
-					weight = (test_data[1] * test_data[2] + 1) / (test_data[2] + 1)
+					weight = test_data[1]
 					extra1 = test_data[2] + 1
-					extra2 = test_data[3]
+					extra2 = test_data[3] + 1
 
 				else:
-					weight = (test_data[1] * test_data[2]) / (test_data[2] + 1)
+					weight = test_data[1]
 					extra1 = test_data[2] + 1
 					extra2 = test_data[3]
 
@@ -923,7 +927,7 @@ def analyze_weights():
 
 			# For each word, unpack the word from the buffer
 			raw_data = struct.unpack_from('16s f i i', words_by_letter[letter], elements * 28)
-			weight = float(raw_data[1])
+			weight = float(raw_data[3]) / raw_data[2]
 
 			# Add it to the list of weights to be analyzed later (for standard deviation)
 			weights_all.append(weight)
@@ -1099,7 +1103,7 @@ def get_word_weight(word_upper):
 		if temp_word[:len(temp_word.split('\0', 1)[0])] == word:
 			
 			# If it is the same, return its value
-			return test_data[1]
+			return float(test_data[3]) / test_data[2]
 
 	# Could not find the word so returning the current average
 	return weight_average

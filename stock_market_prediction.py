@@ -218,51 +218,6 @@ __kernel void analyze_weights_2(__global float* words_by_letter, __global int* n
 
 		out_stats[ (get_group_id(1) * get_num_groups(1) + get_group_id(0)) + work_item_id] = local_out[1024 * work_item_id];
 	}
-
-
-
-	// Get the word for the current work-item to focus on
-
-	unsigned int word_id = get_global_id(0);
-	unsigned int letter_id = get_global_id(1);
-	unsigned int work_item_id = get_local_id(0);
-
-	// Create local arrays to store the data in
-
-	volatile __local float local_out[2];
-	if (work_item_id < 2) {
-                local_out[work_item_id] = 0;
-        }
-
-	// Sync all threads to ensure they all have the local array initialized
-
-	barrier(CLK_GLOBAL_MEM_FENCE | CLK_LOCAL_MEM_FENCE);
-
-	// Get the weight and frequency of the word - words are 16 letters, it goes [word, weight, frequency, n/a]
-	// + word_id * 7 to get the index of the word in the array, + 4 to go to the weight, + 5 to go to the frequency, + 6 would be the unused variable
-
-	float weight = words_by_letter[letter_id * max_words_per_letter + word_id * 7 + 4];
-	float frequency = words_by_letter[letter_id * max_words_per_letter + word_id * 7 + 5];
-
-	// Update the local values atomically
-	// [sum of avg-weight, weighted sum of avg-weight]
-	// All of these mandatory atomic functions is terrible for performance but still better than one big loop
-	// - This is the reason for doing it locally first and then combining afterwards
-
-	atomic_add(local_out + 0, (weight - average) * (weight - average));
-	atomic_add(local_out + 1, (weight - weighted_average) * (weight - weighted_average) * frequency);
-
-	// Sync threads again to be sure all work-items are done updating the local array
-
-	barrier(CLK_GLOBAL_MEM_FENCE | CLK_LOCAL_MEM_FENCE);
-
-	// If its the first thread in the group, update the global values
-	// Also bad for performance but much better than loops
-	if (work_item_id == 0) {
-
-		atomic_add(out_stats + 0, local_out[0]);
-		atomic_add(out_stats + 1, local_out[1]);
-	}
 }
 
 """

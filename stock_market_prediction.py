@@ -132,38 +132,41 @@ __kernel void analyze_weights_1(__global float* words_by_letter, __global int* n
 
 	// Create local arrays to store the data in
 
-	volatile __local float local_out[6 * 1024];
+	volatile __local float local_out[6 * 512];
 
 	// Prepare the indices for the reduction
 
 	unsigned int work_item_id = get_local_id(0);
 
-	// Get the weight and frequency for the current thread	
-
-	float weight = words_by_letter[letter_id * max_words_per_letter + word_id * 7 + 4];
-	float frequency = words_by_letter[letter_id * max_words_per_letter + word_id * 7 + 5];
+	// Get the weight and frequency for the current thread
+	float weight = 0;	
+	float frequency = 0;
+	if (work_id < max_words_per_letter) {
+		weight = words_by_letter[letter_id * max_words_per_letter + word_id * 7 + 4];
+		frequency = words_by_letter[letter_id * max_words_per_letter + word_id * 7 + 5];
+	}
 
 	// Each thread loads initial data into its own space in local memory
 
-	local_out[1024 * 0 + work_item_id] =  weight;
-	local_out[1024 * 1 + work_item_id] =  frequency * weight;
-	local_out[1024 * 2 + work_item_id] =  weight;
-	local_out[1024 * 3 + work_item_id] =  weight;
-	local_out[1024 * 4 + work_item_id] =  1;
-	local_out[1024 * 5 + work_item_id] =  frequency;
+	local_out[512 * 0 + work_item_id] =  weight;
+	local_out[512 * 1 + work_item_id] =  frequency * weight;
+	local_out[512 * 2 + work_item_id] =  weight;
+	local_out[512 * 3 + work_item_id] =  weight;
+	local_out[512 * 4 + work_item_id] =  1;
+	local_out[512 * 5 + work_item_id] =  frequency;
 
-	for (unsigned int stride = 0; stride <= 1024; stride *= 2) {
+	for (unsigned int stride = 0; stride <= 512; stride *= 2) {
 
 		barrier(CLK_GLOBAL_MEM_FENCE | CLK_LOCAL_MEM_FENCE);
 
-		if ( work_item_id % stride == 0 && work_item_id < 512) {
+		if ( work_item_id % stride == 0 && work_item_id < 256 && word_id < max_words_per_letter) {
 
-			local_out[1024 * 0 + work_item_id * 2] +=  local_out[1024 * 0 + work_item_id * 2 + stride];
-			local_out[1024 * 1 + work_item_id * 2] +=  local_out[1024 * 1 + work_item_id * 2 + stride];
-			local_out[1024 * 2 + work_item_id * 2] =  local_out[1024 * 2 + work_item_id * 2 + stride] > local_out[1024 * 2 + work_item_id * 2] ? local_out[1024 * 2 + work_item_id * 2 + stride] : local_out[1024 * 2 + work_item_id * 2];
-			local_out[1024 * 3 + work_item_id * 2] =  local_out[1024 * 3 + work_item_id * 2 + stride] < local_out[1024 * 3 + work_item_id * 2] ? local_out[1024 * 3 + work_item_id * 2 + stride] : local_out[1024 * 3 + work_item_id * 2];
-			local_out[1024 * 4 + work_item_id * 2] +=  local_out[1024 * 4 + work_item_id * 2 + stride];
-			local_out[1024 * 5 + work_item_id * 2] +=  local_out[1024 * 5 + work_item_id * 2 + stride];
+			local_out[512 * 0 + work_item_id * 2] +=  local_out[512 * 0 + work_item_id * 2 + stride];
+			local_out[512 * 1 + work_item_id * 2] +=  local_out[512 * 1 + work_item_id * 2 + stride];
+			local_out[512 * 2 + work_item_id * 2] =  local_out[512 * 2 + work_item_id * 2 + stride] > local_out[512 * 2 + work_item_id * 2] ? local_out[512 * 2 + work_item_id * 2 + stride] : local_out[512 * 2 + work_item_id * 2];
+			local_out[512 * 3 + work_item_id * 2] =  local_out[512 * 3 + work_item_id * 2 + stride] < local_out[512 * 3 + work_item_id * 2] ? local_out[512 * 3 + work_item_id * 2 + stride] : local_out[512 * 3 + work_item_id * 2];
+			local_out[512 * 4 + work_item_id * 2] +=  local_out[512 * 4 + work_item_id * 2 + stride];
+			local_out[512 * 5 + work_item_id * 2] +=  local_out[512 * 5 + work_item_id * 2 + stride];
 		}
 	}
 
@@ -171,7 +174,7 @@ __kernel void analyze_weights_1(__global float* words_by_letter, __global int* n
 
 	if (work_item_id < 6) {
 
-		out_stats[ (get_group_id(1) * get_num_groups(1) + get_group_id(0)) + work_item_id] = local_out[1024 * work_item_id];
+		out_stats[ (get_group_id(1) * get_num_groups(1) + get_group_id(0)) + work_item_id] = local_out[512 * work_item_id];
 	}
 }
 
@@ -184,31 +187,33 @@ __kernel void analyze_weights_2(__global float* words_by_letter, __global int* n
 
 	// Create local arrays to store the data in
 
-	volatile __local float local_out[2 * 1024];
+	volatile __local float local_out[2 * 512];
 
 	// Prepare the indices for the reduction
 
 	unsigned int work_item_id = get_local_id(0);
-	unsigned int start = 512;
 
 	// Get the weight and frequency for the current thread	
-
-	float weight = words_by_letter[letter_id * max_words_per_letter + word_id * 7 + 4];
-	float frequency = words_by_letter[letter_id * max_words_per_letter + word_id * 7 + 5];
+	float weight = 0;	
+	float frequency = 0;
+	if (work_id < max_words_per_letter) {
+		weight = words_by_letter[letter_id * max_words_per_letter + word_id * 7 + 4];
+		frequency = words_by_letter[letter_id * max_words_per_letter + word_id * 7 + 5];
+	}
 
 	// Each thread loads initial data into its own space in local memory
 
-	local_out[1024 * 0 + work_item_id] =  (weight - average) * (weight - average);
-	local_out[1024 * 1 + work_item_id] =  (weight - weighted_average) * (weight - weighted_average) * frequency;
+	local_out[512 * 0 + work_item_id] =  (weight - average) * (weight - average);
+	local_out[512 * 1 + work_item_id] =  (weight - weighted_average) * (weight - weighted_average) * frequency;
 
-	for (unsigned int stride = 0; stride <= 1024; stride *= 2) {
+	for (unsigned int stride = 0; stride <= 512; stride *= 2) {
 
 		barrier(CLK_GLOBAL_MEM_FENCE | CLK_LOCAL_MEM_FENCE);
 
-		if ( work_item_id % stride == 0 && work_item_id < 512) {
+		if ( work_item_id % stride == 0 && work_item_id < 256 && word_id < max_words_per_letter) {
 
-			local_out[1024 * 0 + work_item_id * 2] +=  local_out[1024 * 0 + work_item_id * 2 + stride];
-			local_out[1024 * 1 + work_item_id * 2] +=  local_out[1024 * 1 + work_item_id * 2 + stride];
+			local_out[512 * 0 + work_item_id * 2] +=  local_out[512 * 0 + work_item_id * 2 + stride];
+			local_out[512 * 1 + work_item_id * 2] +=  local_out[512 * 1 + work_item_id * 2 + stride];
 		}
 	}
 
@@ -216,7 +221,7 @@ __kernel void analyze_weights_2(__global float* words_by_letter, __global int* n
 
 	if (work_item_id < 2) {
 
-		out_stats[ (get_group_id(1) * get_num_groups(1) + get_group_id(0)) + work_item_id] = local_out[1024 * work_item_id];
+		out_stats[ (get_group_id(1) * get_num_groups(1) + get_group_id(0)) + work_item_id] = local_out[512 * work_item_id];
 	}
 }
 
@@ -997,7 +1002,7 @@ def analyze_weights_gpu():
 	out_stats_buff = cl.Buffer(ctx, mf.WRITE_ONLY, out_stats.nbytes)
 
 	# Call the kernel
-	prg.analyze_weights_1(queue, np.asarray(words_by_letter).shape, (512, 1), words_by_letter_buff, num_words_by_letter_buff, out_stats_buff, np.uint32(MAX_WORDS_PER_LETTER))
+	prg.analyze_weights_1(queue, (26, 2560), (512, 1), words_by_letter_buff, num_words_by_letter_buff, out_stats_buff, np.uint32(MAX_WORDS_PER_LETTER))
 
 	# Pull results from the GPU
 	cl.enqueue_copy(queue, out_stats, out_stats_buff)
@@ -1021,7 +1026,7 @@ def analyze_weights_gpu():
 	out_std_sum_buff = cl.Buffer(ctx, mf.WRITE_ONLY | mf.COPY_HOST_PTR, out_std_sum.nbytes)
 
 	# Call the kernel
-	prg.analyze_weights_2(queue, (26, 2500), (1024, 1), words_by_letter_buff, num_words_by_letter_buff, out_std_sum_buff, np.uint32(MAX_WORDS_PER_LETTER), np.uint32(weight_average), np.uint32(weight_average_o))
+	prg.analyze_weights_2(queue, (26, 2560), (512, 1), words_by_letter_buff, num_words_by_letter_buff, out_std_sum_buff, np.uint32(MAX_WORDS_PER_LETTER), np.uint32(weight_average), np.uint32(weight_average_o))
 
 	# Pull resutls from the GPU
 	cl.enqueue_copy(queue, out_std_sum, out_std_sum_buff)

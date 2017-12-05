@@ -631,7 +631,7 @@ def load_all_word_weights(option):
 			data = lines.split()
 
 			# Store the data
-			struct.pack_into('16s f i i', words_by_letter[letter_index], num_words_by_letter[letter_index]*28, data[1].encode('utf-8'), float(data[2]), int(data[3]), int(data[4]))
+			struct.pack_into('16s f i i', words_by_letter[letter_index], num_words_by_letter[letter_index]*28, data[1].decode('ascii', 'ignore').encode('utf-8'), float(data[2]), int(data[3]), int(data[4]))
 			num_words_by_letter[letter_index] += 1
 
 	file.close()
@@ -992,12 +992,12 @@ def analyze_weights_gpu():
 
 	#Prepare GPU buffers
 	mf = cl.mem_flags
-	words_by_letter_buff = cl.Buffer(ctx, mf.READ_ONLY | mf.COPY_HOST_PTR, hostbuf = words_by_letter.flatten())
-	num_words_by_letter_buff = cl.Buffer(ctx, mf.READ_ONLY | mf.COPY_HOST_PTR, hostbuf = num_words_by_letter)
+	words_by_letter_buff = cl.Buffer(ctx, mf.READ_ONLY | mf.COPY_HOST_PTR, hostbuf = np.asarray(words_by_letter))
+	num_words_by_letter_buff = cl.Buffer(ctx, mf.READ_ONLY | mf.COPY_HOST_PTR, hostbuf = np.asarray(num_words_by_letter))
 	out_stats_buff = cl.Buffer(ctx, mf.WRITE_ONLY, out_stats.nbytes)
 
 	# Call the kernel
-	prg.analyze_weights_1(queue, words_by_letter.shape, (1024, 1), words_by_letter_buff, num_words_by_letter_buff, out_stats_buff, np.uint32(MAX_WORDS_PER_LETTER))
+	prg.analyze_weights_1(queue, np.asarray(words_by_letter).shape, (512, 1), words_by_letter_buff, num_words_by_letter_buff, out_stats_buff, np.uint32(MAX_WORDS_PER_LETTER))
 
 	# Pull results from the GPU
 	cl.enqueue_copy(queue, out_stats, out_stats_buff)
@@ -1021,7 +1021,7 @@ def analyze_weights_gpu():
 	out_std_sum_buff = cl.Buffer(ctx, mf.WRITE_ONLY | mf.COPY_HOST_PTR, out_std_sum.nbytes)
 
 	# Call the kernel
-	prg.analyze_weights_2(queue, words_by_letter.shape, (1024, 1), words_by_letter_buff, num_words_by_letter_buff, out_std_sum_buff, np.uint32(MAX_WORDS_PER_LETTER), np.uint32(weight_average), np.uint32(weight_average_o))
+	prg.analyze_weights_2(queue, (26, 2500), (1024, 1), words_by_letter_buff, num_words_by_letter_buff, out_std_sum_buff, np.uint32(MAX_WORDS_PER_LETTER), np.uint32(weight_average), np.uint32(weight_average_o))
 
 	# Pull resutls from the GPU
 	cl.enqueue_copy(queue, out_std_sum, out_std_sum_buff)
@@ -2103,7 +2103,7 @@ def main():
 		# Command line argument for printing current weight stats
 		elif opt == '-z':
 			load_all_word_weights('opt1')
-			if not analyze_weights():
+			if not analyze_weights_gpu():
 				print('Error: Unable to analyze weights')
 				sys.exit(-1)
 			print_weight_analysis()

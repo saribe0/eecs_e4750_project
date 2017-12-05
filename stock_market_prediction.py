@@ -160,8 +160,8 @@ __kernel void analyze_weights_1(__global float* words_by_letter, __global int* n
 
 			local_out[1024 * 0 + work_item_id * 2] +=  local_out[1024 * 0 + work_item_id * 2 + stride];
 			local_out[1024 * 1 + work_item_id * 2] +=  local_out[1024 * 1 + work_item_id * 2 + stride];
-			local_out[1024 * 2 + work_item_id * 2] =  local_out[1024 * 2 + work_item_id * 2 + stride] > local_out[1024 * 2 + work_item_id * 2] : local_out[1024 * 2 + work_item_id * 2 + stride] ? local_out[1024 * 2 + work_item_id * 2];
-			local_out[1024 * 3 + work_item_id * 2] =  local_out[1024 * 3 + work_item_id * 2 + stride] < local_out[1024 * 3 + work_item_id * 2] : local_out[1024 * 3 + work_item_id * 2 + stride] ? local_out[1024 * 3 + work_item_id * 2];
+			local_out[1024 * 2 + work_item_id * 2] =  local_out[1024 * 2 + work_item_id * 2 + stride] > local_out[1024 * 2 + work_item_id * 2] ? local_out[1024 * 2 + work_item_id * 2 + stride] : local_out[1024 * 2 + work_item_id * 2];
+			local_out[1024 * 3 + work_item_id * 2] =  local_out[1024 * 3 + work_item_id * 2 + stride] < local_out[1024 * 3 + work_item_id * 2] ? local_out[1024 * 3 + work_item_id * 2 + stride] : local_out[1024 * 3 + work_item_id * 2];
 			local_out[1024 * 4 + work_item_id * 2] +=  local_out[1024 * 4 + work_item_id * 2 + stride];
 			local_out[1024 * 5 + work_item_id * 2] +=  local_out[1024 * 5 + work_item_id * 2 + stride];
 		}

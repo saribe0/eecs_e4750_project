@@ -129,59 +129,98 @@ __kernel void analyze_weights_1(__global float* words_by_letter, __global int* n
 
 	unsigned int word_id = get_global_id(0);
 	unsigned int letter_id = get_global_id(1);
-	unsigned int work_item_id = get_local_id(0);
 
 	// Create local arrays to store the data in
 
-	volatile __local float local_out[6];
-	if (work_item_id < 6 && work_item_id != 3) {
-		local_out[work_item_id] = 0;
-	}
-	if (work_item_id == 3) {
-		local_out[work_item_id] = 1;
-	}
+	volatile __local float local_out[6 * 1024];
 
-	// Sync all threads to ensure they all have the local array initialized
+	// Prepare the indices for the reduction
 
-	barrier(CLK_GLOBAL_MEM_FENCE | CLK_LOCAL_MEM_FENCE);
+	unsigned int work_item_id = get_local_id(0);
 
-	// Get the weight and frequency of the word - words are 16 letters, it goes [word, weight, frequency, n/a]
-	// + word_id * 7 to get the index of the word in the array, + 4 to go to the weight, + 5 to go to the frequency, + 6 would be the unused variable
+	// Get the weight and frequency for the current thread	
 
 	float weight = words_by_letter[letter_id * max_words_per_letter + word_id * 7 + 4];
 	float frequency = words_by_letter[letter_id * max_words_per_letter + word_id * 7 + 5];
 
-	// Update the local values atomically
-	// [sum of weights, weighted sum of weights, max, min, count, weighted count]
-	// All of these mandatory atomic functions is terrible for performance but still better than one big loop
-	// - This is the reason for doing it locally first and then combining afterwards
+	// Each thread loads initial data into its own space in local memory
 
-	atomic_add(local_out + 0, weight);
-	atomic_add(local_out + 1, weight * frequency);
-	atomic_max(local_out + 2, weight);
-	atomic_min(local_out + 3, weight);
-	atomic_inc(local_out + 4);
-	atomic_add(local_out + 5, frequency);
+	local_out[1024 * 0 + work_item_id] =  weight;
+	local_out[1024 * 1 + work_item_id] =  frequency * weight;
+	local_out[1024 * 2 + work_item_id] =  weight;
+	local_out[1024 * 3 + work_item_id] =  weight;
+	local_out[1024 * 4 + work_item_id] =  1;
+	local_out[1024 * 5 + work_item_id] =  frequency;
 
-	// Sync threads again to be sure all work-items are done updating the local array
+	for (unsigned int stride = 0; stride <= 1024; stride *= 2) {
+
+		barrier(CLK_GLOBAL_MEM_FENCE | CLK_LOCAL_MEM_FENCE);
+
+		if ( work_item_id % stride == 0 && work_item_id < 512) {
+
+			local_out[1024 * 0 + work_item_id * 2] +=  local_out[1024 * 0 + work_item_id * 2 + stride];
+			local_out[1024 * 1 + work_item_id * 2] +=  local_out[1024 * 1 + work_item_id * 2 + stride];
+			local_out[1024 * 2 + work_item_id * 2] =  local_out[1024 * 2 + work_item_id * 2 + stride] > local_out[1024 * 2 + work_item_id * 2] : local_out[1024 * 2 + work_item_id * 2 + stride] ? local_out[1024 * 2 + work_item_id * 2];
+			local_out[1024 * 3 + work_item_id * 2] =  local_out[1024 * 3 + work_item_id * 2 + stride] < local_out[1024 * 3 + work_item_id * 2] : local_out[1024 * 3 + work_item_id * 2 + stride] ? local_out[1024 * 3 + work_item_id * 2];
+			local_out[1024 * 4 + work_item_id * 2] +=  local_out[1024 * 4 + work_item_id * 2 + stride];
+			local_out[1024 * 5 + work_item_id * 2] +=  local_out[1024 * 5 + work_item_id * 2 + stride];
+		}
+	}
 
 	barrier(CLK_GLOBAL_MEM_FENCE | CLK_LOCAL_MEM_FENCE);
 
-	// If its the first thread in the group, update the global values
-	// Also bad for performance but much better than loops
-	if (work_item_id == 0) {
+	if (work_item_id < 6) {
 
-		atomic_add(out_stats + 0, local_out[0]);
-		atomic_add(out_stats + 1, local_out[1]);
-		atomic_max(out_stats + 2, local_out[2]);
-		atomic_min(out_stats + 3, local_out[3]);
-		atomic_add(out_stats + 4, local_out[4]);
-		atomic_add(out_stats + 5, local_out[5]);
+		out_stats[ (get_group_id(1) * get_num_groups(1) + get_group_id(0)) + work_item_id] = local_out[1024 * work_item_id];
 	}
 }
 
 __kernel void analyze_weights_2(__global float* words_by_letter, __global int* num_words_by_letter, volatile __global float* out_stats, int max_words_per_letter, int average, int weighted_average) {
 	
+	// Get the word for the current work-item to focus on
+
+	unsigned int word_id = get_global_id(0);
+	unsigned int letter_id = get_global_id(1);
+
+	// Create local arrays to store the data in
+
+	volatile __local float local_out[2 * 1024];
+
+	// Prepare the indices for the reduction
+
+	unsigned int work_item_id = get_local_id(0);
+	unsigned int start = 512;
+
+	// Get the weight and frequency for the current thread	
+
+	float weight = words_by_letter[letter_id * max_words_per_letter + word_id * 7 + 4];
+	float frequency = words_by_letter[letter_id * max_words_per_letter + word_id * 7 + 5];
+
+	// Each thread loads initial data into its own space in local memory
+
+	local_out[1024 * 0 + work_item_id] =  (weight - average) * (weight - average);
+	local_out[1024 * 1 + work_item_id] =  (weight - weighted_average) * (weight - weighted_average) * frequency;
+
+	for (unsigned int stride = 0; stride <= 1024; stride *= 2) {
+
+		barrier(CLK_GLOBAL_MEM_FENCE | CLK_LOCAL_MEM_FENCE);
+
+		if ( work_item_id % stride == 0 && work_item_id < 512) {
+
+			local_out[1024 * 0 + work_item_id * 2] +=  local_out[1024 * 0 + work_item_id * 2 + stride];
+			local_out[1024 * 1 + work_item_id * 2] +=  local_out[1024 * 1 + work_item_id * 2 + stride];
+		}
+	}
+
+	barrier(CLK_GLOBAL_MEM_FENCE | CLK_LOCAL_MEM_FENCE);
+
+	if (work_item_id < 2) {
+
+		out_stats[ (get_group_id(1) * get_num_groups(1) + get_group_id(0)) + work_item_id] = local_out[1024 * work_item_id];
+	}
+
+
+
 	// Get the word for the current work-item to focus on
 
 	unsigned int word_id = get_global_id(0);
@@ -992,7 +1031,7 @@ def analyze_weights_gpu():
 	# Create array that will be used for output, structure looks like:
 	# [sum of weights, weighted sum of weights, max, min, count, weighted count]
 	# Length is 6
-	out_stats = np.zeros((6,), dtype = np.float32)
+	out_stats = np.zeros((64, 6), dtype = np.float32)
 
 	# First part is to calculate these 6 outputs 
 
@@ -1003,18 +1042,19 @@ def analyze_weights_gpu():
 	out_stats_buff = cl.Buffer(ctx, mf.WRITE_ONLY, out_stats.nbytes)
 
 	# Call the kernel
-	prg.analyze_weights_1(queue, words_by_letter.shape, (64, 1), words_by_letter_buff, num_words_by_letter_buff, out_stats_buff, np.uint32(MAX_WORDS_PER_LETTER))
+	prg.analyze_weights_1(queue, words_by_letter.shape, (1024, 1), words_by_letter_buff, num_words_by_letter_buff, out_stats_buff, np.uint32(MAX_WORDS_PER_LETTER))
 
 	# Pull results from the GPU
 	cl.enqueue_copy(queue, out_stats, out_stats_buff)
 
 	# Set all the global variabels for the function
-	weight_sum = out_stats[0]
-	weight_sum_o = out_stats[1]
-	weight_max = out_stats[2]
-	weight_min = out_stats[3]
-	weight_count = out_stats[4]
-	weight_count_o = out_stats[5]
+	for each in out_stats:
+		weight_sum += each[0]
+		weight_sum_o += each[1]
+		weight_max = each[2] if each[2] > weight_max else weight_max
+		weight_min = each[3] if each[3] < weight_min else weight_min
+		weight_count += each[4]
+		weight_count_o += each[5]
 
 	# Calculate the averages
 	weight_average = weight_sum / weight_count
@@ -1026,14 +1066,20 @@ def analyze_weights_gpu():
 	out_std_sum_buff = cl.Buffer(ctx, mf.WRITE_ONLY | mf.COPY_HOST_PTR, out_std_sum.nbytes)
 
 	# Call the kernel
-	prg.analyze_weights_2(queue, words_by_letter.shape, (64, 1), words_by_letter_buff, num_words_by_letter_buff, out_std_sum_buff, np.uint32(MAX_WORDS_PER_LETTER), np.uint32(weight_average), np.uint32(weight_average_o))
+	prg.analyze_weights_2(queue, words_by_letter.shape, (1024, 1), words_by_letter_buff, num_words_by_letter_buff, out_std_sum_buff, np.uint32(MAX_WORDS_PER_LETTER), np.uint32(weight_average), np.uint32(weight_average_o))
 
 	# Pull resutls from the GPU
 	cl.enqueue_copy(queue, out_std_sum, out_std_sum_buff)
 
 	# Set the std deviation global variables
-	weight_stdev = math.sqrt(out_std_sum[0] / (weight_count - 1))
-	weight_stdev_o = math.sqrt(out_std_sum[1] / (weight_count_o - 1))
+	out_std = 0
+	out_std_w = 0
+	for each in out_std_sum:
+		out_std += each[0]
+		out_std_w += each[1]
+
+	weight_stdev = math.sqrt(out_std / (weight_count - 1))
+	weight_stdev_o = math.sqrt(out_std_w / (weight_count_o - 1))
 
 	logging.debug('- Analysis finished with:')
 	logging.debug('-- avg: ' + str(weight_average))

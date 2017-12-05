@@ -5,6 +5,8 @@
 ##
 ####################################################################################################
 
+import pyopencl as cl
+
 import requests
 import os
 import datetime
@@ -87,8 +89,134 @@ elif not os.path.exists('./data/articles/'):
 if not os.path.exists('./output/'):
 	os.makedirs('./output/')
 
-logging.basicConfig(filename="./data/stock_market_prediction.log", level=logging.DEBUG, format="%(asctime)s: %(levelname)s>\t%(message)s")
-logging.info('RUNNING STOCK MARKET PREDICTION')
+
+# Get the correct opencl platform (taken from instructor sample code)
+NAME = 'NVIDIA CUDA'
+platforms = cl.get_platforms()
+devs = None
+for platform in platforms:
+	if platform.name == NAME:
+		devs = platform.get_devices()
+
+# Set up command queue
+ctx = cl.Context(devs)
+queue = cl.CommandQueue(ctx)
+
+'''
+# Create array that will be used for output, structure looks like:
+	# [sum of weights, weighted sum of weights, max, min, count, weighted count]
+	# Length is 6
+	out_stats = np.zeros((6,), dtype = np.uint32)
+
+	# First part is to calculate these 6 outputs 
+
+	#Prepare GPU buffers
+	mf = cl.mem_flags
+	words_by_letter_buff = cl.Buffer(ctx, mf.READ_ONLY, | mf.COPY_HOST_PTR, hostbuf = words_by_letter.flatten())
+	num_words_by_letter_buff = cl.Buffer(ctx, mf.READ_ONLY, | mf.COPY_HOST_PTR, hostbuf = num_words_by_letter)
+	out_stats_buff = cl.Buffer(ctx, mf.WRITE_ONLY, out_stats.nbytes)
+
+	# Call the kernel
+	prg.analyze_weights_1(queue, words_by_letter.shape, (512, 1), words_by_letter_buff, num_words_by_letter_buff, out_stats_buff)
+
+'''
+
+analysis_kernel = """
+
+__kernel void analyze_weights_1(__global float* words_by_letter, __global int* num_words_by_letter, volatile __global unsigned float* out_stats, int max_words_per_letter) {
+	
+	// Get the word for the current work-item to focus on
+
+	unsigned int word_id = get_global_id(0);
+	unsigned int letter_id = get_global_id(1);
+
+	// Create local arrays to store the data in
+
+	volatile __local unsigned float local_out[6] = {0, 0, 0, 1, 0, 0};
+
+	// Sync all threads to ensure they all have the local array initialized
+
+	barrier(CLK_GLOBAL_MEM_FENCE | CLK_LOCAL_MEM_FENCE);
+
+	// Get the weight and frequency of the word - words are 16 letters, it goes [word, weight, frequency, n/a]
+	// + word_id * 7 to get the index of the word in the array, + 4 to go to the weight, + 5 to go to the frequency, + 6 would be the unused variable
+
+	float weight = words_by_letter[letter_id * max_words_per_letter + word_id * 7 + 4];
+	float frequency = words_by_letter[letter_id * max_words_per_letter + word_id * 7 + 5];
+
+	// Update the local values atomically
+	// [sum of weights, weighted sum of weights, max, min, count, weighted count]
+	// All of these mandatory atomic functions is terrible for performance but still better than one big loop
+	// - This is the reason for doing it locally first and then combining afterwards
+
+	atomic_add(local_out + 0, weight);
+	atomic_add(local_out + 1, weight * frequency);
+	atomic_max(local_out + 2, weight);
+	atomic_min(local_out + 3, weight);
+	atomic_inc(local_out + 4);
+	atomic_add(local_out + 5, frequency);
+
+	// Sync threads again to be sure all work-items are done updating the local array
+
+	barrier(CLK_GLOBAL_MEM_FENCE | CLK_LOCAL_MEM_FENCE);
+
+	// If its the first thread in the group, update the global values
+	// Also bad for performance but much better than loops
+	if (get_local_id(0) == 0) {
+
+		atomic_add(out_stats + 0, local_out[0]);
+		atomic_add(out_stats + 1, local_out[1]);
+		atomic_max(out_stats + 2, local_out[2]);
+		atomic_min(out_stats + 3, local_out[3]);
+		atomic_add(out_stats + 4, local_out[4]);
+		atomic_add(out_stats + 5, local_out[5]);
+	}
+}
+
+__kernel void analyze_weights_2(__global float* words_by_letter, __global int* num_words_by_letter, volatile __global unsigned float* out_stats, int max_words_per_letter, int average, int weighted_average) {
+	
+	// Get the word for the current work-item to focus on
+
+	unsigned int word_id = get_global_id(0);
+	unsigned int letter_id = get_global_id(1);
+
+	// Create local arrays to store the data in
+
+	volatile __local unsigned float local_out[2] = {0, 0};
+
+	// Sync all threads to ensure they all have the local array initialized
+
+	barrier(CLK_GLOBAL_MEM_FENCE | CLK_LOCAL_MEM_FENCE);
+
+	// Get the weight and frequency of the word - words are 16 letters, it goes [word, weight, frequency, n/a]
+	// + word_id * 7 to get the index of the word in the array, + 4 to go to the weight, + 5 to go to the frequency, + 6 would be the unused variable
+
+	float weight = words_by_letter[letter_id * max_words_per_letter + word_id * 7 + 4];
+	float frequency = words_by_letter[letter_id * max_words_per_letter + word_id * 7 + 5];
+
+	// Update the local values atomically
+	// [sum of avg-weight, weighted sum of avg-weight]
+	// All of these mandatory atomic functions is terrible for performance but still better than one big loop
+	// - This is the reason for doing it locally first and then combining afterwards
+
+	atomic_add(local_out + 0, (weight - average) * (weight - average));
+	atomic_add(local_out + 1, (weight - weighted_average) * (weight - weighted_average) * frequency);
+
+	// Sync threads again to be sure all work-items are done updating the local array
+
+	barrier(CLK_GLOBAL_MEM_FENCE | CLK_LOCAL_MEM_FENCE);
+
+	// If its the first thread in the group, update the global values
+	// Also bad for performance but much better than loops
+	if (get_local_id(0) == 0) {
+
+		atomic_add(out_stats + 0, local_out[0]);
+		atomic_add(out_stats + 1, local_out[1]);
+	}
+}
+
+"""
+
 
 '''
 Morning Prediction Step
@@ -452,7 +580,7 @@ def load_all_word_weights(option):
 	logging.info('Loading word weights for weighting option: ' + option)
 	print('Loading word weights')
 
-	# For each letter, add a MAX_WORDS_PER_LETTER word array of 28 characters each with the last 8 characters for a float (weight of the word) and int (number of occurences)
+	# For each letter, add a MAX_WORDS_PER_LETTER word array of 28 characters each with the last 12 characters for a float (weight of the word) and int (number of occurences)
 	# - abcdefghijklmnopq0.32########
 	for letters in range(0, 26):
 		letter_words = bytearray(28*MAX_WORDS_PER_LETTER)
@@ -828,6 +956,85 @@ def analyze_weights():
 	logging.debug('-- cnt_o: ' + str(weight_count_o))
 
 	return True
+
+
+def analyze_weights_gpu():
+
+	logging.info('Analyzing weights for distribution using the gpu')
+	print('Analyzing weights with gpu')
+
+	global weight_average
+	global weight_stdev
+	global weight_sum
+	global weight_max
+	global weight_min
+	global weight_count
+
+	global weight_average_o
+	global weight_stdev_o
+	global weight_sum_o
+	global weight_count_o
+
+	# Create array that will be used for output, structure looks like:
+	# [sum of weights, weighted sum of weights, max, min, count, weighted count]
+	# Length is 6
+	out_stats = np.zeros((6,), dtype = np.float32)
+
+	# First part is to calculate these 6 outputs 
+
+	#Prepare GPU buffers
+	mf = cl.mem_flags
+	words_by_letter_buff = cl.Buffer(ctx, mf.READ_ONLY, | mf.COPY_HOST_PTR, hostbuf = words_by_letter.flatten())
+	num_words_by_letter_buff = cl.Buffer(ctx, mf.READ_ONLY, | mf.COPY_HOST_PTR, hostbuf = num_words_by_letter)
+	out_stats_buff = cl.Buffer(ctx, mf.WRITE_ONLY, out_stats.nbytes)
+
+	# Call the kernel
+	prg.analyze_weights_1(queue, words_by_letter.shape, (64, 1), words_by_letter_buff, num_words_by_letter_buff, out_stats_buff, np.uint32(MAX_WORDS_PER_LETTER))
+
+	# Pull results from the GPU
+	cl.enqueue_copy(queue, out_stats, out_stats_buff)
+
+	# Set all the global variabels for the function
+	weight_sum = out_stats[0]
+	weight_sum_o = out_stats[1]
+	weight_max = out_stats[2]
+	weight_min = out_stats[3]
+	weight_count = out_stats[4]
+	weight_count_o = out_stats[5]
+
+	# Calculate the averages
+	weight_average = weight_sum / weight_count
+	weight_average_o = weight_sum_o / weight_count_o
+
+	# Prepare the GPU buffers for the standard deviation calculation
+	# [sum of avg-weight, weighted sum of avg-weight]
+	out_std_sum = np.zeros((2,), dtype = np.float32)
+	out_std_sum_buff = cl.Buffer(ctx, mf.WRITE_ONLY, out_std_sum.nbytes)
+
+	# Call the kernel
+	prg.analyze_weights_2(queue, words_by_letter.shape, (64, 1), words_by_letter_buff, num_words_by_letter_buff, out_std_sum_buff, np.uint32(MAX_WORDS_PER_LETTER), np.uint32(weight_average), np.uint32(weight_average_o))
+
+	# Pull resutls from the GPU
+	cl.enqueue_copy(queue, out_std_sum, out_std_sum_buff)
+
+	# Set the std deviation global variables
+	weight_stdev = math.sqrt(out_std_sum[0] / (weight_count - 1))
+	weight_stdev_o = math.sqrt(out_std_sum[1] / (weight_count_o - 1))
+
+	logging.debug('- Analysis finished with:')
+	logging.debug('-- avg: ' + str(weight_average))
+	logging.debug('-- std: ' + str(weight_stdev))
+	logging.debug('-- sum: ' + str(weight_sum))
+	logging.debug('-- cnt: ' + str(weight_count))
+	logging.debug('-- max: ' + str(weight_max))
+	logging.debug('-- min: ' + str(weight_min))
+	logging.debug('-- avg_o: ' + str(weight_average_o))
+	logging.debug('-- std_o: ' + str(weight_stdev_o))
+	logging.debug('-- sum_o: ' + str(weight_sum_o))
+	logging.debug('-- cnt_o: ' + str(weight_count_o))
+
+	return True
+
 
 '''
 Morning Prediction Step Helper
@@ -1954,18 +2161,26 @@ def main():
 		# Prepare the days to update word weights for
 		days = []
 
+		# First check to see if a day is specified, if it is, set it to the day
+		# - If not, use the current day as the specified day
 		if not verify_date(specified_day):
 			specified_day = today_str
 
+		# If there is no start day specified, then it is assumed that the user wants
+		# - a specified day or the current day. This is added to the days array.
 		if not verify_date(start_day):
 			days.append(specified_day)
+
+		# If there is a start day specified, then the it checks to see if there is an end day. If not, 
+		# - it sets the current day to the end date. The difference between the start data and the and date
+		# - is calculated and the dates inbetween are added to the days array.
 		else:
 			date_parts1 = start_day.split('-')
 			date1 = datetime.date(int(date_parts1[2]), int(date_parts1[0]), int(date_parts1[1]))
 			date2 = datetime.date.today()
 			if verify_date(end_day):
 				date_parts2 = end_day.split('-')
-				d2 = datetime.date(int(date_parts2[2]), int(date_parts2[0]), int(date_parts2[1]))
+				date2 = datetime.date(int(date_parts2[2]), int(date_parts2[0]), int(date_parts2[1]))
 
 			delta = date2-date1
 			for each_day in range(0, delta.days + 1):

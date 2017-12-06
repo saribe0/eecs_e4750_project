@@ -312,10 +312,66 @@ __kernel void update_weights_basic(__global int* word_data, __global char* lette
 }
 """
 
+predict_kernel = """
+
+__kernel void predict_1(__global char* words, __global int* words_int, __global int* weights, __global int* num_weights_letter, volatile __global float* out_weights, int max_words_per_letter, int word_max) {
+	
+	// Get the word for the current work-item to focus on
+
+	unsigned int word_id = get_global_id(0);
+
+	unsigned int word_index = word_id * 16;
+	unsigned int word_index_int = word_id * 4;
+
+	// Get the weight forthe current work item to focus on
+
+	unsigned int weight_id = get_global_id(1);
+
+	if ( word_id < word_max ) 
+	{
+		unsigned int letter_index;
+		if (words[word_index] > 96) 
+			letter_index = letter_data[word_index] - 'a';
+		else
+			letter_index = letter_data[word_index] - 'A';
+
+		unsigned int weight_index = letter_index * max_words_per_letter * 7 + weight_id * 7;
+		unsigned int weight_max = num_weights_letter[letter_index];
+
+		// Get the inputs and outputs to be compared
+
+		word_0 = words_int[word_index_int + 0];
+		word_1 = words_int[word_index_int + 1];
+		word_2 = words_int[word_index_int + 2];
+		word_3 = words_int[word_index_int + 3];
+
+		if ( weight_index < weight_max ) 
+		{
+			word_w_0 = weights[letter_index + 0];
+			word_w_1 = weights[letter_index + 1];
+			word_w_2 = weights[letter_index + 2];
+			word_w_3 = weights[letter_index + 3];
+
+			// Compare them and update the output if necessary
+
+			if ( word_0 == word_w_0 && word_1 == word_w_1 && word_2 == word_w_2 && word_3 == word_w_3 )
+			{
+				int frequency = weights[letter_index + 5];
+				float weight = (float)words_by_letter[letter_index + 6] / frequency;
+
+				out_weights[word_id] = weight;
+			}
+
+		}
+	}
+}
+"""
+
 
 # Build the kernel
 if GPU:
 	prg = cl.Program(ctx, analysis_kernel).build()
+	prg_2 = cl.Program(ctx, predict_kernel).build()
 
 
 '''
@@ -2080,6 +2136,116 @@ def predict_movement7(day):
 
 	file.close()
 
+
+def predict_movement_gpu(day):
+
+	global weight_average
+	global weight_stdev
+	global weight_sum
+	global weight_max
+	global weight_min
+	global weight_count
+
+	logging.info('Prediction stock movement')
+	print('PREDICTIONS BASED ON:')
+	print('\t- AVG: ', weight_average)
+	print('\t- STD: ', weight_stdev)
+
+	# Open file to store todays predictions in
+	file = open('./output/prediction-' + day + '.txt', 'w')
+
+	file.write('Prediction Method 3: \n')
+	file.write('Using all weights in prediciton.\n')
+	file.write('Buy if 0.5 std above mean, sell if 0.5 std below mean. Otherwise undecided.\n')
+	file.write('Weighting stats based on unique words. \n\n')
+
+	file.write('Predictions Based On Weighting Stats: \n')
+	file.write('- Avg: ' + str(weight_average) + '\n')
+	file.write('- Std: ' + str(weight_stdev) + '\n')
+	file.write('- Sum: ' + str(weight_sum) + '\n')
+	file.write('- Cnt: ' + str(weight_count) + '\n')
+	file.write('- Max: ' + str(weight_max) + '\n')
+	file.write('- Min: ' + str(weight_min) + '\n\n')
+
+
+	# Iterate through stocks as predictions are seperate for each
+	for tickers in STOCK_TAGS:
+
+		logging.debug('- Finding prediction for: ' + tickers)
+
+		words_in_text = []
+
+		if not tickers in stock_data:
+			logging.warning('- Could not find articles loaded for ' + tickers)
+			continue
+
+		# Iterate through each article for the stock
+		for articles in stock_data[tickers]:
+
+			# Get the text (ignore link)
+			text = articles[1]
+
+			# Get an array of words with two or more characters for the text
+			words_in_text += re.compile('[A-Za-z\'][A-Za-z\'][A-Za-z\']+').findall(text)
+
+		# Store the words to be read by the kernel
+		word_data = bytearray(len(words_in_text))
+		for ii, word in enumerate(words_in_text):
+			struct.pack_into('16s', word_data, ii * 16, word.encode('utf-8'))
+
+		# Prepare an output buffer
+		out_weights = np.zeros((len(words_in_text), ), dtype = np.float32)
+
+		# Create the buffers for the GPU
+		word_data_buff = cl.Buffer(ctx, mf.READ_ONLY | mf.COPY_HOST_PTR, hostbuf = word_data)
+		word_data_int_buff = cl.Buffer(ctx, mf.READ_ONLY | mf.COPY_HOST_PTR, hostbuf = word_data)
+		weights_buff = cl.Buffer(ctx, mf.READ_ONLY | mf.COPY_HOST_PTR, hostbuf = np.asarray(words_by_letter))
+		num_weights_buff = cl.Buffer(ctx, mf.READ_ONLY | mf.COPY_HOST_PTR, hostbuf = np.asarray(num_words_by_letter, dtype = np.int32))
+		out_weights_buff = cl.Buffer(ctx, mf.WRITE_ONLY, out_weights.nbytes)
+
+		# Call the kernel
+		prg_2.predict_1(queue, grid, None, word_data_buff, word_data_int_buff, weights_buff, num_weights_buff, out_weights_buff, np.uint32(MAX_WORDS_PER_LETTER), np.uint32(len(words_in_text)))
+
+
+		# Collect the output
+		cl.enqueue_copy(queue, out_weights, out_weights_buff)
+
+		stock_rating_sum = 0
+		for w in out_weights:
+			stock_rating_sum += w
+
+		stock_rating_cnt = len(words_in_text)
+
+		# After each word in every article has been examined for that stock, find the average rating
+		stock_rating = stock_rating_sum / stock_rating_cnt
+
+		# Calculate the number of standard deviations above the mean and find the probability of that for a 'normal' distribution 
+		# - Assuming normal because as the word library increases, it should be able to be modeled as normal
+		std_above_avg = (stock_rating - weight_average) / weight_stdev
+		probability = norm(weight_average, weight_stdev).cdf(stock_rating)
+
+		if std_above_avg > 0.5:
+			rating = 'buy'
+		elif std_above_avg < -0.5:
+			rating = 'sell'
+		else:
+			rating = 'undecided'
+
+		print('RATING FOR: ', tickers)
+		print('\t- STD ABOVE MEAN: ', std_above_avg)
+		print('\t- RAW VAL RATING: ', stock_rating)
+		print('\t- PROBABILITY IS: ', probability)
+		print('\t- CORRESPONDS TO: ', rating)
+
+		file.write('Prediction for: ' + tickers + ' \n')
+		file.write('- Std above mean: ' + str(std_above_avg) + '\n')
+		file.write('- Raw val rating: ' + str(stock_rating) + '\n')
+		file.write('- probability is: ' + str(probability) + '\n')
+		file.write('- Corresponds to: ' + str(rating) + '\n\n')
+
+	file.close()
+
+
 '''
 Display help and exit
 '''
@@ -2320,7 +2486,11 @@ def main():
 				sys.exit(-1)
 
 		if weight_opt == 'opt1':
-			predict_movement(specified_day)
+			if GPU:
+				predict_movement_gpu(specified_day)
+			else
+				predict_movement(specified_day)
+				
 			predict_movement2(specified_day)
 			predict_movement3(specified_day)
 			predict_movement4(specified_day)
@@ -2399,7 +2569,7 @@ def main():
 			# Call the proper functions
 			if load_articles(each):
 				if GPU and weight_opt == 'opt1':
-					update_all_word_weights_gpu(weight_opt, each)
+					update_all_word_weights(weight_opt, each)
 				else:
 					update_all_word_weights(weight_opt, each)
 			stock_data.clear() # To prepare for the next set of articles

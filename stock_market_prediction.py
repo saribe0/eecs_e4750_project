@@ -334,8 +334,9 @@ __kernel void predict_1(__global char* words, __global int* weights, __global ch
 		else
 			letter_index = words[word_index] - 'A';
 
-		unsigned int weight_index = letter_index * max_words_per_letter * 7 + weight_id * 7;
-		unsigned int weight_max = num_weights_letter[letter_index] * 7;
+		unsigned int weight_index = letter_index * max_words_per_letter * 28 + weight_id * 28;
+		unsigned int weight_index_int = letter_index * max_words_per_letter * 7 + weight_id * 7;
+		unsigned int weight_max = letter_index * max_words_per_letter * 28 + num_weights_letter[letter_index] * 28;
 
 //if (word_id < 4) { printf("[id %d, letter %c]", word_id, letter_index+'a'); }
 
@@ -358,26 +359,30 @@ __kernel void predict_1(__global char* words, __global int* weights, __global ch
 		char word_14 = words[word_index + 14];
 		char word_15 = words[word_index + 15];
 
+
+
 		if ( weight_index < weight_max ) 
 		{
-			char word_w_0 = weights[weight_index + 0];
-			char word_w_1 = weights[weight_index + 1];
-			char word_w_2 = weights[weight_index + 2];
-			char word_w_3 = weights[weight_index + 3];
-			char word_w_4 = weights[weight_index + 4];
-			char word_w_5 = weights[weight_index + 5];
-			char word_w_6 = weights[weight_index + 6];
-			char word_w_7 = weights[weight_index + 7];
-			char word_w_8 = weights[weight_index + 8];
-			char word_w_9 = weights[weight_index + 9];
-			char word_w_10 = weights[weight_index + 10];
-			char word_w_11 = weights[weight_index + 11];
-			char word_w_12 = weights[weight_index + 12];
-			char word_w_13 = weights[weight_index + 13];
-			char word_w_14 = weights[weight_index + 14];
-			char word_w_15 = weights[weight_index + 15];
+			char word_w_0 = weights_char[weight_index + 0];
+			char word_w_1 = weights_char[weight_index + 1];
+			char word_w_2 = weights_char[weight_index + 2];
+			char word_w_3 = weights_char[weight_index + 3];
+			char word_w_4 = weights_char[weight_index + 4];
+			char word_w_5 = weights_char[weight_index + 5];
+			char word_w_6 = weights_char[weight_index + 6];
+			char word_w_7 = weights_char[weight_index + 7];
+			char word_w_8 = weights_char[weight_index + 8];
+			char word_w_9 = weights_char[weight_index + 9];
+			char word_w_10 = weights_char[weight_index + 10];
+			char word_w_11 = weights_char[weight_index + 11];
+			char word_w_12 = weights_char[weight_index + 12];
+			char word_w_13 = weights_char[weight_index + 13];
+			char word_w_14 = weights_char[weight_index + 14];
+			char word_w_15 = weights_char[weight_index + 15];
 
-//			if(word_id < 4 && weight_id <2) { printf("Found weight: %c, %d |", letter_index + 'a', word_w_0); }
+//			if(word_id < 4 && weight_id <2) { printf("Test word: %c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c vs %c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c |", word_0, word_1, word_2, 
+				word_3, word_4, word_5, word_6, word_7, word_8, word_9, word_10, word_11, word_12, word_13, word_14, word_15, word_w_0, word_w_1, word_w_2,
+				word_w_3, word_w_4, word_w_5, word_w_6, word_w_7, word_w_8, word_w_9, word_w_10, word_w_11, word_w_12, word_w_13, word_w_14, word_w_15); }
 
 			// Compare them and update the output if necessary
 
@@ -386,8 +391,8 @@ __kernel void predict_1(__global char* words, __global int* weights, __global ch
 				 word_8 == word_w_8 && word_9 == word_w_9 && word_10 == word_w_10 && word_11 == word_w_11 &&
 				 word_12 == word_w_12 && word_13 == word_w_13 && word_14 == word_w_14 && word_15 == word_w_15)
 			{
-				int frequency = weights[weight_index + 5];
-				float weight = (float)weights[weight_index + 6] / frequency;
+				int frequency = weights[weight_index_int + 5];
+				float weight = (float)weights[weight_index_int + 6] / frequency;
 
 				out_weights[word_id] = weight;
 
@@ -1346,7 +1351,7 @@ def get_word_weight(word_upper):
 		if temp_word[:len(temp_word.split('\0', 1)[0])] == word:
 			
 			# If it is the same, return its value
-			return float(test_data[3]) / test_data[2]
+			return np.float32(test_data[3]) / test_data[2]
 
 	# Could not find the word so returning the current average
 	return weight_average
@@ -2223,7 +2228,7 @@ def predict_movement_gpu(day):
 		# Store the words to be read by the kernel
 		word_data = bytearray(len(words_in_text)*16)
 		for ii, word in enumerate(words_in_text):
-			struct.pack_into('16s', word_data, ii * 16, word.encode('utf-8'))
+			struct.pack_into('16s', word_data, ii * 16, word.lower().encode('utf-8'))
 
 		# Prepare an output buffer
 		out_weights = np.zeros((len(words_in_text), ), dtype = np.float32)

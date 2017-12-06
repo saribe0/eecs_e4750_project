@@ -314,14 +314,13 @@ __kernel void update_weights_basic(__global int* word_data, __global char* lette
 
 predict_kernel = """
 
-__kernel void predict_1(__global char* words, __global int* words_int, __global int* weights, __global int* num_weights_letter, volatile __global float* out_weights, int max_words_per_letter, int word_max) {
+__kernel void predict_1(__global char* words, __global int* weights, __global char* weights_char, __global int* num_weights_letter, volatile __global float* out_weights, int max_words_per_letter, int word_max) {
 	
 	// Get the word for the current work-item to focus on
 
 	unsigned int word_id = get_global_id(0);
 
 	unsigned int word_index = word_id * 16;
-	unsigned int word_index_int = word_id * 4;
 
 	// Get the weight forthe current work item to focus on
 
@@ -342,26 +341,53 @@ if (word_id < 4) { printf("[id %d, letter %c]", word_id, letter_index+'a'); }
 
 		// Get the inputs and outputs to be compared
 
-		int word_0 = words_int[word_index_int + 0];
-	 	int word_1 = words_int[word_index_int + 1];
-		int word_2 = words_int[word_index_int + 2];
-		int word_3 = words_int[word_index_int + 3];
+		char word_0 = words[word_index + 0];
+	 	char word_1 = words[word_index + 1];
+		char word_2 = words[word_index + 2];
+		char word_3 = words[word_index + 3];
+		char word_0 = words[word_index + 4];
+	 	char word_1 = words[word_index + 5];
+		char word_2 = words[word_index + 6];
+		char word_3 = words[word_index + 7];
+		char word_0 = words[word_index + 8];
+	 	char word_1 = words[word_index + 9];
+		char word_2 = words[word_index + 10];
+		char word_3 = words[word_index + 11];
+		char word_0 = words[word_index + 12];
+	 	char word_1 = words[word_index + 13];
+		char word_2 = words[word_index + 14];
+		char word_3 = words[word_index + 15];
 
 		if ( weight_index < weight_max ) 
 		{
-			int word_w_0 = weights[letter_index + 0];
-			int word_w_1 = weights[letter_index + 1];
-			int word_w_2 = weights[letter_index + 2];
-			int word_w_3 = weights[letter_index + 3];
+			char word_w_0 = weights[weight_index + 0];
+			char word_w_1 = weights[weight_index + 1];
+			char word_w_2 = weights[weight_index + 2];
+			char word_w_3 = weights[weight_index + 3];
+			char word_w_0 = weights[weight_index + 4];
+			char word_w_1 = weights[weight_index + 5];
+			char word_w_2 = weights[weight_index + 6];
+			char word_w_3 = weights[weight_index + 7];
+			char word_w_0 = weights[weight_index + 8];
+			char word_w_1 = weights[weight_index + 9];
+			char word_w_2 = weights[weight_index + 10];
+			char word_w_3 = weights[weight_index + 11];
+			char word_w_0 = weights[weight_index + 12];
+			char word_w_1 = weights[weight_index + 13];
+			char word_w_2 = weights[weight_index + 14];
+			char word_w_3 = weights[weight_index + 15];
 
 //			if(word_id < 4 && weight_id <2) { printf("Found weight: %c, %d |", letter_index + 'a', word_w_0); }
 
 			// Compare them and update the output if necessary
 
-			if ( word_0 == word_w_0 && word_1 == word_w_1 && word_2 == word_w_2 && word_3 == word_w_3 )
+			if ( word_0 == word_w_0 && word_1 == word_w_1 && word_2 == word_w_2 && word_3 == word_w_3 &&
+				 word_4 == word_w_4 && word_5 == word_w_5 && word_6 == word_w_6 && word_7 == word_w_7 &&
+				 word_8 == word_w_8 && word_9 == word_w_9 && word_10 == word_w_10 && word_11 == word_w_11 &&
+				 word_12 == word_w_12 && word_13 == word_w_13 && word_14 == word_w_14 && word_15 == word_w_15)
 			{
-				int frequency = weights[letter_index + 5];
-				float weight = (float)weights[letter_index + 6] / frequency;
+				int frequency = weights[weight_index + 5];
+				float weight = (float)weights[weight_index + 6] / frequency;
 
 				out_weights[word_id] = weight;
 
@@ -2205,8 +2231,8 @@ def predict_movement_gpu(day):
 		# Create the buffers for the GPU
 		mf = cl.mem_flags
 		word_data_buff = cl.Buffer(ctx, mf.READ_ONLY | mf.COPY_HOST_PTR, hostbuf = word_data)
-		word_data_int_buff = cl.Buffer(ctx, mf.READ_ONLY | mf.COPY_HOST_PTR, hostbuf = word_data)
 		weights_buff = cl.Buffer(ctx, mf.READ_ONLY | mf.COPY_HOST_PTR, hostbuf = np.asarray(words_by_letter))
+		weights_char_buff = cl.Buffer(ctx, mf.READ_ONLY | mf.COPY_HOST_PTR, hostbuf = np.asarray(words_by_letter))
 		num_weights_buff = cl.Buffer(ctx, mf.READ_ONLY | mf.COPY_HOST_PTR, hostbuf = np.asarray(num_words_by_letter, dtype = np.int32))
 		out_weights_buff = cl.Buffer(ctx, mf.WRITE_ONLY, out_weights.nbytes)
 
@@ -2215,7 +2241,7 @@ def predict_movement_gpu(day):
 		grid = ((groups + (extra>0))*256, 2560)
 
 		# Call the kernel
-		prg_2.predict_1(queue, grid, None, word_data_buff, word_data_int_buff, weights_buff, num_weights_buff, out_weights_buff, np.uint32(MAX_WORDS_PER_LETTER), np.uint32(len(words_in_text)))
+		prg_2.predict_1(queue, grid, None, word_data_buff, weights_buff, weights_char_buff, num_weights_buff, out_weights_buff, np.uint32(MAX_WORDS_PER_LETTER), np.uint32(len(words_in_text)))
 
 		# Collect the output
 		cl.enqueue_copy(queue, out_weights, out_weights_buff)

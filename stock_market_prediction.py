@@ -242,60 +242,64 @@ __kernel void update_weights_basic(__global int* word_data, __global char* lette
 	unsigned int word_id = get_global_id(0);
 
 	// Only process if the work item is for a valid word
-	if (word_id < total_words)
+	// if (word_id < total_words)
+	// {
+
+	if (word_id >= total_words) { return; }
+
+
+	// Calculate the stock it belongs to and actual index in the word arrays as well as the index of the weight array
+
+	unsigned int word_index = word_id * 16;
+	unsigned int word_index_int = word_id * 4;
+
+	unsigned int stock_num = 0;
+	unsigned int temp = 0;
+	for (stock_num = 0; temp <= word_id; stock_num++)
 	{
-		// Calculate the stock it belongs to and actual index in the word arrays as well as the index of the weight array
+		temp += words_per_stock[stock_num];
+	}
+	stock_num--;
 
-		unsigned int word_index = word_id * 16;
-		unsigned int word_index_int = word_id * 4;
+	unsigned int letter_index;
+	if (letter_data[word_index] > 96) 
+		letter_index = letter_data[word_index] - 'a';
+	else
+		letter_index = letter_data[word_index] - 'A';
 
-		unsigned int stock_num = 0;
-		unsigned int temp = 0;
-		for (stock_num = 0; temp <= word_id; stock_num++)
+	unsigned int weight_start = letter_index * max_word_weights * 7;
+
+	// Prepare the destination word to be searched for
+
+	unsigned int goal[4] = {word_data[word_index_int + 0], word_data[word_index_int + 1], word_data[word_index_int + 2], word_data[word_index_int + 3]};
+	unsigned int test_target[4];
+
+	// Search for the word
+	int ii;
+	for (ii = 0; ii < num_weights_by_letter[letter_index]; ii++)
+	{
+		// Prepare the target to check
+		test_target[0] = word_weights[weight_start + ii * 7 + 0];
+		test_target[1] = word_weights[weight_start + ii * 7 + 1]; 
+		test_target[2] = word_weights[weight_start + ii * 7 + 2];
+		test_target[3] = word_weights[weight_start + ii * 7 + 3];
+
+		// Check to see if the bytes match
+		int test = test_target[0] ^ goal[0];
+		test += test_target[1] ^ goal[1];
+		test += test_target[2] ^ goal[2];
+		test += test_target[3] ^ goal[3];
+
+		if(!test) 
 		{
-			temp += words_per_stock[stock_num];
+			// If the word is found in the array, atomically update the values and finish execution for the item
+		//	atomic_inc(word_weights + weight_start + ii * 7 + 5);
+		//	atomic_add(word_weights + weight_start + ii * 7 + 6, stock_data[stock_num]);
+			return;
 		}
-		stock_num--;
+	}
 
-		unsigned int letter_index;
-		if (letter_data[word_index] > 96) 
-			letter_index = letter_data[word_index] - 'a';
-		else
-			letter_index = letter_data[word_index] - 'A';
-
-		unsigned int weight_start = letter_index * max_word_weights * 7;
-
-		// Prepare the destination word to be searched for
-
-		unsigned int goal[4] = {word_data[word_index_int + 0], word_data[word_index_int + 1], word_data[word_index_int + 2], word_data[word_index_int + 3]};
-		unsigned int test_target[4];
-
-		// Search for the word
-		int ii;
-		for (ii = 0; ii < num_weights_by_letter[letter_index]; ii++)
-		{
-			// Prepare the target to check
-			test_target[0] = word_weights[weight_start + ii * 7 + 0];
-			test_target[1] = word_weights[weight_start + ii * 7 + 1]; 
-			test_target[2] = word_weights[weight_start + ii * 7 + 2];
-			test_target[3] = word_weights[weight_start + ii * 7 + 3];
-
-			// Check to see if the bytes match
-			int test = test_target[0] ^ goal[0];
-			test += test_target[1] ^ goal[1];
-			test += test_target[2] ^ goal[2];
-			test += test_target[3] ^ goal[3];
-
-			if(!test) 
-			{
-				// If the word is found in the array, atomically update the values and finish execution for the item
-				atomic_inc(word_weights + weight_start + ii * 7 + 5);
-				atomic_add(word_weights + weight_start + ii * 7 + 6, stock_data[stock_num]);
-				return;
-			}
-		}
-
-		if (word_id < 4) { printf("Not found: %d", ii);}
+	if (word_id < 4) { printf("Not found: %d", ii);}
 
 
 		/*
@@ -347,8 +351,8 @@ __kernel void update_weights_basic(__global int* word_data, __global char* lette
 			}
 		}
 
-		*/
-	}
+		
+	}*/
 }
 
 """

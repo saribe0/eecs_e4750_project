@@ -236,7 +236,7 @@ __kernel void analyze_weights_2(__global int* words_by_letter, __global int* num
 }
 
 
-__kernel void update_weights_basic(__global int* word_data, __global char* letter_data, __global int* word_index_for_stock, volatile __global int* stock_data, __global int* word_weights, __global int* num_weights_by_letter, int num_stocks, int max_word_weights) {
+__kernel void update_weights_basic(__global int* word_data, __global char* letter_data, __global int* word_index_for_stock, __global int* stock_data, volatile __global int* word_weights, __global int* num_weights_by_letter, int num_stocks, int total_words, int max_word_weights) {
 	
 	// Get the word to be processed by the work item
 
@@ -999,10 +999,10 @@ def update_all_word_weights_gpu(option, day):
 	# Prepare GPU buffers
 	mf = cl.mem_flags
 	word_data_buff = cl.Buffer(ctx, mf.READ_ONLY | mf.COPY_HOST_PTR, hostbuf = np.asarray(word_data))
+	word_data_buff2 = cl.Buffer(ctx, mf.READ_ONLY | mf.COPY_HOST_PTR, hostbuf = np.asarray(word_data))
 	words_index_stock_buff = cl.Buffer(ctx, mf.READ_ONLY | mf.COPY_HOST_PTR, hostbuf = words_index_stock)
 	stock_changes_buff = cl.Buffer(ctx, mf.READ_ONLY | mf.COPY_HOST_PTR, hostbuf = stock_changes)
 	word_weight_buff = cl.Buffer(ctx, mf.WRITE_ONLY | mf.COPY_HOST_PTR, hostbuf = np.asarray(words_by_letter))
-	word_weight_buff2 = cl.Buffer(ctx, mf.READ_ONLY | mf.COPY_HOST_PTR, hostbuf = np.asarray(words_by_letter))
 	num_words_by_letter_buff = cl.Buffer(ctx, mf.READ_ONLY | mf.COPY_HOST_PTR, hostbuf = np.asarray(num_words_by_letter, dtype = np.uint32))
 
 	# Determine the grid size
@@ -1012,7 +1012,7 @@ def update_all_word_weights_gpu(option, day):
 	print(total_words)
 
 	# Call the kernel
-	prg.update_weights_distr(queue, gridDim, (256, 1), word_data_buff, words_index_stock_buff, stock_changes_buff, word_weight_buff, word_weight_buff2, num_words_by_letter_buff, np.uint32(len(STOCK_TAGS)), np.uint32(total_words), np.uint32(MAX_WORDS_PER_LETTER))
+	prg.update_weights_basic(queue, gridDim, (256, 1), word_data_buff, word_data_buff2, words_index_stock_buff, stock_changes_buff, word_weight_buff, num_words_by_letter_buff, np.uint32(len(STOCK_TAGS)), np.uint32(total_words), np.uint32(MAX_WORDS_PER_LETTER))
 
 
 	# Pull results from the GPU

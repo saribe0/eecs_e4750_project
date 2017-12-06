@@ -264,19 +264,45 @@ __kernel void update_weights_basic(__global int* word_data, __global char* lette
 			letter_index = letter_data[word_index] - 'A';
 
 		unsigned int weight_start = letter_index * max_word_weights * 7;
-//		if (word_id < 4) { printf("Letter: %c, index: %d, stock: %d", letter_data[word_index], letter_index, stock_num); }
-
-if (word_id < 4) { printf("weight_start: %d, index: %d | ", weight_start, word_index); };
-
 
 		// Prepare the destination word to be searched for
 
 		unsigned int goal[4] = {word_data[word_index_int + 0], word_data[word_index_int + 1], word_data[word_index_int + 2], word_data[word_index_int + 3]};
 		unsigned int test_target[4];
 
+		// Search for the word
+		for (int ii = 0; ii < num_weights_by_letter[letter_index]; ii++)
+		{
+			// Prepare the target to check
+			test_target[0] = word_weights[weight_start + index * 7 + 0];
+			test_target[1] = word_weights[weight_start + index * 7 + 1]; 
+			test_target[2] = word_weights[weight_start + index * 7 + 2];
+			test_target[3] = word_weights[weight_start + index * 7 + 3];
+
+			// Check to see if the bytes match
+			int test = test_target[0] ^ goal[0];
+			test += test_target[1] ^ goal[1];
+			test += test_target[2] ^ goal[2];
+			test += test_target[3] ^ goal[3];
+
+			if(!test) 
+			{
+				// If the word is found in the array, atomically update the values and finish execution for the item
+				atomic_inc(word_weights + weight_start + ii * 7 + 5);
+				atomic_add(word_weights + weight_start + ii * 7 + 6, stock_data[stock_num]);
+				return;
+			}
+		}
+
+		if (word_id < 4) { printf("Not found");}
+
+
+		/*
+
 		// Search for the word in the weight array by iterating through each word and checking the values of the string bytes
 		unsigned int found = 0;
 		unsigned int index = 0;
+		
 		while(!found && index < max_word_weights)
 		{
 			// Prepare the target to check
@@ -284,18 +310,15 @@ if (word_id < 4) { printf("weight_start: %d, index: %d | ", weight_start, word_i
 			test_target[1] = word_weights[weight_start + index * 7 + 1]; 
 			test_target[2] = word_weights[weight_start + index * 7 + 2];
 			test_target[3] = word_weights[weight_start + index * 7 + 3];
-//if (word_id < 4 && index == 0) { printf("weight_start"); }
-//			int test_target[4] = {0, 1, 2, 3};
+
 			// Check to see if the bytes match
-//			if (goal[0] == test_target[0] && goal[1] == test_target[1] && goal[2] == test_target[2] && goal[3] == test_target[3])
-			int test = test_target[0] ^ goal[0];
+			test = test_target[0] ^ goal[0];
 			test += test_target[1] ^ goal[1];
 			test += test_target[2] ^ goal[2];
 			test += test_target[3] ^ goal[3];
 
 			if(!test)
 			{
-//if(word_id < 4) { printf("weight_start"); } //: %d, index: %d, goal: %d | ", weight_start, index, goal[0]); };
 				// If the word is found in the array, atommically update the values
 				atomic_inc(word_weights + weight_start + index * 7 + 5);
 				atomic_add(word_weights + weight_start + index * 7 + 6, stock_data[stock_num]);
@@ -308,7 +331,6 @@ if (word_id < 4) { printf("weight_start: %d, index: %d | ", weight_start, word_i
 			// If the next index is beyond valid data and the word hasn't been found yet, add the word
 			if (index >= num_weights_by_letter[letter_index] && !found)
 			{
-//if (word_id < 4) { printf("weight_start: %d, index: %d, goal: %d | ", 0, 0, 0); };
 				// Copy the word over
 //				word_weights[weight_start + index * 7 + 0] = goal[0];
 //				word_weights[weight_start + index * 7 + 1] = goal[1];
@@ -323,24 +345,13 @@ if (word_id < 4) { printf("weight_start: %d, index: %d | ", weight_start, word_i
 				found = 1;
 			}
 		}
+
+		*/
 	}
 }
 
 """
-'''
-# Prepare GPU buffers
-	mf = cl.mem_flags
-	words_per_article_buff = cl.Buffer(ctx, mf.READ_ONLY | mf.COPY_HOST_PTR, hostbuf = np.asarray(words_per_article, dtype = np.uint32))
-	articles_per_stock_buff = cl.Buffer(ctx, mf.READ_ONLY | mf.COPY_HOST_PTR, hostbuf = np.asarray(articles_per_stock, dtype = np.uint32))
-	stock_data_buff = cl.Buffer(ctx, mf.READ_ONLY | mf.COPY_HOST_PTR, hostbuf = stock_data)
-	word_data_buff = cl.Buffer(ctx, mf.READ_ONLY | mf.COPY_HOST_PTR, hostbuf = hostbuf = np.asarray(word_data))
-	word_weight_buff = cl.Buffer(ctx, mf.WRITE_ONLY | mf.COPY_HOST_PTR, hostbuf = hostbuf = np.asarray(words_by_letter))
 
-	prg.update_weights(queue, (256*32, 1), (32, 1), word_data_buff, words_per_article_buff, articles_per_stock_buff, stock_data_buff, word_weight_buff, np.uint32(len(STOCK_TAGS)))
-
-	# Pull results from the GPU
-	cl.enqueue_copy(queue, words_by_letter, word_weight_buff)
-'''
 
 # Build the kernel
 if GPU:
@@ -989,7 +1000,7 @@ def update_all_word_weights_gpu(option, day):
 			# Get the text (ignore link)
 			text = articles[1]
 
-			# Get an array of words with two or more characters for the text
+			# Get an array of words with three or more characters for the text
 			words_in_text = re.compile('[A-Za-z\'][A-Za-z\'][A-Za-z\']+').findall(text)
 
 			# Store the words and update the number

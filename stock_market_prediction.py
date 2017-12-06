@@ -296,15 +296,15 @@ __kernel void update_weights_basic(__global int* word_data, __global char* lette
 	if (out < 0)
 	{
 		out = num_weights_by_letter[letter_index];
+	}
 
-		atomic_inc(word_weight_edits_buff + weight_start + out * 7 + 5);
-		atomic_add(word_weight_edits_buff + weight_start + out * 7 + 6, change);
-	}
-	else
-	{
-		atomic_inc(word_weight_edits_buff + weight_start + out * 7 + 5);
-        atomic_add(word_weight_edits_buff + weight_start + out * 7 + 6, change);
-	}
+	atomic_add(word_weight_edits_buff + weight_start + out * 7 + 0, goal0);
+	atomic_add(word_weight_edits_buff + weight_start + out * 7 + 1, goal1);
+	atomic_add(word_weight_edits_buff + weight_start + out * 7 + 2, goal2);
+	atomic_add(word_weight_edits_buff + weight_start + out * 7 + 3, goal3);
+
+	atomic_inc(word_weight_edits_buff + weight_start + out * 7 + 5);
+	atomic_add(word_weight_edits_buff + weight_start + out * 7 + 6, change);
 }
 """
 

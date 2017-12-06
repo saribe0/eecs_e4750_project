@@ -6,7 +6,7 @@
 ####################################################################################################
 
 # Specifies GPU/CPU calculations will be prepformed
-GPU = True
+GPU = False
 
 if GPU:
 	import pyopencl as cl
@@ -836,7 +836,7 @@ def update_all_word_weights(option, day):
 			text = articles[1]
 
 			# Get an array of words with two or more characters for the text
-			words_in_text = re.compile('[A-Za-z\'][A-Za-z\'][A-Za-z\']+').findall(text)
+			words_in_text = re.compile('[A-Za-z][A-Za-z][A-Za-z]+').findall(text)
 
 			# Update each word
 			for each_word in words_in_text:
@@ -1017,7 +1017,7 @@ def update_all_word_weights_gpu(option, day):
 			text = articles[1]
 
 			# Get an array of words with three or more characters for the text
-			words_in_text = re.compile('[A-Za-z\'][A-Za-z\'][A-Za-z\']+').findall(text)
+			words_in_text = re.compile('[A-Za-z][A-Za-z][A-Za-z]+').findall(text)
 
 			# Store the words and update the number
 			temp_word_array += words_in_text
@@ -2186,7 +2186,7 @@ def predict_movement_gpu(day):
 			text = articles[1]
 
 			# Get an array of words with two or more characters for the text
-			words_in_text += re.compile('[A-Za-z\'][A-Za-z\'][A-Za-z\']+').findall(text)
+			words_in_text += re.compile('[A-Za-z][A-Za-z][A-Za-z]+').findall(text)
 
 		# Store the words to be read by the kernel
 		word_data = bytearray(len(words_in_text))
@@ -2488,9 +2488,9 @@ def main():
 		if weight_opt == 'opt1':
 			if GPU:
 				predict_movement_gpu(specified_day)
-			else
+			else:
 				predict_movement(specified_day)
-				
+
 			predict_movement2(specified_day)
 			predict_movement3(specified_day)
 			predict_movement4(specified_day)

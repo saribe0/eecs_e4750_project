@@ -338,6 +338,8 @@ __kernel void predict_1(__global char* words, __global int* words_int, __global 
 		unsigned int weight_index = letter_index * max_words_per_letter * 7 + weight_id * 7;
 		unsigned int weight_max = num_weights_letter[letter_index];
 
+if (word_id < 4) { printf("[id %d, letter %c]", word_id, letter_index+'a'); }
+
 		// Get the inputs and outputs to be compared
 
 		int word_0 = words_int[word_index_int + 0];
@@ -352,6 +354,8 @@ __kernel void predict_1(__global char* words, __global int* words_int, __global 
 			int word_w_2 = weights[letter_index + 2];
 			int word_w_3 = weights[letter_index + 3];
 
+//			if(word_id < 4 && weight_id <2) { printf("Found weight: %c, %d |", letter_index + 'a', word_w_0); }
+
 			// Compare them and update the output if necessary
 
 			if ( word_0 == word_w_0 && word_1 == word_w_1 && word_2 == word_w_2 && word_3 == word_w_3 )
@@ -360,6 +364,8 @@ __kernel void predict_1(__global char* words, __global int* words_int, __global 
 				float weight = (float)weights[letter_index + 6] / frequency;
 
 				out_weights[word_id] = weight;
+
+				if(word_id < 4) { printf("Found weight: %c, %d |", letter_index + 'a', weight); }
 			}
 
 		}
@@ -2217,6 +2223,8 @@ def predict_movement_gpu(day):
 		stock_rating_sum = 0
 		for w in out_weights:
 			stock_rating_sum += w
+
+		print(out_weights[:10])
 
 		stock_rating_cnt = len(words_in_text)
 

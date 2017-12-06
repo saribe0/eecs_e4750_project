@@ -1,0 +1,137 @@
+Loading word weights
+Loading articles
+Analyzing weights with gpu
+PREDICTIONS BASED ON:
+('\t- AVG: ', 0.50359421560663375)
+('\t- STD: ', 0.7813341985084096)
+[ 121.  122.  134.  131.  115.  119.  150.  100.   92.  108.]
+('RATING FOR: ', 'amzn')
+('\t- STD ABOVE MEAN: ', 147.99364826690172)
+('\t- RAW VAL RATING: ', 116.13609276856177)
+('\t- PROBABILITY IS: ', 1.0)
+('\t- CORRESPONDS TO: ', 'buy')
+[ 121.  122.  134.  131.  115.  119.  150.  100.   92.  108.]
+('RATING FOR: ', 'amat')
+('\t- STD ABOVE MEAN: ', 158.79558000127741)
+('\t- RAW VAL RATING: ', 124.57601144258275)
+('\t- PROBABILITY IS: ', 1.0)
+('\t- CORRESPONDS TO: ', 'buy')
+[ 121.  122.  134.  131.  115.  119.  150.  100.   92.  108.]
+('RATING FOR: ', 'agn')
+('\t- STD ABOVE MEAN: ', 153.51598620900626)
+('\t- RAW VAL RATING: ', 120.45088425844861)
+('\t- PROBABILITY IS: ', 1.0)
+('\t- CORRESPONDS TO: ', 'buy')
+[ 121.  122.  134.  131.  115.  119.  150.  100.   92.  108.]
+('RATING FOR: ', 'goog')
+('\t- STD ABOVE MEAN: ', 157.79960157072819)
+('\t- RAW VAL RATING: ', 123.79781943381791)
+('\t- PROBABILITY IS: ', 1.0)
+('\t- CORRESPONDS TO: ', 'buy')
+[ 121.  122.  134.  131.  115.  119.  150.  100.   92.  108.]
+('RATING FOR: ', 'hd')
+('\t- STD ABOVE MEAN: ', 160.80008428948059)
+('\t- RAW VAL RATING: ', 126.14219919401266)
+('\t- PROBABILITY IS: ', 1.0)
+('\t- CORRESPONDS TO: ', 'buy')
+[ 121.  122.  134.  131.  115.  119.  150.  100.   92.  108.]
+('RATING FOR: ', 'lmt')
+('\t- STD ABOVE MEAN: ', 159.07065215240829)
+('\t- RAW VAL RATING: ', 124.79093472131859)
+('\t- PROBABILITY IS: ', 1.0)
+('\t- CORRESPONDS TO: ', 'buy')
+[ 121.  122.  134.  131.  115.  119.  150.  100.   92.  108.]
+('RATING FOR: ', 'data')
+('\t- STD ABOVE MEAN: ', 161.49828711326293)
+('\t- RAW VAL RATING: ', 126.68772893772893)
+('\t- PROBABILITY IS: ', 1.0)
+('\t- CORRESPONDS TO: ', 'buy')
+[ 121.  122.  134.  131.  115.  119.  150.  100.   92.  108.]
+('RATING FOR: ', 'nflx')
+('\t- STD ABOVE MEAN: ', 157.66801419701358)
+('\t- RAW VAL RATING: ', 123.69500571864278)
+('\t- PROBABILITY IS: ', 1.0)
+('\t- CORRESPONDS TO: ', 'buy')
+[ 121.  122.  134.  131.  115.  119.  150.  100.   92.  108.]
+('RATING FOR: ', 'aapl')
+('\t- STD ABOVE MEAN: ', 159.05492624501827)
+('\t- RAW VAL RATING: ', 124.77864753207218)
+('\t- PROBABILITY IS: ', 1.0)
+('\t- CORRESPONDS TO: ', 'buy')
+[ 121.  122.  134.  131.  115.  119.  150.  100.   92.  108.]
+('RATING FOR: ', 'ge')
+('\t- STD ABOVE MEAN: ', 164.35635271421506)
+('\t- RAW VAL RATING: ', 128.92083333333332)
+('\t- PROBABILITY IS: ', 1.0)
+('\t- CORRESPONDS TO: ', 'buy')
+[ 121.  122.  134.  131.  115.  119.  150.  100.   92.  108.]
+('RATING FOR: ', 'tsla')
+('\t- STD ABOVE MEAN: ', 147.57861091208159)
+('\t- RAW VAL RATING: ', 115.81180988958234)
+('\t- PROBABILITY IS: ', 1.0)
+('\t- CORRESPONDS TO: ', 'buy')
+[ 121.  122.  134.  131.  115.  119.  150.  100.   92.  108.]
+('RATING FOR: ', 'bac')
+('\t- STD ABOVE MEAN: ', 159.3143488479158)
+('\t- RAW VAL RATING: ', 124.98134328358209)
+('\t- PROBABILITY IS: ', 1.0)
+('\t- CORRESPONDS TO: ', 'buy')
+[ 121.  122.  134.  131.  115.  119.  150.  100.   92.  108.]
+('RATING FOR: ', 'nvda')
+('\t- STD ABOVE MEAN: ', 158.2425158345456)
+('\t- RAW VAL RATING: ', 124.14388349514563)
+('\t- PROBABILITY IS: ', 1.0)
+('\t- CORRESPONDS TO: ', 'buy')
+[ 121.  122.  134.  131.  115.  119.  150.  100.   92.  108.]
+('RATING FOR: ', 'baba')
+('\t- STD ABOVE MEAN: ', 157.39642556535807)
+('\t- RAW VAL RATING: ', 123.48280423280423)
+('\t- PROBABILITY IS: ', 1.0)
+('\t- CORRESPONDS TO: ', 'buy')
+[ 121.  122.  134.  131.  115.  119.  150.  100.   92.  108.]
+('RATING FOR: ', 'wmt')
+('\t- STD ABOVE MEAN: ', 145.73949370483706)
+('\t- RAW VAL RATING: ', 114.3748447204969)
+('\t- PROBABILITY IS: ', 1.0)
+('\t- CORRESPONDS TO: ', 'buy')
+[ 121.  122.  134.  131.  115.  119.  150.  100.   92.  108.]
+('RATING FOR: ', 'jpm')
+('\t- STD ABOVE MEAN: ', 159.04144329819812)
+('\t- RAW VAL RATING: ', 124.76811284462492)
+('\t- PROBABILITY IS: ', 1.0)
+('\t- CORRESPONDS TO: ', 'buy')
+[ 121.  122.  134.  131.  115.  119.  150.  100.   92.  108.]
+('RATING FOR: ', 'mu')
+('\t- STD ABOVE MEAN: ', 159.98195673856574)
+('\t- RAW VAL RATING: ', 125.50296815974096)
+('\t- PROBABILITY IS: ', 1.0)
+('\t- CORRESPONDS TO: ', 'buy')
+[ 121.  122.  134.  131.  115.  119.  150.  100.   92.  108.]
+('RATING FOR: ', 'uaa')
+('\t- STD ABOVE MEAN: ', 162.80000679417876)
+('\t- RAW VAL RATING: ', 127.70480704129993)
+('\t- PROBABILITY IS: ', 1.0)
+('\t- CORRESPONDS TO: ', 'buy')
+[ 121.  122.  134.  131.  115.  119.  150.  100.   92.  108.]
+('RATING FOR: ', 'gild')
+('\t- STD ABOVE MEAN: ', 157.09606431116683)
+('\t- RAW VAL RATING: ', 123.24812171299774)
+('\t- PROBABILITY IS: ', 1.0)
+('\t- CORRESPONDS TO: ', 'buy')
+[ 121.  122.  134.  131.  115.  119.  150.  100.   92.  108.]
+('RATING FOR: ', 'xom')
+('\t- STD ABOVE MEAN: ', 159.17431369086859)
+('\t- RAW VAL RATING: ', 124.87192902638762)
+('\t- PROBABILITY IS: ', 1.0)
+('\t- CORRESPONDS TO: ', 'buy')
+PREDICTIONS BASED ON:
+('\t- AVG: ', 0.50359421560663375)
+('\t- STD: ', 0.7813341985084096)
+Traceback (most recent call last):
+  File "stock_market_prediction.py", line 2596, in <module>
+    main()
+  File "stock_market_prediction.py", line 2502, in main
+    predict_movement2(specified_day)
+  File "stock_market_prediction.py", line 1570, in predict_movement2
+    stock_rating = stock_rating_sum / stock_rating_cnt
+ZeroDivisionError: integer division or modulo by zero

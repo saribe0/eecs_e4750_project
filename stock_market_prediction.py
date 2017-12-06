@@ -236,7 +236,7 @@ __kernel void analyze_weights_2(__global int* words_by_letter, __global int* num
 }
 
 
-__kernel void update_weights_basic(__global int* word_data, __global char* letter_data, __global int* word_index_for_stock, __global int* stock_data, volatile __global int* word_weights, __global int* num_weights_by_letter, int num_stocks, int total_words, int max_word_weights) {
+__kernel void update_weights_basic(__global int* word_data, __global char* letter_data, __global int* words_per_stock, __global int* stock_data, volatile __global int* word_weights, __global int* num_weights_by_letter, int num_stocks, int total_words, int max_word_weights) {
 	
 	// Get the word to be processed by the work item
 
@@ -280,7 +280,7 @@ __kernel void update_weights_basic(__global int* word_data, __global char* lette
 	for (ii = 0; ii < max_word_weights; ii++)
 	{
 		// Check to see if the bytes match
-		int test = word_weights[weight_start + ii * 7 + 0] ^ goa0;
+		int test = word_weights[weight_start + ii * 7 + 0] ^ goal0;
 		test += word_weights[weight_start + ii * 7 + 1] ^ goal1;
 		test += word_weights[weight_start + ii * 7 + 2] ^ goal2;
 		test += word_weights[weight_start + ii * 7 + 3] ^ goal3;

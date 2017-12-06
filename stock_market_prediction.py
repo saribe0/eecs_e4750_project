@@ -279,17 +279,11 @@ __kernel void update_weights_basic(__global int* word_data, __global char* lette
 	int out = -1;
 	for (ii = 0; ii < max_word_weights; ii++)
 	{
-		// Prepare the target to check
-		test_target[0] = word_weights[weight_start + ii * 7 + 0];
-		test_target[1] = word_weights[weight_start + ii * 7 + 1]; 
-		test_target[2] = word_weights[weight_start + ii * 7 + 2];
-		test_target[3] = word_weights[weight_start + ii * 7 + 3];
-
 		// Check to see if the bytes match
-		int test = word_weights[weight_start + ii * 7 + 0] ^ goal[0];
-		test += word_weights[weight_start + ii * 7 + 1] ^ goal[1];
-		test += word_weights[weight_start + ii * 7 + 2] ^ goal[2];
-		test += word_weights[weight_start + ii * 7 + 3] ^ goal[3];
+		int test = word_weights[weight_start + ii * 7 + 0] ^ goa0;
+		test += word_weights[weight_start + ii * 7 + 1] ^ goal1;
+		test += word_weights[weight_start + ii * 7 + 2] ^ goal2;
+		test += word_weights[weight_start + ii * 7 + 3] ^ goal3;
 
 		if (test == 0) {
 			out = ii;

@@ -6,7 +6,7 @@
 ####################################################################################################
 
 # Specifies GPU/CPU calculations will be prepformed
-GPU = True
+GPU = False
 
 if GPU:
 	import pyopencl as cl
@@ -338,8 +338,6 @@ __kernel void predict_1(__global char* words, __global int* weights, __global ch
 		unsigned int weight_index_int = letter_index * max_words_per_letter * 7 + weight_id * 7;
 		unsigned int weight_max = letter_index * max_words_per_letter * 28 + num_weights_letter[letter_index] * 28;
 
-//if (word_id < 4) { printf("[id %d, letter %c]", word_id, letter_index+'a'); }
-
 		// Get the inputs and outputs to be compared
 
 		char word_0 = words[word_index + 0];
@@ -395,8 +393,6 @@ __kernel void predict_1(__global char* words, __global int* weights, __global ch
 				float weight = (float)weights[weight_index_int + 6] / frequency;
 
 				out_weights[word_id] = weight;
-
-				if(word_id < 4) { printf("Found weight: %c, %d |", letter_index + 'a', weight); }
 			}
 
 		}
@@ -1351,7 +1347,7 @@ def get_word_weight(word_upper):
 		if temp_word[:len(temp_word.split('\0', 1)[0])] == word:
 			
 			# If it is the same, return its value
-			return np.float32(test_data[3]) / test_data[2]
+			return np.float32(np.float32(test_data[3]) / test_data[2])
 
 	# Could not find the word so returning the current average
 	return weight_average

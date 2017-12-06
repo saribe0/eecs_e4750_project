@@ -236,15 +236,13 @@ __kernel void analyze_weights_2(__global int* words_by_letter, __global int* num
 }
 
 
-__kernel void update_weights_basic(__global int* word_data, __global char* letter_data, __global int* words_per_stock, volatile __global int* stock_data, __global int* word_weights, __global int* num_weights_by_letter, int num_stocks, int max_word_weights, int total_words) {
+__kernel void update_weights_basic(__global int* word_data, __global char* letter_data, __global int* word_index_for_stock, volatile __global int* stock_data, __global int* word_weights, __global int* num_weights_by_letter, int num_stocks, int max_word_weights) {
 	
 	// Get the word to be processed by the work item
 
 	unsigned int word_id = get_global_id(0);
 
 	// Only process if the work item is for a valid word
-	// if (word_id < total_words)
-	// {
 
 	if (word_id >= total_words) { return; }
 
@@ -255,12 +253,11 @@ __kernel void update_weights_basic(__global int* word_data, __global char* lette
 	unsigned int word_index_int = word_id * 4;
 
 	unsigned int stock_num = 0;
-	unsigned int temp = 0;
+	int temp = 0;
 	for (stock_num = 0; temp <= word_id; stock_num++)
 	{
-		if (stock_num < 20) { temp += words_per_stock[stock_num]; }
+		temp += words_per_stock[stock_num];
 	}
-	stock_num--;
 
 	unsigned int letter_index;
 	if (letter_data[word_index] > 96) 
@@ -272,14 +269,15 @@ __kernel void update_weights_basic(__global int* word_data, __global char* lette
 
 	// Prepare the destination word to be searched for
 
-	unsigned int goal[4] = {word_data[word_index_int + 0], word_data[word_index_int + 1], word_data[word_index_int + 2], word_data[word_index_int + 3]};
-	unsigned int test_target[4];
+	unsigned int goal0 = word_data[word_index_int + 0];
+	unsigned int goal1 = word_data[word_index_int + 1];
+	unsigned int goal2 = word_data[word_index_int + 2];
+	unsigned int goal3 = word_data[word_index_int + 3];
 
 	// Search for the word
 	int ii;
-	int out = 0;
-	int max = num_weights_by_letter[letter_index];
-	for (ii = 0; ii < max; ii++)
+	int out = -1;
+	for (ii = 0; ii < max_word_weights; ii++)
 	{
 		// Prepare the target to check
 		test_target[0] = word_weights[weight_start + ii * 7 + 0];
@@ -293,77 +291,53 @@ __kernel void update_weights_basic(__global int* word_data, __global char* lette
 		test += word_weights[weight_start + ii * 7 + 2] ^ goal[2];
 		test += word_weights[weight_start + ii * 7 + 3] ^ goal[3];
 
-		if(test == 0) 
-		{
+		if (test == 0) {
 			out = ii;
-			
-			// If the word is found in the array, atomically update the values and finish execution for the item
-//			int val = stock_data[stock_num];
-//			int addr = weight_start + ii * 7 +5;
-//			atomic_inc(word_weights + addr);
-//			atomic_add(word_weights + weight_start + ii * 7 + 6, val);
-//			return;
 		}
 	}
 
-	if (word_id < 4) { printf("Storing, %d |", ii);}
+	if (out < 0)
+	{
+		out = num_weights_by_letter[letter_index];
+	}
+
+	// Atomic stuff
+}
+"""
+
+'''
+	prg.update_weights_distr(queue, gridDim, (256, 1), word_data_buff, words_index_stock_buff, stock_changes_buff, word_weight_buff, word_weight_buff2, num_words_by_letter_buff, np.uint32(len(STOCK_TAGS)), np.uint32(MAX_WORDS_PER_LETTER))
+
+
+__kernel void update_weights_disrt(__global char* word_data, __global int* word_index_per_stock, __global int* stock_change, volatile __global int* word_weights, __global int* word_weights_by_letter, __global int* num_weights_by_letter, int num_stocks, int, max_words, int max_word_weights) {
 	
+	// First, get the indices
+	unsigned int word_id = get_global_id(0);
+	unsigned int row_id = get_global_id(1);
 
-		/*
+	// Get rid of excesss work items
+	if (row_id >= max_word_weights * 26 || word_id >= max_words)
+		return;
 
-		// Search for the word in the weight array by iterating through each word and checking the values of the string bytes
-		unsigned int found = 0;
-		unsigned int index = 0;
-		
-		while(!found && index < max_word_weights)
-		{
-			// Prepare the target to check
-			test_target[0] = word_weights[weight_start + index * 7 + 0];
-			test_target[1] = word_weights[weight_start + index * 7 + 1]; 
-			test_target[2] = word_weights[weight_start + index * 7 + 2];
-			test_target[3] = word_weights[weight_start + index * 7 + 3];
+	// Calculate the weight indices
+	unsigned int letter_id = row_id / max_word_weights;
+	unsigned int weight_id = row_id % max_word_weights;
 
-			// Check to see if the bytes match
-			test = test_target[0] ^ goal[0];
-			test += test_target[1] ^ goal[1];
-			test += test_target[2] ^ goal[2];
-			test += test_target[3] ^ goal[3];
+	// Get rid of excess work items
+	if ()
 
-			if(!test)
-			{
-				// If the word is found in the array, atommically update the values
-				atomic_inc(word_weights + weight_start + index * 7 + 5);
-				atomic_add(word_weights + weight_start + index * 7 + 6, stock_data[stock_num]);
+	unsigned int stock_id = 0;
+	temp = 0;
+	for ( ; temp < word_id; stock_id++ ) {
+		temp += stock_change[stock_id];
+	}
 
-				found = 1;
-			}
 
-			index++;
 
-			// If the next index is beyond valid data and the word hasn't been found yet, add the word
-			if (index >= num_weights_by_letter[letter_index] && !found)
-			{
-				// Copy the word over
-//				word_weights[weight_start + index * 7 + 0] = goal[0];
-//				word_weights[weight_start + index * 7 + 1] = goal[1];
-//				word_weights[weight_start + index * 7 + 2] = goal[2];
-//				word_weights[weight_start + index * 7 + 3] = goal[3];
-
-				// Initialize the information variables
-//				word_weights[weight_start + index * 7 + 4] = as_int(1.0f);
-//				word_weights[weight_start + index * 7 + 5] = 1;
-//				word_weights[weight_start + index * 7 + 6] = stock_data[stock_num];
-
-				found = 1;
-			}
-		}
-
-		
-	}*/
 }
 
 """
-
+'''
 
 # Build the kernel
 if GPU:
@@ -987,7 +961,7 @@ def update_all_word_weights_gpu(option, day):
 
 	# At this point, the weighting arrays are initialized or loaded
 	# - Next step is to generate the datastructures for the kernel to manipulate
-	words_per_stock = np.zeros((len(STOCK_TAGS),), dtype = np.uint32)
+	words_index_stock = np.zeros((len(STOCK_TAGS),), dtype = np.uint32)
 	stock_changes = np.zeros((len(STOCK_TAGS),), dtype = np.uint32)
 
 	# Get all the words for the articles and data about them
@@ -1030,11 +1004,11 @@ def update_all_word_weights_gpu(option, day):
 
 	# Prepare GPU buffers
 	mf = cl.mem_flags
-	words_per_stock_buff = cl.Buffer(ctx, mf.READ_ONLY | mf.COPY_HOST_PTR, hostbuf = words_per_stock)
-	stock_changes_buff = cl.Buffer(ctx, mf.READ_ONLY | mf.COPY_HOST_PTR, hostbuf = stock_changes)
 	word_data_buff = cl.Buffer(ctx, mf.READ_ONLY | mf.COPY_HOST_PTR, hostbuf = np.asarray(word_data))
-	word_data_buff2 = cl.Buffer(ctx, mf.READ_ONLY | mf.COPY_HOST_PTR, hostbuf = np.asarray(word_data))
-	word_weight_buff = cl.Buffer(ctx, mf.READ_ONLY | mf.COPY_HOST_PTR, hostbuf = np.asarray(words_by_letter))
+	words_index_stock_buff = cl.Buffer(ctx, mf.READ_ONLY | mf.COPY_HOST_PTR, hostbuf = words_index_stock)
+	stock_changes_buff = cl.Buffer(ctx, mf.READ_ONLY | mf.COPY_HOST_PTR, hostbuf = stock_changes)
+	word_weight_buff = cl.Buffer(ctx, mf.WRITE_ONLY | mf.COPY_HOST_PTR, hostbuf = np.asarray(words_by_letter))
+	word_weight_buff2 = cl.Buffer(ctx, mf.READ_ONLY | mf.COPY_HOST_PTR, hostbuf = np.asarray(words_by_letter))
 	num_words_by_letter_buff = cl.Buffer(ctx, mf.READ_ONLY | mf.COPY_HOST_PTR, hostbuf = np.asarray(num_words_by_letter, dtype = np.uint32))
 
 	# Determine the grid size
@@ -1044,15 +1018,14 @@ def update_all_word_weights_gpu(option, day):
 	print(total_words)
 
 	# Call the kernel
-	prg.update_weights_basic(queue, gridDim, (256, 1), word_data_buff, word_data_buff2, words_per_stock_buff, stock_changes_buff, word_weight_buff, num_words_by_letter_buff, np.uint32(len(STOCK_TAGS)), np.uint32(MAX_WORDS_PER_LETTER), np.uint32(total_words))
+	prg.update_weights_distr(queue, gridDim, (256, 1), word_data_buff, words_index_stock_buff, stock_changes_buff, word_weight_buff, word_weight_buff2, num_words_by_letter_buff, np.uint32(len(STOCK_TAGS)), np.uint32(total_words), np.uint32(MAX_WORDS_PER_LETTER))
 
-#	print(queue)
-#	print(queue.finish())
+
 	# Pull results from the GPU
 
 	return_buffer = bytearray(MAX_WORDS_PER_LETTER*28*26)
 
-	cl.enqueue_copy(queue, return_buffer, word_weight_buff)
+	cl.enqueue_copy(queue, words_by_letter, word_weight_buff)
 
 '''
 Evening Update Step

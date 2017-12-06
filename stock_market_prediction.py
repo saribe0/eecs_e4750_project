@@ -6,7 +6,7 @@
 ####################################################################################################
 
 # Specifies GPU/CPU calculations will be prepformed
-GPU = False
+GPU = True
 
 if GPU:
 	import pyopencl as cl
@@ -255,6 +255,7 @@ __kernel void update_weights_basic(__global int* word_data, __global char* lette
 		{
 			temp += words_per_stock[stock_num];
 		}
+		stock_num--;
 
 		unsigned int letter_index;
 		if (letter_data[word_index] > 96) 
@@ -262,11 +263,16 @@ __kernel void update_weights_basic(__global int* word_data, __global char* lette
 		else
 			letter_index = letter_data[word_index] - 'A';
 
-		unsigned int weight_start = word_weights + letter_index * max_word_weights * 7;
+		unsigned int weight_start = letter_index * max_word_weights * 7;
+//		if (word_id < 4) { printf("Letter: %c, index: %d, stock: %d", letter_data[word_index], letter_index, stock_num); }
+
+if (word_id < 4) { printf("weight_start: %d, index: %d | ", weight_start, word_index); };
+
 
 		// Prepare the destination word to be searched for
 
-		unsigned int goal[4] = {word_data[word_index_int + 0], word_data[word_index_int + 1], word_data[word_index_int + 2], word_data[word_index_int + 3]}
+		unsigned int goal[4] = {word_data[word_index_int + 0], word_data[word_index_int + 1], word_data[word_index_int + 2], word_data[word_index_int + 3]};
+		unsigned int test_target[4];
 
 		// Search for the word in the weight array by iterating through each word and checking the values of the string bytes
 		unsigned int found = 0;
@@ -274,11 +280,22 @@ __kernel void update_weights_basic(__global int* word_data, __global char* lette
 		while(!found && index < max_word_weights)
 		{
 			// Prepare the target to check
-			unsigned int test_target[4] = {word_weights[weight_start + index * 7 + 0], word_weights[weight_start + index * 7 + 1], word_weights[weight_start + index * 7 + 2], word_weights[weight_start + index * 7 + 3]}
-
+			test_target[0] = word_weights[weight_start + index * 7 + 0];
+			test_target[1] = word_weights[weight_start + index * 7 + 1]; 
+			test_target[2] = word_weights[weight_start + index * 7 + 2];
+			test_target[3] = word_weights[weight_start + index * 7 + 3];
+//if (word_id < 4 && index == 0) { printf("weight_start"); }
+//			int test_target[4] = {0, 1, 2, 3};
 			// Check to see if the bytes match
-			if (goal[0] == test_target[0] && goal[1] == test_target[1] && goal[2] == test_target[2] && goal[3] == test_target[3])
+//			if (goal[0] == test_target[0] && goal[1] == test_target[1] && goal[2] == test_target[2] && goal[3] == test_target[3])
+			int test = test_target[0] ^ goal[0];
+			test += test_target[1] ^ goal[1];
+			test += test_target[2] ^ goal[2];
+			test += test_target[3] ^ goal[3];
+
+			if(!test)
 			{
+//if(word_id < 4) { printf("weight_start"); } //: %d, index: %d, goal: %d | ", weight_start, index, goal[0]); };
 				// If the word is found in the array, atommically update the values
 				atomic_inc(word_weights + weight_start + index * 7 + 5);
 				atomic_add(word_weights + weight_start + index * 7 + 6, stock_data[stock_num]);
@@ -289,18 +306,19 @@ __kernel void update_weights_basic(__global int* word_data, __global char* lette
 			index++;
 
 			// If the next index is beyond valid data and the word hasn't been found yet, add the word
-			if (index < num_weights_by_letter[letter_index] && !found)
+			if (index >= num_weights_by_letter[letter_index] && !found)
 			{
+//if (word_id < 4) { printf("weight_start: %d, index: %d, goal: %d | ", 0, 0, 0); };
 				// Copy the word over
-				word_weights[weight_start + index * 7 + 0] = goal[0]
-				word_weights[weight_start + index * 7 + 1] = goal[0]
-				word_weights[weight_start + index * 7 + 2] = goal[0]
-				word_weights[weight_start + index * 7 + 3] = goal[0]
+//				word_weights[weight_start + index * 7 + 0] = goal[0];
+//				word_weights[weight_start + index * 7 + 1] = goal[1];
+//				word_weights[weight_start + index * 7 + 2] = goal[2];
+//				word_weights[weight_start + index * 7 + 3] = goal[3];
 
 				// Initialize the information variables
-				word_weights[weight_start + index * 7 + 4] = as_int(1.0f);
-				word_weights[weight_start + index * 7 + 5] = 1;
-				word_weights[weight_start + index * 7 + 6] = stock_data[stock_num];
+//				word_weights[weight_start + index * 7 + 4] = as_int(1.0f);
+//				word_weights[weight_start + index * 7 + 5] = 1;
+//				word_weights[weight_start + index * 7 + 6] = stock_data[stock_num];
 
 				found = 1;
 			}
@@ -947,22 +965,23 @@ def update_all_word_weights_gpu(option, day):
 	# At this point, the weighting arrays are initialized or loaded
 	# - Next step is to generate the datastructures for the kernel to manipulate
 	words_per_stock = np.zeros((len(STOCK_TAGS),), dtype = np.uint32)
-	stock_data = np.zeros((len(STOCK_TAGS),), dtype = np.uint32)
+	stock_changes = np.zeros((len(STOCK_TAGS),), dtype = np.uint32)
 
 	# Get all the words for the articles and data about them
 	total_words = 0
 	temp_word_array = []
+
 	for ii, ticker in enumerate(STOCK_TAGS):
 		
 		logging.debug('- Updating word weights for: ' + ticker)
 
-		if not ticker in stock_data:
+		if ticker not in stock_data:
 			logging.warning('- Could not find articles loaded for ' + ticker)
 			continue
 
 		change = stock_prices[ticker][day][1] - stock_prices[ticker][day][0]
 		if change > 0:
-			stock_data[ii] = 1
+			stock_changes[ii] = 1
 
 		# For each stock, iterate through the articles
 		for articles in stock_data[ticker]:
@@ -979,6 +998,7 @@ def update_all_word_weights_gpu(option, day):
 
 			words_per_stock[ii] += len(words_in_text)
 
+
 	# Store all the words in one big word array
 	word_data = bytearray(16*total_words)
 	for ii, word in enumerate(temp_word_array):
@@ -988,21 +1008,26 @@ def update_all_word_weights_gpu(option, day):
 	# Prepare GPU buffers
 	mf = cl.mem_flags
 	words_per_stock_buff = cl.Buffer(ctx, mf.READ_ONLY | mf.COPY_HOST_PTR, hostbuf = words_per_stock)
-	stock_data_buff = cl.Buffer(ctx, mf.READ_ONLY | mf.COPY_HOST_PTR, hostbuf = stock_data)
+	stock_changes_buff = cl.Buffer(ctx, mf.READ_ONLY | mf.COPY_HOST_PTR, hostbuf = stock_changes)
 	word_data_buff = cl.Buffer(ctx, mf.READ_ONLY | mf.COPY_HOST_PTR, hostbuf = np.asarray(word_data))
 	word_data_buff2 = cl.Buffer(ctx, mf.READ_ONLY | mf.COPY_HOST_PTR, hostbuf = np.asarray(word_data))
-	word_weight_buff = cl.Buffer(ctx, mf.READ_WRITE | mf.COPY_HOST_PTR, hostbuf = np.asarray(words_by_letter))
+	word_weight_buff = cl.Buffer(ctx, mf.COPY_HOST_PTR, hostbuf = np.asarray(words_by_letter))
 	num_words_by_letter_buff = cl.Buffer(ctx, mf.READ_ONLY | mf.COPY_HOST_PTR, hostbuf = np.asarray(num_words_by_letter, dtype = np.uint32))
 
 	# Determine the grid size
 	groups, extra = divmod(total_words, 256)
 	gridDim = ((groups + (extra>0))*256, 1)
 
+	print(total_words)
+
 	# Call the kernel
-	prg.update_weights_basic(queue, gridDim, (256, 1), word_data_buff, word_data_buff2, words_per_stock_buff, stock_data_buff, word_weight_buff, num_words_by_letter_buff, np.uint32(len(STOCK_TAGS), np.uint32(MAX_WORDS_PER_LETTER), np.uint32(total_words)))
+	prg.update_weights_basic(queue, gridDim, (256, 1), word_data_buff, word_data_buff2, words_per_stock_buff, stock_changes_buff, word_weight_buff, num_words_by_letter_buff, np.uint32(len(STOCK_TAGS)), np.uint32(MAX_WORDS_PER_LETTER), np.uint32(total_words))
 
 	# Pull results from the GPU
-	cl.enqueue_copy(queue, words_by_letter, word_weight_buff)
+
+	return_buffer = bytearray(MAX_WORDS_PER_LETTER*28*26)
+
+	cl.enqueue_copy(queue, return_buffer, word_weight_buff)
 
 '''
 Evening Update Step
@@ -2399,8 +2424,8 @@ def main():
 
 			# Call the proper functions
 			if load_articles(each):
-				if GPU and weights_opt == 'opt1':
-					update_all_word_weights_gpu(weights_opt, each)
+				if GPU and weight_opt == 'opt1':
+					update_all_word_weights_gpu(weight_opt, each)
 				else:
 					update_all_word_weights(weight_opt, each)
 			stock_data.clear() # To prepare for the next set of articles

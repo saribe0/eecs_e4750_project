@@ -345,18 +345,18 @@ if (word_id < 4) { printf("[id %d, letter %c]", word_id, letter_index+'a'); }
 	 	char word_1 = words[word_index + 1];
 		char word_2 = words[word_index + 2];
 		char word_3 = words[word_index + 3];
-		char word_0 = words[word_index + 4];
-	 	char word_1 = words[word_index + 5];
-		char word_2 = words[word_index + 6];
-		char word_3 = words[word_index + 7];
-		char word_0 = words[word_index + 8];
-	 	char word_1 = words[word_index + 9];
-		char word_2 = words[word_index + 10];
-		char word_3 = words[word_index + 11];
-		char word_0 = words[word_index + 12];
-	 	char word_1 = words[word_index + 13];
-		char word_2 = words[word_index + 14];
-		char word_3 = words[word_index + 15];
+		char word_4 = words[word_index + 4];
+	 	char word_5 = words[word_index + 5];
+		char word_6 = words[word_index + 6];
+		char word_7 = words[word_index + 7];
+		char word_8 = words[word_index + 8];
+	 	char word_9 = words[word_index + 9];
+		char word_10 = words[word_index + 10];
+		char word_11 = words[word_index + 11];
+		char word_12 = words[word_index + 12];
+	 	char word_13 = words[word_index + 13];
+		char word_14 = words[word_index + 14];
+		char word_15 = words[word_index + 15];
 
 		if ( weight_index < weight_max ) 
 		{
@@ -364,18 +364,18 @@ if (word_id < 4) { printf("[id %d, letter %c]", word_id, letter_index+'a'); }
 			char word_w_1 = weights[weight_index + 1];
 			char word_w_2 = weights[weight_index + 2];
 			char word_w_3 = weights[weight_index + 3];
-			char word_w_0 = weights[weight_index + 4];
-			char word_w_1 = weights[weight_index + 5];
-			char word_w_2 = weights[weight_index + 6];
-			char word_w_3 = weights[weight_index + 7];
-			char word_w_0 = weights[weight_index + 8];
-			char word_w_1 = weights[weight_index + 9];
-			char word_w_2 = weights[weight_index + 10];
-			char word_w_3 = weights[weight_index + 11];
-			char word_w_0 = weights[weight_index + 12];
-			char word_w_1 = weights[weight_index + 13];
-			char word_w_2 = weights[weight_index + 14];
-			char word_w_3 = weights[weight_index + 15];
+			char word_w_4 = weights[weight_index + 4];
+			char word_w_5 = weights[weight_index + 5];
+			char word_w_6 = weights[weight_index + 6];
+			char word_w_7 = weights[weight_index + 7];
+			char word_w_8 = weights[weight_index + 8];
+			char word_w_9 = weights[weight_index + 9];
+			char word_w_10 = weights[weight_index + 10];
+			char word_w_11 = weights[weight_index + 11];
+			char word_w_12 = weights[weight_index + 12];
+			char word_w_13 = weights[weight_index + 13];
+			char word_w_14 = weights[weight_index + 14];
+			char word_w_15 = weights[weight_index + 15];
 
 //			if(word_id < 4 && weight_id <2) { printf("Found weight: %c, %d |", letter_index + 'a', word_w_0); }
 

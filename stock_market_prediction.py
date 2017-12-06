@@ -236,7 +236,7 @@ __kernel void analyze_weights_2(__global int* words_by_letter, __global int* num
 }
 
 
-__kernel void update_weights_basic(__global int* word_data, __global char* letter_data, __global int* words_per_stock, __global int* stock_data, __global int* word_weights, __global int* num_weights_by_letter, int num_stocks, int max_word_weights, int total_words) {
+__kernel void update_weights_basic(__global int* word_data, __global char* letter_data, __global int* words_per_stock, volatile __global int* stock_data, __global int* word_weights, __global int* num_weights_by_letter, int num_stocks, int max_word_weights, int total_words) {
 	
 	// Get the word to be processed by the work item
 
@@ -277,7 +277,9 @@ __kernel void update_weights_basic(__global int* word_data, __global char* lette
 
 	// Search for the word
 	int ii;
-	for (ii = 0; ii < num_weights_by_letter[letter_index]; ii++)
+	int out = 0;
+	int max = num_weights_by_letter[letter_index];
+	for (ii = 0; ii < max; ii++)
 	{
 		// Prepare the target to check
 		test_target[0] = word_weights[weight_start + ii * 7 + 0];
@@ -286,22 +288,26 @@ __kernel void update_weights_basic(__global int* word_data, __global char* lette
 		test_target[3] = word_weights[weight_start + ii * 7 + 3];
 
 		// Check to see if the bytes match
-		int test = test_target[0] ^ goal[0];
-		test += test_target[1] ^ goal[1];
-		test += test_target[2] ^ goal[2];
-		test += test_target[3] ^ goal[3];
+		int test = word_weights[weight_start + ii * 7 + 0] ^ goal[0];
+		test += word_weights[weight_start + ii * 7 + 1] ^ goal[1];
+		test += word_weights[weight_start + ii * 7 + 2] ^ goal[2];
+		test += word_weights[weight_start + ii * 7 + 3] ^ goal[3];
 
-		if(!test) 
+		if(test == 0) 
 		{
+			out = ii;
+			
 			// If the word is found in the array, atomically update the values and finish execution for the item
-		//	atomic_inc(word_weights + weight_start + ii * 7 + 5);
-		//	atomic_add(word_weights + weight_start + ii * 7 + 6, stock_data[stock_num]);
-			return;
+//			int val = stock_data[stock_num];
+//			int addr = weight_start + ii * 7 +5;
+//			atomic_inc(word_weights + addr);
+//			atomic_add(word_weights + weight_start + ii * 7 + 6, val);
+//			return;
 		}
 	}
 
-	if (word_id < 4) { printf("Not found: %d - %d |", num_weights_by_letter[letter_index], weight_start + ii * 7 + 5);}
-
+	if (word_id < 4) { printf("Storing, %d |", ii);}
+	
 
 		/*
 
@@ -1028,7 +1034,7 @@ def update_all_word_weights_gpu(option, day):
 	stock_changes_buff = cl.Buffer(ctx, mf.READ_ONLY | mf.COPY_HOST_PTR, hostbuf = stock_changes)
 	word_data_buff = cl.Buffer(ctx, mf.READ_ONLY | mf.COPY_HOST_PTR, hostbuf = np.asarray(word_data))
 	word_data_buff2 = cl.Buffer(ctx, mf.READ_ONLY | mf.COPY_HOST_PTR, hostbuf = np.asarray(word_data))
-	word_weight_buff = cl.Buffer(ctx, mf.COPY_HOST_PTR, hostbuf = np.asarray(words_by_letter))
+	word_weight_buff = cl.Buffer(ctx, mf.READ_ONLY | mf.COPY_HOST_PTR, hostbuf = np.asarray(words_by_letter))
 	num_words_by_letter_buff = cl.Buffer(ctx, mf.READ_ONLY | mf.COPY_HOST_PTR, hostbuf = np.asarray(num_words_by_letter, dtype = np.uint32))
 
 	# Determine the grid size
@@ -1040,6 +1046,8 @@ def update_all_word_weights_gpu(option, day):
 	# Call the kernel
 	prg.update_weights_basic(queue, gridDim, (256, 1), word_data_buff, word_data_buff2, words_per_stock_buff, stock_changes_buff, word_weight_buff, num_words_by_letter_buff, np.uint32(len(STOCK_TAGS)), np.uint32(MAX_WORDS_PER_LETTER), np.uint32(total_words))
 
+#	print(queue)
+#	print(queue.finish())
 	# Pull results from the GPU
 
 	return_buffer = bytearray(MAX_WORDS_PER_LETTER*28*26)

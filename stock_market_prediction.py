@@ -956,7 +956,7 @@ def update_all_word_weights_gpu(option, day):
 
 	# At this point, the weighting arrays are initialized or loaded
 	# - Next step is to generate the datastructures for the kernel to manipulate
-	words_index_stock = np.zeros((len(STOCK_TAGS),), dtype = np.uint32)
+	words_per_stock = np.zeros((len(STOCK_TAGS),), dtype = np.uint32)
 	stock_changes = np.zeros((len(STOCK_TAGS),), dtype = np.uint32)
 
 	# Get all the words for the articles and data about them
@@ -1001,7 +1001,7 @@ def update_all_word_weights_gpu(option, day):
 	mf = cl.mem_flags
 	word_data_buff = cl.Buffer(ctx, mf.READ_ONLY | mf.COPY_HOST_PTR, hostbuf = np.asarray(word_data))
 	word_data_buff2 = cl.Buffer(ctx, mf.READ_ONLY | mf.COPY_HOST_PTR, hostbuf = np.asarray(word_data))
-	words_index_stock_buff = cl.Buffer(ctx, mf.READ_ONLY | mf.COPY_HOST_PTR, hostbuf = words_index_stock)
+	words_per_stock_buff = cl.Buffer(ctx, mf.READ_ONLY | mf.COPY_HOST_PTR, hostbuf = words_per_stock)
 	stock_changes_buff = cl.Buffer(ctx, mf.READ_ONLY | mf.COPY_HOST_PTR, hostbuf = stock_changes)
 	word_weight_buff = cl.Buffer(ctx, mf.WRITE_ONLY | mf.COPY_HOST_PTR, hostbuf = np.asarray(words_by_letter))
 	num_words_by_letter_buff = cl.Buffer(ctx, mf.READ_ONLY | mf.COPY_HOST_PTR, hostbuf = np.asarray(num_words_by_letter, dtype = np.uint32))
@@ -1013,7 +1013,7 @@ def update_all_word_weights_gpu(option, day):
 	print(total_words)
 
 	# Call the kernel
-	prg.update_weights_basic(queue, gridDim, (256, 1), word_data_buff, word_data_buff2, words_index_stock_buff, stock_changes_buff, word_weight_buff, num_words_by_letter_buff, np.uint32(len(STOCK_TAGS)), np.uint32(total_words), np.uint32(MAX_WORDS_PER_LETTER))
+	prg.update_weights_basic(queue, gridDim, (256, 1), word_data_buff, word_data_buff2, words_per_stock_buff, stock_changes_buff, word_weight_buff, num_words_by_letter_buff, np.uint32(len(STOCK_TAGS)), np.uint32(total_words), np.uint32(MAX_WORDS_PER_LETTER))
 
 
 	# Pull results from the GPU

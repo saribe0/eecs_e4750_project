@@ -1,0 +1,16 @@
+Loading word weights
+Loading stock prices
+Loading articles
+Updating word weights with gpu
+(26, 70000)
+(1820000,)
+Access: 332500 |Access: 35000 |Access: 192500 |Access: 332500 |Traceback (most recent call last):
+  File "stock_market_prediction.py", line 2419, in <module>
+    main()
+  File "stock_market_prediction.py", line 2403, in main
+    update_all_word_weights_gpu(weight_opt, each)
+  File "stock_market_prediction.py", line 1005, in update_all_word_weights_gpu
+    cl.enqueue_copy(queue, return_buffer, word_weight_edits_buff)
+  File "/opt/miniconda/lib/python2.7/site-packages/pyopencl-2015.1-py2.7-linux-x86_64.egg/pyopencl/__init__.py", line 1086, in enqueue_copy
+    return _cl._enqueue_read_buffer(queue, src, dest, **kwargs)
+pyopencl.RuntimeError: clEnqueueReadBuffer failed: out of resources

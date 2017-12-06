@@ -275,17 +275,18 @@ __kernel void update_weights_basic(__global int* word_data, __global char* lette
 	unsigned int goal3 = word_data[word_index_int + 3];
 
 	// Search for the word
+	unsigned int null_int = 1 << 33
 	int ii;
 	int out = -1;
 	for (ii = 0; ii < max_word_weights; ii++)
 	{
 		// Check to see if the bytes match
 		int test = word_weights[weight_start + ii * 7 + 0] ^ goal0;
-		test += word_weights[weight_start + ii * 7 + 1] ^ goal1;
-		test += word_weights[weight_start + ii * 7 + 2] ^ goal2;
-		test += word_weights[weight_start + ii * 7 + 3] ^ goal3;
+		test |= word_weights[weight_start + ii * 7 + 1] ^ goal1;
+		test |= word_weights[weight_start + ii * 7 + 2] ^ goal2;
+		test |= word_weights[weight_start + ii * 7 + 3] ^ goal3;
 
-		if (test == 0) {
+		if (test == null_int) {
 			out = ii;
 		}
 	}

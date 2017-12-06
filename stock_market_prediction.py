@@ -335,9 +335,9 @@ __kernel void predict_1(__global char* words, __global int* weights, __global ch
 			letter_index = words[word_index] - 'A';
 
 		unsigned int weight_index = letter_index * max_words_per_letter * 7 + weight_id * 7;
-		unsigned int weight_max = num_weights_letter[letter_index];
+		unsigned int weight_max = num_weights_letter[letter_index] * 7;
 
-if (word_id < 4) { printf("[id %d, letter %c]", word_id, letter_index+'a'); }
+//if (word_id < 4) { printf("[id %d, letter %c]", word_id, letter_index+'a'); }
 
 		// Get the inputs and outputs to be compared
 

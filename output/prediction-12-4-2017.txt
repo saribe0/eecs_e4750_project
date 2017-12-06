@@ -12,122 +12,122 @@ Predictions Based On Weighting Stats:
 - Min: 0.0
 
 Prediction for: amzn 
-- Std above mean: 147.993648267
-- Raw val rating: 116.136092769
+- Std above mean: 109.462535863
+- Raw val rating: 86.030416941
 - probability is: 1.0
 - Corresponds to: buy
 
 Prediction for: amat 
-- Std above mean: 158.795580001
-- Raw val rating: 124.576011443
+- Std above mean: 110.386180259
+- Raw val rating: 86.7520918948
 - probability is: 1.0
 - Corresponds to: buy
 
 Prediction for: agn 
-- Std above mean: 153.515986209
-- Raw val rating: 120.450884258
+- Std above mean: 110.213880285
+- Raw val rating: 86.6174680328
 - probability is: 1.0
 - Corresponds to: buy
 
 Prediction for: goog 
-- Std above mean: 157.799601571
-- Raw val rating: 123.797819434
+- Std above mean: 110.309416348
+- Raw val rating: 86.6921136258
 - probability is: 1.0
 - Corresponds to: buy
 
 Prediction for: hd 
-- Std above mean: 160.800084289
-- Raw val rating: 126.142199194
+- Std above mean: 115.250139418
+- Raw val rating: 90.5524695259
 - probability is: 1.0
 - Corresponds to: buy
 
 Prediction for: lmt 
-- Std above mean: 159.070652152
-- Raw val rating: 124.790934721
+- Std above mean: 111.953732845
+- Raw val rating: 87.9768743381
 - probability is: 1.0
 - Corresponds to: buy
 
 Prediction for: data 
-- Std above mean: 161.498287113
-- Raw val rating: 126.687728938
+- Std above mean: 115.063199464
+- Raw val rating: 90.4064069462
 - probability is: 1.0
 - Corresponds to: buy
 
 Prediction for: nflx 
-- Std above mean: 157.668014197
-- Raw val rating: 123.695005719
+- Std above mean: 110.289352114
+- Raw val rating: 86.6764367537
 - probability is: 1.0
 - Corresponds to: buy
 
 Prediction for: aapl 
-- Std above mean: 159.054926245
-- Raw val rating: 124.778647532
+- Std above mean: 111.905100623
+- Raw val rating: 87.9388763201
 - probability is: 1.0
 - Corresponds to: buy
 
 Prediction for: ge 
-- Std above mean: 164.356352714
-- Raw val rating: 128.920833333
+- Std above mean: 114.822663589
+- Raw val rating: 90.2184680415
 - probability is: 1.0
 - Corresponds to: buy
 
 Prediction for: tsla 
-- Std above mean: 147.578610912
-- Raw val rating: 115.81180989
+- Std above mean: 109.503333733
+- Raw val rating: 86.0622937122
 - probability is: 1.0
 - Corresponds to: buy
 
 Prediction for: bac 
-- Std above mean: 159.314348848
-- Raw val rating: 124.981343284
+- Std above mean: 112.347091238
+- Raw val rating: 88.2842187028
 - probability is: 1.0
 - Corresponds to: buy
 
 Prediction for: nvda 
-- Std above mean: 158.242515835
-- Raw val rating: 124.143883495
+- Std above mean: 109.996815731
+- Raw val rating: 86.4478680732
 - probability is: 1.0
 - Corresponds to: buy
 
 Prediction for: baba 
-- Std above mean: 157.396425565
-- Raw val rating: 123.482804233
+- Std above mean: 110.277112389
+- Raw val rating: 86.6668734378
 - probability is: 1.0
 - Corresponds to: buy
 
 Prediction for: wmt 
-- Std above mean: 145.739493705
-- Raw val rating: 114.37484472
+- Std above mean: 109.574027179
+- Raw val rating: 86.1175289187
 - probability is: 1.0
 - Corresponds to: buy
 
 Prediction for: jpm 
-- Std above mean: 159.041443298
-- Raw val rating: 124.768112845
+- Std above mean: 112.067607238
+- Raw val rating: 88.0658482954
 - probability is: 1.0
 - Corresponds to: buy
 
 Prediction for: mu 
-- Std above mean: 159.981956739
-- Raw val rating: 125.50296816
+- Std above mean: 115.098617549
+- Raw val rating: 90.4340803078
 - probability is: 1.0
 - Corresponds to: buy
 
 Prediction for: uaa 
-- Std above mean: 162.800006794
-- Raw val rating: 127.704807041
+- Std above mean: 115.018873377
+- Raw val rating: 90.3717734589
 - probability is: 1.0
 - Corresponds to: buy
 
 Prediction for: gild 
-- Std above mean: 157.096064311
-- Raw val rating: 123.248121713
+- Std above mean: 110.203296048
+- Raw val rating: 86.6091982059
 - probability is: 1.0
 - Corresponds to: buy
 
 Prediction for: xom 
-- Std above mean: 159.174313691
-- Raw val rating: 124.871929026
+- Std above mean: 112.116179355
+- Raw val rating: 88.103799352
 - probability is: 1.0
 - Corresponds to: buy
 

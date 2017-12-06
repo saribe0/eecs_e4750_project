@@ -6,7 +6,7 @@
 ####################################################################################################
 
 # Specifies GPU/CPU calculations will be prepformed
-GPU = False
+GPU = True
 
 if GPU:
 	import pyopencl as cl
@@ -331,33 +331,33 @@ __kernel void predict_1(__global char* words, __global int* words_int, __global 
 	{
 		unsigned int letter_index;
 		if (words[word_index] > 96) 
-			letter_index = letter_data[word_index] - 'a';
+			letter_index = words[word_index] - 'a';
 		else
-			letter_index = letter_data[word_index] - 'A';
+			letter_index = words[word_index] - 'A';
 
 		unsigned int weight_index = letter_index * max_words_per_letter * 7 + weight_id * 7;
 		unsigned int weight_max = num_weights_letter[letter_index];
 
 		// Get the inputs and outputs to be compared
 
-		word_0 = words_int[word_index_int + 0];
-		word_1 = words_int[word_index_int + 1];
-		word_2 = words_int[word_index_int + 2];
-		word_3 = words_int[word_index_int + 3];
+		int word_0 = words_int[word_index_int + 0];
+	 	int word_1 = words_int[word_index_int + 1];
+		int word_2 = words_int[word_index_int + 2];
+		int word_3 = words_int[word_index_int + 3];
 
 		if ( weight_index < weight_max ) 
 		{
-			word_w_0 = weights[letter_index + 0];
-			word_w_1 = weights[letter_index + 1];
-			word_w_2 = weights[letter_index + 2];
-			word_w_3 = weights[letter_index + 3];
+			int word_w_0 = weights[letter_index + 0];
+			int word_w_1 = weights[letter_index + 1];
+			int word_w_2 = weights[letter_index + 2];
+			int word_w_3 = weights[letter_index + 3];
 
 			// Compare them and update the output if necessary
 
 			if ( word_0 == word_w_0 && word_1 == word_w_1 && word_2 == word_w_2 && word_3 == word_w_3 )
 			{
 				int frequency = weights[letter_index + 5];
-				float weight = (float)words_by_letter[letter_index + 6] / frequency;
+				float weight = (float)weights[letter_index + 6] / frequency;
 
 				out_weights[word_id] = weight;
 			}
@@ -2189,7 +2189,7 @@ def predict_movement_gpu(day):
 			words_in_text += re.compile('[A-Za-z][A-Za-z][A-Za-z]+').findall(text)
 
 		# Store the words to be read by the kernel
-		word_data = bytearray(len(words_in_text))
+		word_data = bytearray(len(words_in_text)*16)
 		for ii, word in enumerate(words_in_text):
 			struct.pack_into('16s', word_data, ii * 16, word.encode('utf-8'))
 
@@ -2197,15 +2197,19 @@ def predict_movement_gpu(day):
 		out_weights = np.zeros((len(words_in_text), ), dtype = np.float32)
 
 		# Create the buffers for the GPU
+		mf = cl.mem_flags
 		word_data_buff = cl.Buffer(ctx, mf.READ_ONLY | mf.COPY_HOST_PTR, hostbuf = word_data)
 		word_data_int_buff = cl.Buffer(ctx, mf.READ_ONLY | mf.COPY_HOST_PTR, hostbuf = word_data)
 		weights_buff = cl.Buffer(ctx, mf.READ_ONLY | mf.COPY_HOST_PTR, hostbuf = np.asarray(words_by_letter))
 		num_weights_buff = cl.Buffer(ctx, mf.READ_ONLY | mf.COPY_HOST_PTR, hostbuf = np.asarray(num_words_by_letter, dtype = np.int32))
 		out_weights_buff = cl.Buffer(ctx, mf.WRITE_ONLY, out_weights.nbytes)
 
+		# Determine the grid size
+		groups, extra = divmod(len(words_in_text), 256)
+		grid = ((groups + (extra>0))*256, 2560)
+
 		# Call the kernel
 		prg_2.predict_1(queue, grid, None, word_data_buff, word_data_int_buff, weights_buff, num_weights_buff, out_weights_buff, np.uint32(MAX_WORDS_PER_LETTER), np.uint32(len(words_in_text)))
-
 
 		# Collect the output
 		cl.enqueue_copy(queue, out_weights, out_weights_buff)

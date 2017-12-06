@@ -235,6 +235,7 @@ __kernel void analyze_weights_2(__global int* words_by_letter, __global int* num
 	}
 }
 
+
 __kernel void update_weights_basic(__global int* word_data, __global char* letter_data, __global int* words_per_stock, __global int* stock_data, __global int* word_weights, __global int* num_weights_by_letter, int num_stocks, int max_word_weights, int total_words) {
 	
 	// Get the word to be processed by the work item
@@ -299,7 +300,7 @@ __kernel void update_weights_basic(__global int* word_data, __global char* lette
 		}
 	}
 
-	if (word_id < 4) { printf("Not found: %d", ii);}
+	if (word_id < 4) { printf("Not found: %d - %d |", num_weights_by_letter[letter_index], weight_start + ii * 7 + 5);}
 
 
 		/*

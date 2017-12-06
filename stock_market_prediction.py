@@ -6,7 +6,7 @@
 ####################################################################################################
 
 # Specifies GPU/CPU calculations will be prepformed
-GPU = False
+GPU = True
 
 if GPU:
 	import pyopencl as cl
@@ -208,8 +208,13 @@ __kernel void analyze_weights_2(__global int* words_by_letter, __global int* num
 
 	// Each thread loads initial data into its own space in local memory
 
-	local_out[group_size * 0 + work_item_id] =  (weight - average) * (weight - average);
+	if (word_id < num_words_by_letter[letter_id])
+		local_out[group_size * 0 + work_item_id] =  (weight - average) * (weight - average);
+	else
+		local_out[group_size * 0 + work_item_id] = 0;
 	local_out[group_size * 1 + work_item_id] =  (weight - weighted_average) * (weight - weighted_average) * frequency;
+
+	if (word_id < 10 && letter_id < 1) { printf("[dif: %f]", local_out[group_size * 0 + work_item_id]); }
 
 	// Preform reduction
 
@@ -229,7 +234,7 @@ __kernel void analyze_weights_2(__global int* words_by_letter, __global int* num
 	barrier(CLK_GLOBAL_MEM_FENCE | CLK_LOCAL_MEM_FENCE);
 
 	// Writeback to output
-
+if (work_item_id < 2 && letter_id< 1) { printf("out: %f]", local_out[group_size * work_item_id]); }
 	if (work_item_id < 2) {
 		out_stats[ (work_group_y * 5 + work_group_x) * 2 + work_item_id] = local_out[group_size * work_item_id];
 	}
@@ -379,8 +384,8 @@ __kernel void predict_1(__global char* words, __global int* weights, __global ch
 			char word_w_15 = weights_char[weight_index + 15];
 
 //			if(word_id < 4 && weight_id <2) { printf("Test word: %c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c vs %c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c |", word_0, word_1, word_2, 
-				word_3, word_4, word_5, word_6, word_7, word_8, word_9, word_10, word_11, word_12, word_13, word_14, word_15, word_w_0, word_w_1, word_w_2,
-				word_w_3, word_w_4, word_w_5, word_w_6, word_w_7, word_w_8, word_w_9, word_w_10, word_w_11, word_w_12, word_w_13, word_w_14, word_w_15); }
+	//			word_3, word_4, word_5, word_6, word_7, word_8, word_9, word_10, word_11, word_12, word_13, word_14, word_15, word_w_0, word_w_1, word_w_2,
+	//			word_w_3, word_w_4, word_w_5, word_w_6, word_w_7, word_w_8, word_w_9, word_w_10, word_w_11, word_w_12, word_w_13, word_w_14, word_w_15); }
 
 			// Compare them and update the output if necessary
 
@@ -1296,6 +1301,8 @@ def analyze_weights_gpu():
 	for each in out_std_sum:
 		out_std += each[0]
 		out_std_w += each[1]
+
+	print(out_std_sum[0][0], ', ', out_std_sum[1][0], ', ', out_std_sum[2][0], ', ', out_std_sum[3][0], ', ', out_std_sum[4][0], ', ', out_std_sum[5][0], ', ', out_std_sum[6][0])
 
 	weight_stdev = math.sqrt(out_std / (weight_count - 1))
 	weight_stdev_o = math.sqrt(out_std_w / (weight_count_o - 1))

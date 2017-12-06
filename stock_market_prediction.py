@@ -206,15 +206,14 @@ __kernel void analyze_weights_2(__global int* words_by_letter, __global int* num
 		weight = (float)words_by_letter[letter_id * max_words_per_letter * 7 + word_id * 7 + 6] / frequency;
 	}
 
-	// Each thread loads initial data into its own space in local memory
+	// Each thread loads initial data into its own space in local memory - initialize the normal average to zero first to avoid incorrect initialization for out of bounds values
+
+	local_out[group_size * 0 + work_item_id] = 0;
 
 	if (word_id < num_words_by_letter[letter_id])
 		local_out[group_size * 0 + work_item_id] =  (weight - average) * (weight - average);
-	else
-		local_out[group_size * 0 + work_item_id] = 0;
-	local_out[group_size * 1 + work_item_id] =  (weight - weighted_average) * (weight - weighted_average) * frequency;
 
-	if (word_id < 10 && letter_id < 1) { printf("[dif: %f]", local_out[group_size * 0 + work_item_id]); }
+	local_out[group_size * 1 + work_item_id] =  (weight - weighted_average) * (weight - weighted_average) * frequency;
 
 	// Preform reduction
 
@@ -234,87 +233,12 @@ __kernel void analyze_weights_2(__global int* words_by_letter, __global int* num
 	barrier(CLK_GLOBAL_MEM_FENCE | CLK_LOCAL_MEM_FENCE);
 
 	// Writeback to output
-if (work_item_id < 2 && letter_id< 1) { printf("out: %f]", local_out[group_size * work_item_id]); }
+
 	if (work_item_id < 2) {
 		out_stats[ (work_group_y * 5 + work_group_x) * 2 + work_item_id] = local_out[group_size * work_item_id];
 	}
 }
 
-
-__kernel void update_weights_basic(__global int* word_data, __global char* letter_data, __global int* words_per_stock, __global int* stock_data, __global int* word_weights, volatile __global unsigned  int* word_weight_edits_buff, __global int* num_weights_by_letter, int num_stocks, int total_words, int max_word_weights) {
-	
-	// Get the word to be processed by the work item
-
-	unsigned int word_id = get_global_id(0);
-
-	// Only process if the work item is for a valid word
-	if (word_id >= total_words)
-		return;
-
-	// Calculate the stock it belongs to and actual index in the word arrays as well as the index of the weight array
-
-	unsigned int word_index = word_id * 16;
-	unsigned int word_index_int = word_id * 4;
-
-	unsigned int stock_num = 0;
-	int temp = 0;
-	for (stock_num = 0; temp <= word_id; stock_num++)
-	{
-		temp += words_per_stock[stock_num];
-	}
-
-	unsigned int letter_index;
-	if (letter_data[word_index] > 96) 
-		letter_index = letter_data[word_index] - 'a';
-	else
-		letter_index = letter_data[word_index] - 'A';
-
-	unsigned int weight_start = letter_index * max_word_weights * 7;
-
-	// Prepare the destination word to be searched for
-
-	unsigned int goal0 = word_data[word_index_int + 0];
-	unsigned int goal1 = word_data[word_index_int + 1];
-	unsigned int goal2 = word_data[word_index_int + 2];
-	unsigned int goal3 = word_data[word_index_int + 3];
-
-	// Search for the word
-	unsigned int null_int = 1 << 33;
-	int ii;
-	int out = -1;
-	for (ii = 0; ii < max_word_weights; ii++)
-	{
-		// Check to see if the bytes match
-		int test = word_weights[weight_start + ii * 7 + 0] ^ goal0;
-//		test |= word_weights[weight_start + ii * 7 + 1] ^ goal1;
-//		test |= word_weights[weight_start + ii * 7 + 2] ^ goal2;
-//		test |= word_weights[weight_start + ii * 7 + 3] ^ goal3;
-
-		if (test == null_int) {
-			out = ii;
-		}
-	}
-
-	unsigned int change = stock_data[stock_num];
-
-	if (out < 0)
-	{
-		out = num_weights_by_letter[letter_index];
-	}
-
-	if (word_id < 4) {printf("Access: %d |", weight_start + out * 7); }
-
-//	word_weight_edits_buff[weight_start + out * 7 + 0] = goal0;
-
-
-/*	atomic_add(word_weight_edits_buff + weight_start + out * 7 + 0, goal0);
-	atomic_add(word_weight_edits_buff + weight_start + out * 7 + 1, goal1);
-	atomic_add(word_weight_edits_buff + weight_start + out * 7 + 2, goal2);
-	atomic_add(word_weight_edits_buff + weight_start + out * 7 + 3, goal3);
-
-	atomic_inc(word_weight_edits_buff + weight_start + out * 7 + 5);
-	atomic_add(word_weight_edits_buff + weight_start + out * 7 + 6, change);*/
-}
 """
 
 predict_kernel = """
@@ -362,8 +286,6 @@ __kernel void predict_1(__global char* words, __global int* weights, __global ch
 		char word_14 = words[word_index + 14];
 		char word_15 = words[word_index + 15];
 
-
-
 		if ( weight_index < weight_max ) 
 		{
 			char word_w_0 = weights_char[weight_index + 0];
@@ -384,8 +306,8 @@ __kernel void predict_1(__global char* words, __global int* weights, __global ch
 			char word_w_15 = weights_char[weight_index + 15];
 
 //			if(word_id < 4 && weight_id <2) { printf("Test word: %c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c vs %c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c |", word_0, word_1, word_2, 
-	//			word_3, word_4, word_5, word_6, word_7, word_8, word_9, word_10, word_11, word_12, word_13, word_14, word_15, word_w_0, word_w_1, word_w_2,
-	//			word_w_3, word_w_4, word_w_5, word_w_6, word_w_7, word_w_8, word_w_9, word_w_10, word_w_11, word_w_12, word_w_13, word_w_14, word_w_15); }
+//				word_3, word_4, word_5, word_6, word_7, word_8, word_9, word_10, word_11, word_12, word_13, word_14, word_15, word_w_0, word_w_1, word_w_2,
+//				word_w_3, word_w_4, word_w_5, word_w_6, word_w_7, word_w_8, word_w_9, word_w_10, word_w_11, word_w_12, word_w_13, word_w_14, word_w_15); }
 
 			// Compare them and update the output if necessary
 
@@ -399,7 +321,6 @@ __kernel void predict_1(__global char* words, __global int* weights, __global ch
 
 				out_weights[word_id] = weight;
 			}
-
 		}
 	}
 }
@@ -1460,37 +1381,14 @@ def predict_movement(day):
 			# Get the text (ignore link)
 			text = articles[1]
 
-			# Variables to keep track of words
-			word_in_progress = False
-			word_number = 0
-			word_start_index = 0
+			# Get an array of words with two or more characters for the text
+			words_in_text = re.compile('[A-Za-z][A-Za-z][A-Za-z]+').findall(text)
 
-			# Iterate through the characters to find words
-			for ii, chars in enumerate(text):
+			# Update the word's info
+			for words in words_in_text:
 
-				# If there is a word being found and non-character pops up, word is over
-				if word_in_progress and (not chars.isalpha() or ii == len(text)):
-
-					# Reset word variables
-					word_in_progress = False
-					word_number += 1
-
-					# Get the found word
-					found_word = text[word_start_index:ii]
-
-					# Add the word to the word arrays or update its current value
-					if len(found_word) > 1:
-						
-						stock_rating_sum += get_word_weight(found_word)
-						stock_rating_cnt += 1
-
-
-				# If a word is not being found and letter pops up, start the word
-				elif not word_in_progress and chars.isalpha():
-
-					# Start the word
-					word_in_progress = True
-					word_start_index = ii
+				stock_rating_sum += get_word_weight(words)
+				stock_rating_cnt += 1
 
 		# After each word in every article has been examined for that stock, find the average rating
 		stock_rating = stock_rating_sum / stock_rating_cnt
@@ -1570,39 +1468,16 @@ def predict_movement2(day):
 			# Get the text (ignore link)
 			text = articles[1]
 
-			# Variables to keep track of words
-			word_in_progress = False
-			word_number = 0
-			word_start_index = 0
+			# Get an array of words with two or more characters for the text
+			words_in_text = re.compile('[A-Za-z][A-Za-z][A-Za-z]+').findall(text)
 
-			# Iterate through the characters to find words
-			for ii, chars in enumerate(text):
+			# Update the word's info
+			for words in words_in_text:
 
-				# If there is a word being found and non-character pops up, word is over
-				if word_in_progress and (not chars.isalpha() or ii == len(text)):
-
-					# Reset word variables
-					word_in_progress = False
-					word_number += 1
-
-					# Get the found word
-					found_word = text[word_start_index:ii]
-
-					# Add the word to the word arrays or update its current value
-					if len(found_word) > 1:
-						
-						weight = get_word_weight(found_word)
-						if weight > weight_stdev + weight_average or weight < weight_average - weight_stdev:
-							stock_rating_sum += weight
-							stock_rating_cnt += 1
-
-
-				# If a word is not being found and letter pops up, start the word
-				elif not word_in_progress and chars.isalpha():
-
-					# Start the word
-					word_in_progress = True
-					word_start_index = ii
+				weight = get_word_weight(words)
+				if weight > weight_stdev + weight_average or weight < weight_average - weight_stdev:
+					stock_rating_sum += weight
+					stock_rating_cnt += 1
 
 		# After each word in every article has been examined for that stock, find the average rating
 		stock_rating = stock_rating_sum / stock_rating_cnt
@@ -1682,37 +1557,14 @@ def predict_movement3(day):
 			# Get the text (ignore link)
 			text = articles[1]
 
-			# Variables to keep track of words
-			word_in_progress = False
-			word_number = 0
-			word_start_index = 0
+			# Get an array of words with two or more characters for the text
+			words_in_text = re.compile('[A-Za-z][A-Za-z][A-Za-z]+').findall(text)
 
-			# Iterate through the characters to find words
-			for ii, chars in enumerate(text):
+			# Update the word's info
+			for words in words_in_text:
 
-				# If there is a word being found and non-character pops up, word is over
-				if word_in_progress and (not chars.isalpha() or ii == len(text)):
-
-					# Reset word variables
-					word_in_progress = False
-					word_number += 1
-
-					# Get the found word
-					found_word = text[word_start_index:ii]
-
-					# Add the word to the word arrays or update its current value
-					if len(found_word) > 1:
-						
-						stock_rating_sum += get_word_weight(found_word)
-						stock_rating_cnt += 1
-
-
-				# If a word is not being found and letter pops up, start the word
-				elif not word_in_progress and chars.isalpha():
-
-					# Start the word
-					word_in_progress = True
-					word_start_index = ii
+				stock_rating_sum += get_word_weight(words)
+				stock_rating_cnt += 1
 
 		# After each word in every article has been examined for that stock, find the average rating
 		stock_rating = stock_rating_sum / stock_rating_cnt
@@ -1792,37 +1644,14 @@ def predict_movement4(day):
 			# Get the text (ignore link)
 			text = articles[1]
 
-			# Variables to keep track of words
-			word_in_progress = False
-			word_number = 0
-			word_start_index = 0
+			# Get an array of words with two or more characters for the text
+			words_in_text = re.compile('[A-Za-z][A-Za-z][A-Za-z]+').findall(text)
 
-			# Iterate through the characters to find words
-			for ii, chars in enumerate(text):
+			# Update the word's info
+			for words in words_in_text:
 
-				# If there is a word being found and non-character pops up, word is over
-				if word_in_progress and (not chars.isalpha() or ii == len(text)):
-
-					# Reset word variables
-					word_in_progress = False
-					word_number += 1
-
-					# Get the found word
-					found_word = text[word_start_index:ii]
-
-					# Add the word to the word arrays or update its current value
-					if len(found_word) > 1:
-						
-						stock_rating_sum += get_word_weight(found_word)
-						stock_rating_cnt += 1
-
-
-				# If a word is not being found and letter pops up, start the word
-				elif not word_in_progress and chars.isalpha():
-
-					# Start the word
-					word_in_progress = True
-					word_start_index = ii
+				stock_rating_sum += get_word_weight(words)
+				stock_rating_cnt += 1
 
 		# After each word in every article has been examined for that stock, find the average rating
 		stock_rating = stock_rating_sum / stock_rating_cnt
@@ -1902,39 +1731,16 @@ def predict_movement5(day):
 			# Get the text (ignore link)
 			text = articles[1]
 
-			# Variables to keep track of words
-			word_in_progress = False
-			word_number = 0
-			word_start_index = 0
+			# Get an array of words with two or more characters for the text
+			words_in_text = re.compile('[A-Za-z][A-Za-z][A-Za-z]+').findall(text)
 
-			# Iterate through the characters to find words
-			for ii, chars in enumerate(text):
+			# Update the word's info
+			for words in words_in_text:
 
-				# If there is a word being found and non-character pops up, word is over
-				if word_in_progress and (not chars.isalpha() or ii == len(text)):
-
-					# Reset word variables
-					word_in_progress = False
-					word_number += 1
-
-					# Get the found word
-					found_word = text[word_start_index:ii]
-
-					# Add the word to the word arrays or update its current value
-					if len(found_word) > 1:
-						
-						weight = get_word_weight(found_word)
-						if weight > weight_stdev_o + weight_average_o or weight < weight_average_o - weight_stdev_o:
-							stock_rating_sum += weight
-							stock_rating_cnt += 1
-
-
-				# If a word is not being found and letter pops up, start the word
-				elif not word_in_progress and chars.isalpha():
-
-					# Start the word
-					word_in_progress = True
-					word_start_index = ii
+				weight = get_word_weight(words)
+				if weight > weight_stdev_o + weight_average_o or weight < weight_average_o - weight_stdev_o:
+					stock_rating_sum += weight
+					stock_rating_cnt += 1
 
 		# After each word in every article has been examined for that stock, find the average rating
 		stock_rating = stock_rating_sum / stock_rating_cnt
@@ -2014,37 +1820,14 @@ def predict_movement6(day):
 			# Get the text (ignore link)
 			text = articles[1]
 
-			# Variables to keep track of words
-			word_in_progress = False
-			word_number = 0
-			word_start_index = 0
+			# Get an array of words with two or more characters for the text
+			words_in_text = re.compile('[A-Za-z][A-Za-z][A-Za-z]+').findall(text)
 
-			# Iterate through the characters to find words
-			for ii, chars in enumerate(text):
+			# Update the word's info
+			for words in words_in_text:
 
-				# If there is a word being found and non-character pops up, word is over
-				if word_in_progress and (not chars.isalpha() or ii == len(text)):
-
-					# Reset word variables
-					word_in_progress = False
-					word_number += 1
-
-					# Get the found word
-					found_word = text[word_start_index:ii]
-
-					# Add the word to the word arrays or update its current value
-					if len(found_word) > 1:
-						
-						stock_rating_sum += get_word_weight(found_word)
-						stock_rating_cnt += 1
-
-
-				# If a word is not being found and letter pops up, start the word
-				elif not word_in_progress and chars.isalpha():
-
-					# Start the word
-					word_in_progress = True
-					word_start_index = ii
+				stock_rating_sum += get_word_weight(words)
+				stock_rating_cnt += 1
 
 		# After each word in every article has been examined for that stock, find the average rating
 		stock_rating = stock_rating_sum / stock_rating_cnt
@@ -2121,40 +1904,17 @@ def predict_movement7(day):
 			# Get the text (ignore link)
 			text = articles[1]
 
-			# Variables to keep track of words
-			word_in_progress = False
-			word_number = 0
-			word_start_index = 0
+			# Get an array of words with two or more characters for the text
+			words_in_text = re.compile('[A-Za-z][A-Za-z][A-Za-z]+').findall(text)
 
-			# Iterate through the characters to find words
-			for ii, chars in enumerate(text):
+			# Update the word's info
+			for words in words_in_text:
 
-				# If there is a word being found and non-character pops up, word is over
-				if word_in_progress and (not chars.isalpha() or ii == len(text)):
-
-					# Reset word variables
-					word_in_progress = False
-					word_number += 1
-
-					# Get the found word
-					found_word = text[word_start_index:ii]
-
-					# Add the word to the word arrays or update its current value
-					if len(found_word) > 1:
-
-						up, down = get_word_probability_given_label(found_word, c)
+				up, down = get_word_probability_given_label(found_word, c)
 						
-						if up != None and down != None:
-							stock_rating_up += math.log(up)
-							stock_rating_down += math.log(down)
-
-
-				# If a word is not being found and letter pops up, start the word
-				elif not word_in_progress and chars.isalpha():
-
-					# Start the word
-					word_in_progress = True
-					word_start_index = ii
+				if up != None and down != None:
+					stock_rating_up += math.log(up)
+					stock_rating_down += math.log(down)
 
 		# If the up value is greater, rating is a buy, else sell
 		if stock_rating_up > stock_rating_down:

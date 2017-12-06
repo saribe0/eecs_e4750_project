@@ -258,7 +258,7 @@ __kernel void update_weights_basic(__global int* word_data, __global char* lette
 	unsigned int temp = 0;
 	for (stock_num = 0; temp <= word_id; stock_num++)
 	{
-		temp += words_per_stock[stock_num];
+		if (stock_num < 20) { temp += words_per_stock[stock_num]; }
 	}
 	stock_num--;
 

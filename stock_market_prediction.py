@@ -271,13 +271,14 @@ __kernel void update_weights_basic(__global int* word_data, __global char* lette
 		unsigned int test_target[4];
 
 		// Search for the word
-		for (int ii = 0; ii < num_weights_by_letter[letter_index]; ii++)
+		int ii;
+		for (ii = 0; ii < num_weights_by_letter[letter_index]; ii++)
 		{
 			// Prepare the target to check
-			test_target[0] = word_weights[weight_start + index * 7 + 0];
-			test_target[1] = word_weights[weight_start + index * 7 + 1]; 
-			test_target[2] = word_weights[weight_start + index * 7 + 2];
-			test_target[3] = word_weights[weight_start + index * 7 + 3];
+			test_target[0] = word_weights[weight_start + ii * 7 + 0];
+			test_target[1] = word_weights[weight_start + ii * 7 + 1]; 
+			test_target[2] = word_weights[weight_start + ii * 7 + 2];
+			test_target[3] = word_weights[weight_start + ii * 7 + 3];
 
 			// Check to see if the bytes match
 			int test = test_target[0] ^ goal[0];
@@ -294,7 +295,7 @@ __kernel void update_weights_basic(__global int* word_data, __global char* lette
 			}
 		}
 
-		if (word_id < 4) { printf("Not found");}
+		if (word_id < 4) { printf("Not found: %d", ii);}
 
 
 		/*

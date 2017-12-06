@@ -275,7 +275,7 @@ __kernel void update_weights_basic(__global int* word_data, __global char* lette
 	unsigned int goal3 = word_data[word_index_int + 3];
 
 	// Search for the word
-	unsigned int null_int = 1 << 33
+	unsigned int null_int = 1 << 33;
 	int ii;
 	int out = -1;
 	for (ii = 0; ii < max_word_weights; ii++)
@@ -291,12 +291,20 @@ __kernel void update_weights_basic(__global int* word_data, __global char* lette
 		}
 	}
 
+	int change = stock_data[stock_num];
+
 	if (out < 0)
 	{
 		out = num_weights_by_letter[letter_index];
-	}
 
-	// Atomic stuff
+//		atomic_inc(word_weights + weight_start + out * 7 + 5);
+//		atomic_add(word_weights + weight_start + out * 7 + 6, change);
+	}
+	else
+	{
+//		atomic_inc(word_weights + weight_start + out * 7 + 5);
+  //              atomic_add(word_weights + weight_start + out * 7 + 6, change);
+	}
 }
 """
 
@@ -1020,7 +1028,7 @@ def update_all_word_weights_gpu(option, day):
 
 	return_buffer = bytearray(MAX_WORDS_PER_LETTER*28*26)
 
-	cl.enqueue_copy(queue, words_by_letter, word_weight_buff)
+	cl.enqueue_copy(queue, return_buffer, word_weight_buff)
 
 '''
 Evening Update Step

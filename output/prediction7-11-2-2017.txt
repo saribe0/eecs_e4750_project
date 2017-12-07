@@ -5,109 +5,109 @@ Value for label: log(P(y, word1, word2, ... wordn)) = log(P(y)) + log(P(word1 | 
 Label (Up or Down) with the greatest value is chosen.
 
 Predictions Based On: 
-- Total Up Days    : 468
-- Total Down Days  : 388
-- Total Up Words   : 189196
-- Total Down Words : 176848
+- Total Up Days    : 888
+- Total Down Days  : 844
+- Total Up Words   : 158890
+- Total Down Words : 147203
 - Value for C      : 0.01
 
 Prediction for: amzn 
-- Up rating is  : -18062.214438675193
-- Down rating is: -17932.92110358112
+- Up rating is  : -15835.0731147
+- Down rating is: -15693.7873715
 - Corresponds to: sell
 
 Prediction for: amat 
-- Up rating is  : -39696.39033344012
-- Down rating is: -40502.65538927668
+- Up rating is  : -34524.3416695
+- Down rating is: -35307.7629534
 - Corresponds to: buy
 
 Prediction for: agn 
-- Up rating is  : -56074.06144816227
-- Down rating is: -57345.495915015345
+- Up rating is  : -48712.6605391
+- Down rating is: -49841.8674905
 - Corresponds to: buy
 
 Prediction for: goog 
-- Up rating is  : -22090.184632051823
-- Down rating is: -23586.5870005046
+- Up rating is  : -19196.6730154
+- Down rating is: -20656.8710738
 - Corresponds to: buy
 
 Prediction for: hd 
-- Up rating is  : -46059.316833074416
-- Down rating is: -45666.9106217929
+- Up rating is  : -39077.135603
+- Down rating is: -38698.6934319
 - Corresponds to: sell
 
 Prediction for: lmt 
-- Up rating is  : -29073.933228064554
-- Down rating is: -28938.72987599254
+- Up rating is  : -25343.9986263
+- Down rating is: -25188.3152188
 - Corresponds to: sell
 
 Prediction for: data 
-- Up rating is  : -35175.164459400126
-- Down rating is: -34588.26695523862
+- Up rating is  : -31193.5575963
+- Down rating is: -30613.0441879
 - Corresponds to: sell
 
 Prediction for: nflx 
-- Up rating is  : -31577.777199171236
-- Down rating is: -31741.349941996796
+- Up rating is  : -27584.4829579
+- Down rating is: -27730.1578702
 - Corresponds to: buy
 
 Prediction for: aapl 
-- Up rating is  : -36493.267636476
-- Down rating is: -37275.36390441468
+- Up rating is  : -31893.6568515
+- Down rating is: -32681.9028976
 - Corresponds to: buy
 
 Prediction for: ge 
-- Up rating is  : -39203.42436551008
-- Down rating is: -35850.78945115352
+- Up rating is  : -33229.9929231
+- Down rating is: -30452.3056868
 - Corresponds to: sell
 
 Prediction for: tsla 
-- Up rating is  : -25853.40369597637
-- Down rating is: -25872.160319811414
+- Up rating is  : -22314.4821497
+- Down rating is: -22343.6222177
 - Corresponds to: buy
 
 Prediction for: bac 
-- Up rating is  : -29349.85254184199
-- Down rating is: -28822.187553836702
+- Up rating is  : -25269.4729369
+- Down rating is: -24768.2947162
 - Corresponds to: sell
 
 Prediction for: nvda 
-- Up rating is  : -28131.382806499663
-- Down rating is: -28259.420285941058
+- Up rating is  : -24096.6861034
+- Down rating is: -24209.0820651
 - Corresponds to: buy
 
 Prediction for: baba 
-- Up rating is  : -44929.562483005415
-- Down rating is: -45013.24624451813
+- Up rating is  : -38992.6037098
+- Down rating is: -39076.9181635
 - Corresponds to: buy
 
 Prediction for: wmt 
-- Up rating is  : -28475.697058910446
-- Down rating is: -29236.881679647675
+- Up rating is  : -24816.88982
+- Down rating is: -25544.8306145
 - Corresponds to: buy
 
 Prediction for: jpm 
-- Up rating is  : -30272.924603738917
-- Down rating is: -29166.305232199553
+- Up rating is  : -25780.1921068
+- Down rating is: -24718.6327032
 - Corresponds to: sell
 
 Prediction for: mu 
-- Up rating is  : -43360.16113223651
-- Down rating is: -42949.31244550208
+- Up rating is  : -37264.6382589
+- Down rating is: -36916.4983634
 - Corresponds to: sell
 
 Prediction for: uaa 
-- Up rating is  : -36909.962032269905
-- Down rating is: -32402.023520519186
+- Up rating is  : -32914.5857275
+- Down rating is: -28517.4004537
 - Corresponds to: sell
 
 Prediction for: gild 
-- Up rating is  : -28683.38362260983
-- Down rating is: -28745.48711369735
+- Up rating is  : -25063.5967471
+- Down rating is: -25133.1315571
 - Corresponds to: buy
 
 Prediction for: xom 
-- Up rating is  : -28423.29171196012
-- Down rating is: -28478.975981154497
+- Up rating is  : -24469.9122108
+- Down rating is: -24527.0254984
 - Corresponds to: buy
 

@@ -1,0 +1,133 @@
+Prediction Method 6: 
+Using all weights in prediciton.
+Buy if above mean, sell if below mean. 
+Weighting stats based on each occurence of each words. 
+
+Predictions Based On Weighting Stats: 
+- Avg: 0.509690933679
+- Std: 0.119918673026
+- Sum: 335054.0
+- Cnt: 657367
+- Max: 1.0
+- Min: 0.0
+
+Prediction for: amzn 
+- Std above mean: 0.0902522643001
+- Raw val rating: 0.520513865452
+- probability is: 0.535956623578
+- Corresponds to: buy
+
+Prediction for: amat 
+- Std above mean: 0.0589444126704
+- Raw val rating: 0.516759469429
+- probability is: 0.523501808335
+- Corresponds to: buy
+
+Prediction for: agn 
+- Std above mean: -0.303425225398
+- Raw val rating: 0.473304583287
+- probability is: 0.380782912078
+- Corresponds to: sell
+
+Prediction for: goog 
+- Std above mean: 0.220539208129
+- Raw val rating: 0.536137702868
+- probability is: 0.587274379857
+- Corresponds to: buy
+
+Prediction for: hd 
+- Std above mean: -0.134387640368
+- Raw val rating: 0.493575346175
+- probability is: 0.446548027269
+- Corresponds to: sell
+
+Prediction for: lmt 
+- Std above mean: 0.203572193147
+- Raw val rating: 0.534103040947
+- probability is: 0.580656087628
+- Corresponds to: buy
+
+Prediction for: data 
+- Std above mean: -0.228396720255
+- Raw val rating: 0.482301902063
+- probability is: 0.409668919469
+- Corresponds to: sell
+
+Prediction for: nflx 
+- Std above mean: 0.0259970807432
+- Raw val rating: 0.512808469105
+- probability is: 0.510370166553
+- Corresponds to: buy
+
+Prediction for: aapl 
+- Std above mean: 0.181189051047
+- Raw val rating: 0.531418884248
+- probability is: 0.571890405817
+- Corresponds to: buy
+
+Prediction for: ge 
+- Std above mean: -0.128148304318
+- Raw val rating: 0.494323559075
+- probability is: 0.449015804914
+- Corresponds to: sell
+
+Prediction for: tsla 
+- Std above mean: 0.0901678536369
+- Raw val rating: 0.520503743037
+- probability is: 0.535923085338
+- Corresponds to: buy
+
+Prediction for: bac 
+- Std above mean: 0.0203498148433
+- Raw val rating: 0.512131256472
+- probability is: 0.508117841249
+- Corresponds to: buy
+
+Prediction for: nvda 
+- Std above mean: 0.177958595581
+- Raw val rating: 0.531031492315
+- probability is: 0.570622253713
+- Corresponds to: buy
+
+Prediction for: baba 
+- Std above mean: -0.14583008142
+- Raw val rating: 0.492203183828
+- probability is: 0.442027764106
+- Corresponds to: sell
+
+Prediction for: wmt 
+- Std above mean: 0.302499893304
+- Raw val rating: 0.545966319475
+- probability is: 0.618864492611
+- Corresponds to: buy
+
+Prediction for: jpm 
+- Std above mean: -0.172544223732
+- Raw val rating: 0.488999659331
+- probability is: 0.431504848577
+- Corresponds to: sell
+
+Prediction for: mu 
+- Std above mean: -0.0584134356827
+- Raw val rating: 0.502686071985
+- probability is: 0.47670965646
+- Corresponds to: sell
+
+Prediction for: uaa 
+- Std above mean: -0.400545545818
+- Raw val rating: 0.461658043338
+- probability is: 0.344377372084
+- Corresponds to: sell
+
+Prediction for: gild 
+- Std above mean: 0.0893760370905
+- Raw val rating: 0.520408789448
+- probability is: 0.535608466562
+- Corresponds to: buy
+
+Prediction for: xom 
+- Std above mean: -0.049534572527
+- Raw val rating: 0.503750813473
+- probability is: 0.480246643057
+- Corresponds to: sell
+

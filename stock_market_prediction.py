@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 ####################################################################################################
 ## Created 10/27/2017 by Sam Beaulieu
 ##
@@ -6,14 +6,13 @@
 ####################################################################################################
 
 # Specifies GPU/CPU calculations will be prepformed
-GPU = True
+GPU = False
 
 if GPU:
 	import pyopencl as cl
 else:
 	from bs4 import BeautifulSoup as BS
-
-import requests
+	import requests
 import os
 import datetime
 import time
@@ -24,6 +23,8 @@ import struct
 import binascii
 import math
 from scipy.stats import norm
+from matplotlib import pyplot as plt
+from matplotlib import dates as plt_dates
 import re
 
 ########### Global Variables and Configurations ###########
@@ -1087,6 +1088,11 @@ def analyze_weights():
 	global weight_sum_o
 	global weight_count_o
 
+	start_all = time.time()
+
+	cpu = 0
+	start = time.time()
+
 	# Iterate through each letter
 	for letter in range(0, 26):
 
@@ -1122,20 +1128,34 @@ def analyze_weights():
 		logging.error('Could not find any words with weights to analyze')
 		return False
 
+	end = time.time()
+	cpu += end - start
+
 	# Once all weights have been iterated through, calculate the average
 	weight_average = weight_sum / weight_count
 	weight_average_o = weight_sum_o / weight_count_o
 
 	# Calculate the standard deviation
+	start = time.time()
+
 	running_sum = 0
 	for weights in weights_all:
 		running_sum += ((weights - weight_average) * (weights - weight_average))
-	weight_stdev = math.sqrt(running_sum / (weight_count - 1))
 
 	running_sum_o = 0
 	for weights in weights_all_o:
 		running_sum_o += ((weights - weight_average_o) * (weights - weight_average_o))
+
+	end = time.time()
+	cpu += end - start
+
+	weight_stdev = math.sqrt(running_sum / (weight_count - 1))
 	weight_stdev_o = math.sqrt(running_sum_o / (weight_count_o - 1))
+
+	end_all = time.time()
+
+	print('========================> Time All Analyze: ', end_all - start_all)
+	print('========================> Time CPU Analyze: ', cpu)
 
 	logging.debug('- Analysis finished with:')
 	logging.debug('-- avg: ' + str(weight_average))
@@ -1169,6 +1189,8 @@ def analyze_weights_gpu():
 	global weight_sum_o
 	global weight_count_o
 
+	start_all = time.time()
+
 	# Create array that will be used for output, structure looks like:
 	# [sum of weights, weighted sum of weights, max, min, count, weighted count]
 	# Length is 6
@@ -1183,8 +1205,9 @@ def analyze_weights_gpu():
 	out_stats_buff = cl.Buffer(ctx, mf.WRITE_ONLY, out_stats.nbytes)
 
 	# Call the kernel
+	gpu = 0
+	start = time.time()
 	prg.analyze_weights_1(queue, (2560, 26), (512, 1), words_by_letter_buff, num_words_by_letter_buff, out_stats_buff, np.uint32(MAX_WORDS_PER_LETTER))
-
 
 	# Pull results from the GPU
 	cl.enqueue_copy(queue, out_stats, out_stats_buff)
@@ -1197,6 +1220,9 @@ def analyze_weights_gpu():
 		weight_min = each[3] if each[3] < weight_min else weight_min
 		weight_count += each[4]
 		weight_count_o += each[5]
+
+	end = time.time()
+	gpu += end - start
 
 	# Calculate the averages
 	weight_average = weight_sum / weight_count
@@ -1211,7 +1237,10 @@ def analyze_weights_gpu():
 	num_words_by_letter_buff = cl.Buffer(ctx, mf.READ_ONLY | mf.COPY_HOST_PTR, hostbuf = np.asarray(num_words_by_letter, dtype = np.uint32))
 
 	# Call the kernel
+	start = time.time()
 	prg.analyze_weights_2(queue, (2560, 26), (512, 1), words_by_letter_buff, num_words_by_letter_buff, out_std_sum_buff, np.uint32(MAX_WORDS_PER_LETTER), np.float32(weight_average), np.float32(weight_average_o))
+	end = time.time()
+	gpu += end - start
 
 	# Pull resutls from the GPU
 	cl.enqueue_copy(queue, out_std_sum, out_std_sum_buff)
@@ -1223,10 +1252,13 @@ def analyze_weights_gpu():
 		out_std += each[0]
 		out_std_w += each[1]
 
-	print(out_std_sum[0][0], ', ', out_std_sum[1][0], ', ', out_std_sum[2][0], ', ', out_std_sum[3][0], ', ', out_std_sum[4][0], ', ', out_std_sum[5][0], ', ', out_std_sum[6][0])
-
 	weight_stdev = math.sqrt(out_std / (weight_count - 1))
 	weight_stdev_o = math.sqrt(out_std_w / (weight_count_o - 1))
+
+	end_all = time.time()
+
+	print('========================> Time All Analyze: ', end_all - start_all)
+	print('========================> Time Gpu Analyze: ', gpu)
 
 	logging.debug('- Analysis finished with:')
 	logging.debug('-- avg: ' + str(weight_average))
@@ -1375,6 +1407,9 @@ def predict_movement(day):
 			logging.warning('- Could not find articles loaded for ' + tickers)
 			continue
 
+		start_all = time.time()
+		cpu = 0
+
 		# Iterate through each article for the stock
 		for articles in stock_data[tickers]:
 
@@ -1384,11 +1419,16 @@ def predict_movement(day):
 			# Get an array of words with two or more characters for the text
 			words_in_text = re.compile('[A-Za-z][A-Za-z][A-Za-z]+').findall(text)
 
+			start = time.time()
+
 			# Update the word's info
 			for words in words_in_text:
 
 				stock_rating_sum += get_word_weight(words)
 				stock_rating_cnt += 1
+
+			end = time.time()
+			cpu += end - start
 
 		# After each word in every article has been examined for that stock, find the average rating
 		stock_rating = stock_rating_sum / stock_rating_cnt
@@ -1397,6 +1437,8 @@ def predict_movement(day):
 		# - Assuming normal because as the word library increases, it should be able to be modeled as normal
 		std_above_avg = (stock_rating - weight_average) / weight_stdev
 		probability = norm(weight_average, weight_stdev).cdf(stock_rating)
+
+		end_all = time.time()
 
 		if std_above_avg > 0.5:
 			rating = 'buy'
@@ -1410,6 +1452,8 @@ def predict_movement(day):
 		print('\t- RAW VAL RATING: ', stock_rating)
 		print('\t- PROBABILITY IS: ', probability)
 		print('\t- CORRESPONDS TO: ', rating)
+		print('========================> Time All: ', end_all - start_all)
+		print('========================> Time Cpu: ', cpu)
 
 		file.write('Prediction for: ' + tickers + ' \n')
 		file.write('- Std above mean: ' + str(std_above_avg) + '\n')
@@ -1910,7 +1954,7 @@ def predict_movement7(day):
 			# Update the word's info
 			for words in words_in_text:
 
-				up, down = get_word_probability_given_label(found_word, c)
+				up, down = get_word_probability_given_label(words, c)
 						
 				if up != None and down != None:
 					stock_rating_up += math.log(up)
@@ -1979,6 +2023,8 @@ def predict_movement_gpu(day):
 			logging.warning('- Could not find articles loaded for ' + tickers)
 			continue
 
+		start_all = time.time()
+
 		# Iterate through each article for the stock
 		for articles in stock_data[tickers]:
 
@@ -2008,6 +2054,8 @@ def predict_movement_gpu(day):
 		groups, extra = divmod(len(words_in_text), 256)
 		grid = ((groups + (extra>0))*256, 2560)
 
+		start = time.time()
+
 		# Call the kernel
 		prg_2.predict_1(queue, grid, None, word_data_buff, weights_buff, weights_char_buff, num_weights_buff, out_weights_buff, np.uint32(MAX_WORDS_PER_LETTER), np.uint32(len(words_in_text)))
 
@@ -2018,9 +2066,9 @@ def predict_movement_gpu(day):
 		for w in out_weights:
 			stock_rating_sum += w
 
-		print(out_weights[:10])
-
 		stock_rating_cnt = len(words_in_text)
+
+		end = time.time()
 
 		# After each word in every article has been examined for that stock, find the average rating
 		stock_rating = stock_rating_sum / stock_rating_cnt
@@ -2029,6 +2077,8 @@ def predict_movement_gpu(day):
 		# - Assuming normal because as the word library increases, it should be able to be modeled as normal
 		std_above_avg = (stock_rating - weight_average) / weight_stdev
 		probability = norm(weight_average, weight_stdev).cdf(stock_rating)
+
+		end_all = time.time()
 
 		if std_above_avg > 0.5:
 			rating = 'buy'
@@ -2042,6 +2092,8 @@ def predict_movement_gpu(day):
 		print('\t- RAW VAL RATING: ', stock_rating)
 		print('\t- PROBABILITY IS: ', probability)
 		print('\t- CORRESPONDS TO: ', rating)
+		print('========================> Time All: ', end_all - start_all)
+		print('========================> Time Gpu: ', end - start)
 
 		file.write('Prediction for: ' + tickers + ' \n')
 		file.write('- Std above mean: ' + str(std_above_avg) + '\n')
@@ -2135,6 +2187,8 @@ Looks over Predictions and determines accuracy
 '''
 def determine_accuracy():
 
+	prediction_results = [[], [], [], [], [], [], []]
+
 	# Loop over all prediction files
 	for filename in os.listdir('./output/'):
 
@@ -2150,6 +2204,14 @@ def determine_accuracy():
 		num_undecided = 0
 		current_stock = ''
 		found = False
+
+		try: 
+			if (filename[10] == '-'):
+				prediction_type = 1
+			else:
+				prediction_type = int(filename[10])
+		except:
+			continue
 
 		# Get the day the prediction was made
 		try:
@@ -2197,6 +2259,37 @@ def determine_accuracy():
 			print(filename + '\t: Correct: ' + str(float(num_correct) / (num_wrong + num_correct) * 100) + '%')
 		else:
 			print(filename + '\t: All undecided')
+
+		# Add the values to the date set and prediction lists
+		if num_correct + num_wrong != 0:
+			date_parts = prediction_date.split('-')
+			test_date = datetime.date(int(date_parts[2]), int(date_parts[0]), int(date_parts[1]))
+			prediction_results[prediction_type - 1].append([ float(num_correct) / (num_wrong + num_correct) , test_date ])
+	
+	# Plot everything
+	plt.figure()
+	plt.gcf()
+	legend = []
+	for ii, types in enumerate(prediction_results):
+		dates = []
+		vals = []
+
+		for each in types:
+			dates.append(each[1])
+			vals.append(each[0])
+
+		if(len(dates) > 0):
+			new_dates, new_vals = zip(*sorted(zip(dates, vals)))
+			plt.plot(new_dates, new_vals)
+
+			legend.append('Prediction  ' + str(ii + 1))
+	
+	plt.legend(legend, loc = 'upper left')
+	plt.xlabel('Date')
+	plt.ylabel('Accuracy')
+	plt.savefig('prediction_accuracy.png')
+
+
 
 '''
 Main Execution
@@ -2282,19 +2375,18 @@ def main():
 			print('Error: Could not load articles for: ', specified_day)
 			sys.exit(-1)
 
-		if GPU:
-			if not analyze_weights_gpu():
-				print('Error: Unable to analyze weights')
-				sys.exit(-1)
-		else:
-			if not analyze_weights():
-				print('Error: Unable to analyze weights')
-				sys.exit(-1)
-
 		if weight_opt == 'opt1':
 			if GPU:
+				if not analyze_weights_gpu():
+					print('Error: Unable to analyze weights')
+					sys.exit(-1)
+
 				predict_movement_gpu(specified_day)
 			else:
+				if not analyze_weights():
+					print('Error: Unable to analyze weights')
+					sys.exit(-1)
+
 				predict_movement(specified_day)
 
 			predict_movement2(specified_day)

@@ -85,10 +85,20 @@ total_words_down = 0
 c = 0.01
 
 # Timing variables for CPU and GPU
-cpu_kernel_time = []
-gpu_kernel_time = []
-cpu_function_time = []
-gpu_function_time = []
+prediction_cpu_kernel_time = []
+prediction_gpu_kernel_time = []
+prediction_cpu_function_time = []
+prediction_gpu_function_time = []
+
+analysis_cpu_kernel_time = []
+analysis_gpu_kernel_time = []
+analysis_cpu_function_time = []
+analysis_gpu_function_time = []
+
+update_cpu_kernel_time = []
+update_gpu_kernel_time = []
+update_cpu_function_time = []
+update_gpu_function_time = []
 
 # Global Configurations
 if not os.path.exists('./data/'):
@@ -408,11 +418,184 @@ __kernel void predict_bayes(__global char* words, __global int* weights, __globa
 }
 """
 
+update_kernel = """
+
+__kernel void update(__global char* words, volatile __global int* word_bitmap, volatile __global int* weights, __global char* weights_char, __global int* num_weights_letter, int max_words_per_letter, int word_max, int direction) {
+	
+	// Get the word for the current work-item to focus on
+
+	unsigned int word_id = get_global_id(0);
+
+	unsigned int word_index = word_id * 16;
+
+	// Get the weight for the current work item to focus on
+
+	unsigned int weight_id = get_global_id(1);
+
+	if ( word_id < word_max ) 
+	{
+		unsigned int letter_index;
+		if (words[word_index] > 96) 
+			letter_index = words[word_index] - 'a';
+		else
+			letter_index = words[word_index] - 'A';
+
+		unsigned int weight_index = letter_index * max_words_per_letter * 28 + weight_id * 28;
+		unsigned int weight_index_int = letter_index * max_words_per_letter * 7 + weight_id * 7;
+		unsigned int weight_max = letter_index * max_words_per_letter * 28 + num_weights_letter[letter_index] * 28;
+
+		// Get the inputs and outputs to be compared
+
+		char word_0 = words[word_index + 0];
+	 	char word_1 = words[word_index + 1];
+		char word_2 = words[word_index + 2];
+		char word_3 = words[word_index + 3];
+		char word_4 = words[word_index + 4];
+	 	char word_5 = words[word_index + 5];
+		char word_6 = words[word_index + 6];
+		char word_7 = words[word_index + 7];
+		char word_8 = words[word_index + 8];
+	 	char word_9 = words[word_index + 9];
+		char word_10 = words[word_index + 10];
+		char word_11 = words[word_index + 11];
+		char word_12 = words[word_index + 12];
+	 	char word_13 = words[word_index + 13];
+		char word_14 = words[word_index + 14];
+		char word_15 = words[word_index + 15];
+
+		if ( weight_index < weight_max ) 
+		{
+			char word_w_0 = weights_char[weight_index + 0];
+			char word_w_1 = weights_char[weight_index + 1];
+			char word_w_2 = weights_char[weight_index + 2];
+			char word_w_3 = weights_char[weight_index + 3];
+			char word_w_4 = weights_char[weight_index + 4];
+			char word_w_5 = weights_char[weight_index + 5];
+			char word_w_6 = weights_char[weight_index + 6];
+			char word_w_7 = weights_char[weight_index + 7];
+			char word_w_8 = weights_char[weight_index + 8];
+			char word_w_9 = weights_char[weight_index + 9];
+			char word_w_10 = weights_char[weight_index + 10];
+			char word_w_11 = weights_char[weight_index + 11];
+			char word_w_12 = weights_char[weight_index + 12];
+			char word_w_13 = weights_char[weight_index + 13];
+			char word_w_14 = weights_char[weight_index + 14];
+			char word_w_15 = weights_char[weight_index + 15];
+
+			// Compare them and update the output if necessary
+
+			if ( word_0 == word_w_0 && word_1 == word_w_1 && word_2 == word_w_2 && word_3 == word_w_3 &&
+				 word_4 == word_w_4 && word_5 == word_w_5 && word_6 == word_w_6 && word_7 == word_w_7 &&
+				 word_8 == word_w_8 && word_9 == word_w_9 && word_10 == word_w_10 && word_11 == word_w_11 &&
+				 word_12 == word_w_12 && word_13 == word_w_13 && word_14 == word_w_14 && word_15 == word_w_15)
+			{
+				if (direction == 1)
+				{
+					atomic_inc(weights + 4 * (weight_index_int + 5)]);
+					atomic_inc(weights + 4 * (weight_index_int + 6)]);
+				}
+				else
+				{
+					atomic_inc(weights + 4 * (weight_index_int + 5)]);
+				}
+
+				word_bitmap[word_id] = 1;
+			}
+		}
+	}
+}
+
+__kernel void update_bayes(__global char* words, volatile __global int* word_bitmap, volatile __global int* weights, __global char* weights_char, __global int* num_weights_letter, int max_words_per_letter, int word_max, int direction) {
+	
+	// Get the word for the current work-item to focus on
+
+	unsigned int word_id = get_global_id(0);
+
+	unsigned int word_index = word_id * 16;
+
+	// Get the weight for the current work item to focus on
+
+	unsigned int weight_id = get_global_id(1);
+
+	if ( word_id < word_max ) 
+	{
+		unsigned int letter_index;
+		if (words[word_index] > 96) 
+			letter_index = words[word_index] - 'a';
+		else
+			letter_index = words[word_index] - 'A';
+
+		unsigned int weight_index = letter_index * max_words_per_letter * 28 + weight_id * 28;
+		unsigned int weight_index_int = letter_index * max_words_per_letter * 7 + weight_id * 7;
+		unsigned int weight_max = letter_index * max_words_per_letter * 28 + num_weights_letter[letter_index] * 28;
+
+		// Get the inputs and outputs to be compared
+
+		char word_0 = words[word_index + 0];
+	 	char word_1 = words[word_index + 1];
+		char word_2 = words[word_index + 2];
+		char word_3 = words[word_index + 3];
+		char word_4 = words[word_index + 4];
+	 	char word_5 = words[word_index + 5];
+		char word_6 = words[word_index + 6];
+		char word_7 = words[word_index + 7];
+		char word_8 = words[word_index + 8];
+	 	char word_9 = words[word_index + 9];
+		char word_10 = words[word_index + 10];
+		char word_11 = words[word_index + 11];
+		char word_12 = words[word_index + 12];
+	 	char word_13 = words[word_index + 13];
+		char word_14 = words[word_index + 14];
+		char word_15 = words[word_index + 15];
+
+		if ( weight_index < weight_max ) 
+		{
+			char word_w_0 = weights_char[weight_index + 0];
+			char word_w_1 = weights_char[weight_index + 1];
+			char word_w_2 = weights_char[weight_index + 2];
+			char word_w_3 = weights_char[weight_index + 3];
+			char word_w_4 = weights_char[weight_index + 4];
+			char word_w_5 = weights_char[weight_index + 5];
+			char word_w_6 = weights_char[weight_index + 6];
+			char word_w_7 = weights_char[weight_index + 7];
+			char word_w_8 = weights_char[weight_index + 8];
+			char word_w_9 = weights_char[weight_index + 9];
+			char word_w_10 = weights_char[weight_index + 10];
+			char word_w_11 = weights_char[weight_index + 11];
+			char word_w_12 = weights_char[weight_index + 12];
+			char word_w_13 = weights_char[weight_index + 13];
+			char word_w_14 = weights_char[weight_index + 14];
+			char word_w_15 = weights_char[weight_index + 15];
+
+			// Compare them and update the output if necessary
+
+			if ( word_0 == word_w_0 && word_1 == word_w_1 && word_2 == word_w_2 && word_3 == word_w_3 &&
+				 word_4 == word_w_4 && word_5 == word_w_5 && word_6 == word_w_6 && word_7 == word_w_7 &&
+				 word_8 == word_w_8 && word_9 == word_w_9 && word_10 == word_w_10 && word_11 == word_w_11 &&
+				 word_12 == word_w_12 && word_13 == word_w_13 && word_14 == word_w_14 && word_15 == word_w_15)
+			{
+				if (direction == 1)
+				{
+					atomic_inc(weights + 4 * (weight_index_int + 5)]);
+				}
+				else
+				{
+					atomic_inc(weights + 4 * (weight_index_int + 6)]);
+				}
+
+				word_bitmap[word_id] = 1;
+			}
+		}
+	}
+}
+"""
+
 
 # Build the kernel
 if GPU:
-	prg = cl.Program(ctx, analysis_kernel).build()
-	prg_2 = cl.Program(ctx, predict_kernel).build()
+	analysis_prg = cl.Program(ctx, analysis_kernel).build()
+	predict_prg = cl.Program(ctx, predict_kernel).build()
+	update_prg = cl.Program(ctx, update_kernel).build()
 
 
 '''
@@ -870,6 +1053,9 @@ def update_all_word_weights(option, day):
 			logging.warning('- Could not find articles loaded for ' + ticker)
 			continue
 
+		start_all = time.time()
+		cpu = 0
+
 		# For each stock, iterate through the articles
 		for articles in stock_data[ticker]:
 		
@@ -879,9 +1065,19 @@ def update_all_word_weights(option, day):
 			# Get an array of words with two or more characters for the text
 			words_in_text = re.compile('[A-Za-z][A-Za-z][A-Za-z]+').findall(text)
 
+			start = time.time()
+
 			# Update each word
 			for each_word in words_in_text:
 				update_word(ticker, option, each_word, day)
+
+			end = time.time()
+			cpu += end - start
+
+		end_all = time.time()
+
+		update_cpu_kernel_time.append(cpu)
+		update_cpu_function_time.append(end_all - start_all)
 
 '''
 Evening Update Step Helper
@@ -1030,16 +1226,7 @@ def update_all_word_weights_gpu(option, day):
 			words_by_letter.append(letter_words)
 			num_words_by_letter.append(0)
 
-	# At this point, the weighting arrays are initialized or loaded
-	# - Next step is to generate the datastructures for the kernel to manipulate
-	words_per_stock = np.zeros((len(STOCK_TAGS),), dtype = np.uint32)
-	stock_changes = np.zeros((len(STOCK_TAGS),), dtype = np.uint32)
-
-	# Get all the words for the articles and data about them
-	total_words = 0
-	temp_word_array = []
-
-	for ii, ticker in enumerate(STOCK_TAGS):
+	for ticker in STOCK_TAGS:
 		
 		logging.debug('- Updating word weights for: ' + ticker)
 
@@ -1047,9 +1234,16 @@ def update_all_word_weights_gpu(option, day):
 			logging.warning('- Could not find articles loaded for ' + ticker)
 			continue
 
+		start_all = time.time()
+
+		# Determine the direction the stock took on the day in question
 		change = stock_prices[ticker][day][1] - stock_prices[ticker][day][0]
 		if change > 0:
-			stock_changes[ii] = 1
+			direction = 1
+		else:
+			direction = 0
+
+		words_in_text = []
 
 		# For each stock, iterate through the articles
 		for articles in stock_data[ticker]:
@@ -1058,47 +1252,57 @@ def update_all_word_weights_gpu(option, day):
 			text = articles[1]
 
 			# Get an array of words with three or more characters for the text
-			words_in_text = re.compile('[A-Za-z][A-Za-z][A-Za-z]+').findall(text)
+			words_in_text += re.compile('[A-Za-z][A-Za-z][A-Za-z]+').findall(text)
 
-			# Store the words and update the number
-			temp_word_array += words_in_text
-			total_words += len(words_in_text)
+		# Store the words to be read by the kernel
+		word_data = bytearray(len(words_in_text)*16)
+		for ii, word in enumerate(words_in_text):
+			struct.pack_into('16s', word_data, ii * 16, word.lower().encode('utf-8'))
 
-			words_per_stock[ii] += len(words_in_text)
+		# Prepare the bitmap output buffer
+		word_bitmap = np.zeros((len(words_in_text), ), dtype = np.uint32)
 
+		# Create the buffers for the GPU
+		mf = cl.mem_flags
+		word_data_buff = cl.Buffer(ctx, mf.READ_ONLY | mf.COPY_HOST_PTR, hostbuf = word_data)
+		word_bitmap_buff = cl.Buffer(ctx, mf.WRITE_ONLY | mf.COPY_HOST_PTR, hostbuf = word_bitmap)
+		weights_buff = cl.Buffer(ctx, mf.COPY_HOST_PTR, hostbuf = np.asarray(words_by_letter))
+		weights_char_buff = cl.Buffer(ctx, mf.READ_ONLY | mf.COPY_HOST_PTR, hostbuf = np.asarray(words_by_letter))
+		num_weights_buff = cl.Buffer(ctx, mf.READ_ONLY | mf.COPY_HOST_PTR, hostbuf = np.asarray(num_words_by_letter, dtype = np.int32))
 
-	# Store all the words in one big word array
-	word_data = bytearray(16*total_words / 3)
-	for ii, word in enumerate(temp_word_array[:total_words/3]):
-		struct.pack_into('16s', word_data, ii * 16, word.encode('utf-8'))
-		
+		# Determine the grid size
+		groups, extra = divmod(len(words_in_text), 256)
+		grid = ((groups + (extra>0))*256, 2560)
 
-	# Prepare GPU buffers
-	mf = cl.mem_flags
-	word_data_buff = cl.Buffer(ctx, mf.READ_ONLY | mf.COPY_HOST_PTR, hostbuf = np.asarray(word_data))
-	word_data_buff2 = cl.Buffer(ctx, mf.READ_ONLY | mf.COPY_HOST_PTR, hostbuf = np.asarray(word_data))
-	words_per_stock_buff = cl.Buffer(ctx, mf.READ_ONLY | mf.COPY_HOST_PTR, hostbuf = words_per_stock)
-	stock_changes_buff = cl.Buffer(ctx, mf.READ_ONLY | mf.COPY_HOST_PTR, hostbuf = stock_changes)
-	word_weight_buff = cl.Buffer(ctx, mf.READ_ONLY | mf.COPY_HOST_PTR, hostbuf = np.asarray(words_by_letter))
-	word_weight_edits_buff = cl.Buffer(ctx, mf.WRITE_ONLY | mf.COPY_HOST_PTR, hostbuf = np.asarray(words_by_letter, dtype = np.uint32).flatten())
-	num_words_by_letter_buff = cl.Buffer(ctx, mf.READ_ONLY | mf.COPY_HOST_PTR, hostbuf = np.asarray(num_words_by_letter, dtype = np.uint32))
+		start = time.time()
 
-	# Determine the grid size
-	groups, extra = divmod(total_words, 256)
-	gridDim = ((groups + (extra>0))*256, 1)
+		# Call the right kernel
+		if option == 'opt1':
+			update_prg.update(queue, grid, None, word_data_buff, word_bitmap_buff, weights_buff, weights_char_buff, num_weights_buff, np.uint32(MAX_WORDS_PER_LETTER), np.uint32(len(words_in_text)))
+		elif option == 'opt2':
+			update_prg.update_bayes(queue, grid, None, word_data_buff, word_bitmap_buff, weights_buff, weights_char_buff, num_weights_buff, np.uint32(MAX_WORDS_PER_LETTER), np.uint32(len(words_in_text)))
+		else:
+			continue
 
-	print(np.asarray(words_by_letter, dtype=np.uint32).shape)
-	print(np.asarray(words_by_letter, dtype = np.uint32).flatten().shape)
+		# Collect the output
+		cl.enqueue_copy(queue, word_bitmap, word_bitmap_buff)
+		cl.enqueue_copy(queue, words_by_letter, weights_buff)
 
-	# Call the kernel
-	prg.update_weights_basic(queue, gridDim, (256, 1), word_data_buff, word_data_buff2, words_per_stock_buff, stock_changes_buff, word_weight_buff, word_weight_edits_buff, num_words_by_letter_buff, np.uint32(len(STOCK_TAGS)), np.uint32(total_words), np.uint32(MAX_WORDS_PER_LETTER))
+		# Update the words that couldn't be updated by the kernel
+		for ii, bit in enumerate(word_bitmap):
 
+			# Only update words that couldn't be updated by the kernel
+			# - A full update is still needed (full search) because if one word was not found, then every other identical one will not be found either
+			# - we only want it added once so the other times it will have to be searched.
+			if bit == 0:
+				update_word(ticker, option, words_in_text[ii], day)
 
-	# Pull results from the GPU
+		end = time.time()
+		end_all = time.time()
 
-	return_buffer = np.zeros((MAX_WORDS_PER_LETTER*28*26, ), dtype = np.uint32)
+		update_gpu_kernel_time.append(end - start)
+		update_gpu_function_time.append(end_all - start_all)
 
-	cl.enqueue_copy(queue, return_buffer, word_weight_edits_buff)
 
 '''
 Evening Update Step
@@ -1235,8 +1439,8 @@ def analyze_weights():
 
 	end_all = time.time()
 
-	cpu_kernel_time.append(cpu)
-	cpu_function_time.append(end_all - start_all)
+	analysis_cpu_kernel_time.append(cpu)
+	analysis_cpu_function_time.append(end_all - start_all)
 
 	logging.debug('- Analysis finished with:')
 	logging.debug('-- avg: ' + str(weight_average))
@@ -1288,7 +1492,7 @@ def analyze_weights_gpu():
 	# Call the kernel
 	gpu = 0
 	start = time.time()
-	prg.analyze_weights_1(queue, (2560, 26), (512, 1), words_by_letter_buff, num_words_by_letter_buff, out_stats_buff, np.uint32(MAX_WORDS_PER_LETTER))
+	analysis_prg.analyze_weights_1(queue, (2560, 26), (512, 1), words_by_letter_buff, num_words_by_letter_buff, out_stats_buff, np.uint32(MAX_WORDS_PER_LETTER))
 
 	# Pull results from the GPU
 	cl.enqueue_copy(queue, out_stats, out_stats_buff)
@@ -1319,7 +1523,7 @@ def analyze_weights_gpu():
 
 	# Call the kernel
 	start = time.time()
-	prg.analyze_weights_2(queue, (2560, 26), (512, 1), words_by_letter_buff, num_words_by_letter_buff, out_std_sum_buff, np.uint32(MAX_WORDS_PER_LETTER), np.float32(weight_average), np.float32(weight_average_o))
+	analysis_prg.analyze_weights_2(queue, (2560, 26), (512, 1), words_by_letter_buff, num_words_by_letter_buff, out_std_sum_buff, np.uint32(MAX_WORDS_PER_LETTER), np.float32(weight_average), np.float32(weight_average_o))
 	end = time.time()
 	gpu += end - start
 
@@ -1338,8 +1542,8 @@ def analyze_weights_gpu():
 
 	end_all = time.time()
 
-	gpu_kernel_time.append(gpu)
-	gpu_function_time.append(end_all - start_all)
+	analysis_gpu_kernel_time.append(gpu)
+	analysis_gpu_function_time.append(end_all - start_all)
 
 	logging.debug('- Analysis finished with:')
 	logging.debug('-- avg: ' + str(weight_average))
@@ -1546,8 +1750,8 @@ def predict_movement(day):
 
 		end_all = time.time()
 
-		cpu_kernel_time.append(cpu)
-		cpu_function_time.append(end_all - start_all)
+		predict_cpu_kernel_time.append(cpu)
+		predict_cpu_function_time.append(end_all - start_all)
 
 		# Update the variables for prediction 1 in slot 0
 		all_std_devs[tickers].append(std_above_avg_p1)
@@ -1695,8 +1899,8 @@ def predict_movement7(day):
 
 		end_all = time.time()
 
-		cpu_kernel_time.append(cpu)
-		cpu_function_time.append(end_all - start_all)
+		predict_cpu_kernel_time.append(cpu)
+		predict_cpu_function_time.append(end_all - start_all)
 
 		# If the up value is greater, rating is a buy, else sell
 		if stock_rating_up > stock_rating_down:
@@ -1790,7 +1994,7 @@ def predict_movement_gpu(day):
 		start = time.time()
 
 		# Call the kernel
-		prg_2.predict(queue, grid, None, word_data_buff, weights_buff, weights_char_buff, num_weights_buff, out_weights_buff, np.uint32(MAX_WORDS_PER_LETTER), np.uint32(len(words_in_text)))
+		predict_prg.predict(queue, grid, None, word_data_buff, weights_buff, weights_char_buff, num_weights_buff, out_weights_buff, np.uint32(MAX_WORDS_PER_LETTER), np.uint32(len(words_in_text)))
 
 		# Collect the output
 		cl.enqueue_copy(queue, out_weights, out_weights_buff)
@@ -1843,8 +2047,8 @@ def predict_movement_gpu(day):
 
 		end_all = time.time()
 
-		gpu_kernel_time.append(end - start)
-		gpu_function_time.append(end_all - start_all)
+		predict_gpu_kernel_time.append(end - start)
+		predict_gpu_function_time.append(end_all - start_all)
 
 		# Update the variables for prediction 1 in slot 0
 		all_std_devs[tickers].append(std_above_avg_p1)
@@ -2007,7 +2211,7 @@ def predict_movement7_gpu(day):
 		start = time.time()
 
 		# Call the kernel
-		prg_2.predict_bayes(queue, grid, None, word_data_buff, weights_buff, weights_char_buff, num_weights_buff, out_up_buff, out_down_buff, np.uint32(total_words_up), np.uint32(total_words_down), np.uint32(num_words), np.uint32(c), np.uint32(MAX_WORDS_PER_LETTER), np.uint32(len(words_in_text)))
+		predict_prg.predict_bayes(queue, grid, None, word_data_buff, weights_buff, weights_char_buff, num_weights_buff, out_up_buff, out_down_buff, np.uint32(total_words_up), np.uint32(total_words_down), np.uint32(num_words), np.uint32(c), np.uint32(MAX_WORDS_PER_LETTER), np.uint32(len(words_in_text)))
 
 		# Collect the output
 		cl.enqueue_copy(queue, out_up, out_up_buff)
@@ -2025,8 +2229,8 @@ def predict_movement7_gpu(day):
 		end = time.time()
 		end_all = time.time()
 
-		gpu_kernel_time.append(end - start)
-		gpu_function_time.append(end_all - start_all)
+		predict_gpu_kernel_time.append(end - start)
+		predict_gpu_function_time.append(end_all - start_all)
 
 		# If the up value is greater, rating is a buy, else sell
 		if stock_rating_up > stock_rating_down:
@@ -2536,24 +2740,60 @@ def main():
 
 	# Determine speedup from GPU for this command if using the GPU
 	if GPU:
-		sum_cpu_function = 0
-		sum_cpu_kernel = 0
-		for times in cpu_function_time:
-			sum_cpu_function += times
-		for times in cpu_kernel_time:
-			sum_cpu_kernel += times
-
-		sum_gpu_function = 0
-		sum_gpu_kernel = 0
-		for times in gpu_function_time:
-			sum_gpu_function += times
-		for times in gpu_kernel_time:
-			sum_gpu_kernel += times
-
 		print('')
-		print('Kernel Speedup: ' + str(sum_cpu_kernel / sum_gpu_kernel))
-		print('Function Speedup: ' + str(sum_cpu_function / sum_gpu_function))
+		if len(analysis_cpu_kernel_time) != 0 and len(analysis_cpu_function_time) != 0 and len(analysis_gpu_kernel_time) != 0 and len(analysis_gpu_function_time) != 0:
+			sum_cpu_function = 0
+			sum_cpu_kernel = 0
+			for times in analysis_cpu_function_time:
+				sum_cpu_function += times
+			for times in analysis_cpu_kernel_time:
+				sum_cpu_kernel += times
 
+			sum_gpu_function = 0
+			sum_gpu_kernel = 0
+			for times in analysis_gpu_function_time:
+				sum_gpu_function += times
+			for times in analysis_gpu_kernel_time:
+				sum_gpu_kernel += times
+
+			print('Analysis Speedup: Kernel = ' + str(sum_cpu_kernel / sum_gpu_kernel) + ', Function = ' + str(sum_cpu_function / sum_gpu_function))
+
+		if len(predict_cpu_kernel_time) != 0 and len(predict_cpu_function_time) != 0 and len(predict_gpu_kernel_time) != 0 and len(predict_gpu_function_time) != 0:
+			sum_cpu_function = 0
+			sum_cpu_kernel = 0
+			for times in predict_cpu_function_time:
+				sum_cpu_function += times
+			for times in predict_cpu_kernel_time:
+				sum_cpu_kernel += times
+
+			sum_gpu_function = 0
+			sum_gpu_kernel = 0
+			for times in predict_gpu_function_time:
+				sum_gpu_function += times
+			for times in predict_gpu_kernel_time:
+				sum_gpu_kernel += times
+
+			print('Prediction Speedup: Kernel = ' + str(sum_cpu_kernel / sum_gpu_kernel) + ', Function = ' + str(sum_cpu_function / sum_gpu_function))
+
+		if len(update_cpu_kernel_time) != 0 and len(update_cpu_function_time) != 0 and len(update_gpu_kernel_time) != 0 and len(update_gpu_function_time) != 0:
+			sum_cpu_function = 0
+			sum_cpu_kernel = 0
+			for times in update_cpu_function_time:
+				sum_cpu_function += times
+			for times in update_cpu_kernel_time:
+				sum_cpu_kernel += times
+
+			sum_gpu_function = 0
+			sum_gpu_kernel = 0
+			for times in update_gpu_function_time:
+				sum_gpu_function += times
+			for times in update_gpu_kernel_time:
+				sum_gpu_kernel += times
+
+			print('Update Speedup: Kernel = ' + str(sum_cpu_kernel / sum_gpu_kernel) + ', Function = ' + str(sum_cpu_function / sum_gpu_function))
+
+
+	print('')
 	print('Done')
 
 

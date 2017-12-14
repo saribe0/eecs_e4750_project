@@ -491,12 +491,12 @@ __kernel void update(__global char* words, volatile __global int* word_bitmap, v
 			{
 				if (direction == 1)
 				{
-					atomic_inc(weights + 4 * (weight_index_int + 5)]);
-					atomic_inc(weights + 4 * (weight_index_int + 6)]);
+					atomic_inc(weights + (weight_index_int + 5));
+					atomic_inc(weights + (weight_index_int + 6));
 				}
 				else
 				{
-					atomic_inc(weights + 4 * (weight_index_int + 5)]);
+					atomic_inc(weights + (weight_index_int + 5));
 				}
 
 				word_bitmap[word_id] = 1;
@@ -576,11 +576,11 @@ __kernel void update_bayes(__global char* words, volatile __global int* word_bit
 			{
 				if (direction == 1)
 				{
-					atomic_inc(weights + 4 * (weight_index_int + 5)]);
+//					atomic_inc(weights + 4 * (weight_index_int + 5));
 				}
 				else
 				{
-					atomic_inc(weights + 4 * (weight_index_int + 6)]);
+//					atomic_inc(weights + 4 * (weight_index_int + 6));
 				}
 
 				word_bitmap[word_id] = 1;
@@ -1278,9 +1278,9 @@ def update_all_word_weights_gpu(option, day):
 
 		# Call the right kernel
 		if option == 'opt1':
-			update_prg.update(queue, grid, None, word_data_buff, word_bitmap_buff, weights_buff, weights_char_buff, num_weights_buff, np.uint32(MAX_WORDS_PER_LETTER), np.uint32(len(words_in_text)))
+			update_prg.update(queue, grid, None, word_data_buff, word_bitmap_buff, weights_buff, weights_char_buff, num_weights_buff, np.uint32(MAX_WORDS_PER_LETTER), np.uint32(len(words_in_text)), np.uint32(direction))
 		elif option == 'opt2':
-			update_prg.update_bayes(queue, grid, None, word_data_buff, word_bitmap_buff, weights_buff, weights_char_buff, num_weights_buff, np.uint32(MAX_WORDS_PER_LETTER), np.uint32(len(words_in_text)))
+			update_prg.update_bayes(queue, grid, None, word_data_buff, word_bitmap_buff, weights_buff, weights_char_buff, num_weights_buff, np.uint32(MAX_WORDS_PER_LETTER), np.uint32(len(words_in_text)), np.uint32(direction))
 		else:
 			continue
 
@@ -2726,8 +2726,8 @@ def main():
 
 			# Call the proper functions
 			if load_articles(each):
-				if GPU and weight_opt == 'opt1':
-					update_all_word_weights(weight_opt, each)
+				if GPU:
+					update_all_word_weights_gpu(weight_opt, each)
 				else:
 					update_all_word_weights(weight_opt, each)
 			stock_data.clear() # To prepare for the next set of articles

@@ -1634,6 +1634,9 @@ def predict_movement7(day):
 
 	logging.info('Prediction stock movements with method 7 -> Naive Bayes Classifier')
 
+	print('')
+	print('BAYES PREDICTIONS ')
+
 	# Open file to store todays predictions in
 	file = open('./output/prediction7-' + day + '.txt', 'w')
 
@@ -1927,6 +1930,9 @@ def predict_movement7_gpu(day):
 	global c
 
 	logging.info('Prediction stock movements with method 7 -> Naive Bayes Classifier with the GPU')
+
+	print('')
+	print('BAYES PREDICTIONS WITH GPU ')
 
 	# Open file to store todays predictions in
 	file = open('./output/prediction7-' + day + '.txt', 'w')
@@ -2544,6 +2550,7 @@ def main():
 		for times in gpu_kernel_time:
 			sum_gpu_kernel += times
 
+		print('')
 		print('Kernel Speedup: ' + str(sum_cpu_kernel / sum_gpu_kernel))
 		print('Function Speedup: ' + str(sum_cpu_function / sum_gpu_function))
 

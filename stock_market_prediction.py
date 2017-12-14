@@ -85,10 +85,10 @@ total_words_down = 0
 c = 0.01
 
 # Timing variables for CPU and GPU
-prediction_cpu_kernel_time = []
-prediction_gpu_kernel_time = []
-prediction_cpu_function_time = []
-prediction_gpu_function_time = []
+predict_cpu_kernel_time = []
+predict_gpu_kernel_time = []
+predict_cpu_function_time = []
+predict_gpu_function_time = []
 
 analysis_cpu_kernel_time = []
 analysis_gpu_kernel_time = []
@@ -1287,9 +1287,11 @@ def update_all_word_weights_gpu(option, day):
 		# Collect the output
 		cl.enqueue_copy(queue, word_bitmap, word_bitmap_buff)
 
-		temp_weights = np.empty([26, MAX_WORDS_PER_LETTER], dtype = int)
-		cl.enqueue_copy(queue, temp_weights, weights_buff)
-		words_by_letter = temp_weights.tobytes()
+	#	temp_weights = np.empty([26, 7*MAX_WORDS_PER_LETTER], dtype = np.uint32)
+	#	cl.enqueue_copy(queue, temp_weights, weights_buff)
+		
+		for ii in range(0, 26):
+			cl.enqueue_copy(queue, words_by_letter[ii], weights_buff, device_offset = 2500 * 28 * ii)
 
 		# Update the words that couldn't be updated by the kernel
 		for ii, bit in enumerate(word_bitmap):

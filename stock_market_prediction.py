@@ -1806,13 +1806,13 @@ def predict_movement_gpu(day):
 			stock_rating_sum_p1 += w
 
 			# Prediction Method 2
-			if weight > weight_stdev + weight_average or weight < weight_average - weight_stdev:
-				stock_rating_sum_p2 += weight
+			if w > weight_stdev + weight_average or w < weight_average - weight_stdev:
+				stock_rating_sum_p2 += w
 				stock_rating_cnt_p2 += 1
 
 			# Prediction Method 5
-			if weight > weight_stdev_o + weight_average_o or weight < weight_average_o - weight_stdev_o:
-				stock_rating_sum_p5 += weight
+			if w > weight_stdev_o + weight_average_o or w < weight_average_o - weight_stdev_o:
+				stock_rating_sum_p5 += w
 				stock_rating_cnt_p5 += 1
 
 		stock_rating_cnt_p1 = len(words_in_text)
@@ -2066,7 +2066,8 @@ def write_predictions_to_file_and_print(day, all_predictions, all_std_devs, all_
 		# Print the header info and open the file
 		# When less than 3, uses normal weight analysis 
 		if ii < 3:
-			print('PREDICTIONS FOR METHOD ' + str(ii) + ' BASED ON:')
+			print('')
+			print('PREDICTIONS FOR METHOD ' + str(ii + 1) + ' BASED ON:')
 			print('\t- AVG: ', weight_average)
 			print('\t- STD: ', weight_stdev)
 
@@ -2095,7 +2096,8 @@ def write_predictions_to_file_and_print(day, all_predictions, all_std_devs, all_
 			file.write('- Min: ' + str(weight_min) + '\n\n')
 		# When greater than 2, uses the weighted weights
 		else:
-			print('PREDICTIONS BASED ON:')
+			print('')
+			print('PREDICTIONS FOR METHOD ' + str(ii + 1) + ' BASED ON:')
 			print('\t- AVG: ', weight_average_o)
 			print('\t- STD: ', weight_stdev_o)
 

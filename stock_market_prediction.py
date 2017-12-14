@@ -1286,7 +1286,10 @@ def update_all_word_weights_gpu(option, day):
 
 		# Collect the output
 		cl.enqueue_copy(queue, word_bitmap, word_bitmap_buff)
-		cl.enqueue_copy(queue, words_by_letter, weights_buff)
+
+		temp_weights = np.empty([26, MAX_WORDS_PER_LETTER], dtype = int)
+		cl.enqueue_copy(queue, temp_weights, weights_buff)
+		words_by_letter = temp_weights.tobytes()
 
 		# Update the words that couldn't be updated by the kernel
 		for ii, bit in enumerate(word_bitmap):

@@ -6,7 +6,7 @@
 ####################################################################################################
 
 # Specifies GPU/CPU calculations will be prepformed
-GPU = True
+GPU = False
 
 if GPU:
 	import pyopencl as cl
@@ -491,12 +491,12 @@ __kernel void update(__global char* words, volatile __global int* word_bitmap, v
 			{
 				if (direction == 1)
 				{
-					atomic_inc(weights + (weight_index_int + 5));
-					atomic_inc(weights + (weight_index_int + 6));
+					atomic_inc(weights + weight_index_int + 5);
+					atomic_inc(weights + weight_index_int + 6);
 				}
 				else
 				{
-					atomic_inc(weights + (weight_index_int + 5));
+					atomic_inc(weights + weight_index_int + 5);
 				}
 
 				word_bitmap[word_id] = 1;
@@ -576,11 +576,11 @@ __kernel void update_bayes(__global char* words, volatile __global int* word_bit
 			{
 				if (direction == 1)
 				{
-//					atomic_inc(weights + 4 * (weight_index_int + 5));
+					atomic_inc(weights + weight_index_int + 5);
 				}
 				else
 				{
-//					atomic_inc(weights + 4 * (weight_index_int + 6));
+					atomic_inc(weights + weight_index_int + 6);
 				}
 
 				word_bitmap[word_id] = 1;
@@ -2725,17 +2725,30 @@ def main():
 		load_all_word_weights(weight_opt)
 		load_stock_prices()
 
+		# Run everything on the CPU
 		for each in days:
 
 			logging.info('Updating word weights for: ' + each)
 
 			# Call the proper functions
 			if load_articles(each):
-				if GPU:
-					update_all_word_weights_gpu(weight_opt, each)
-				else:
-					update_all_word_weights(weight_opt, each)
+				update_all_word_weights(weight_opt, each)
 			stock_data.clear() # To prepare for the next set of articles
+
+		if GPU:
+			# Clear and run everything on the GPU
+			words_by_letter = []
+			num_words_by_letter = []
+
+			# Run everything on the GPU
+			for each in days:
+
+				logging.info('Updating word weights with the gpu for: ' + each)
+
+				# Call the proper functions
+				if load_articles(each):
+					update_all_word_weights_gpu(weight_opt, each)
+				stock_data.clear() # To prepare for the next set of articles
 
 		# Save data
 		logging.info('Saving word weights')

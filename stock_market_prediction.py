@@ -6,7 +6,7 @@
 ####################################################################################################
 
 # Specifies GPU/CPU calculations will be prepformed
-GPU = False
+GPU = True
 
 if GPU:
 	import pyopencl as cl
@@ -278,13 +278,13 @@ __kernel void predict(__global char* words, __global int* weights, __global char
 		{
 			// Compare them and update the output if necessary
 
-			if (memcmp(words + word_index * 16, weights + weight_index_int * 4, 16) == 0)
+/*			if (memcmp(words + word_index * 16, weights + weight_index_int * 4, 16) == 0)
 			{
 				int frequency = weights[weight_index_int + 5];
 				float weight = (float)weights[weight_index_int + 6] / frequency;
 
 				out_weights[word_id] = weight;
-			}
+			}*/
 		}
 	}
 
@@ -385,14 +385,14 @@ __kernel void predict_bayes(__global char* words, __global int* weights, __globa
 		{
 			// Compare them and update the output if necessary
 
-			if (memcmp(words + word_index * 16, weights + weight_index_int * 4, 16) == 0)
+/*			if (memcmp(words + word_index * 16, weights + weight_index_int * 4, 16) == 0)
 			{
 				float up = ((float)weights[weight_index_int + 5] + c) / (total_weights_up + c * total_weights);
 				float down = ((float)weights[weight_index_int + 6] + c) / (total_weights_down + c * total_weights);
 
 				out_probabilities_up[word_id] = up;
 				out_probabilities_down[word_id] = down;
-			}
+			}*/
 		}
 	}
 

@@ -1,6 +1,0 @@
-Traceback (most recent call last):
-  File "stock_market_prediction.py", line 2612, in <module>
-    main()
-  File "stock_market_prediction.py", line 2604, in main
-    print('Kernel Speedup: ' + str(sum_cpu_kernel / sum_gpu_kernel))
-ZeroDivisionError: integer division or modulo by zero

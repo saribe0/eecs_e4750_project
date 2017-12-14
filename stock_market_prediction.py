@@ -274,33 +274,6 @@ __kernel void predict(__global char* words, __global int* weights, __global char
 		unsigned int weight_index_int = letter_index * max_words_per_letter * 7 + weight_id * 7;
 		unsigned int weight_max = letter_index * max_words_per_letter * 28 + num_weights_letter[letter_index] * 28;
 
-		if ( weight_index < weight_max ) 
-		{
-			// Compare them and update the output if necessary
-
-/*			if (memcmp(words + word_index * 16, weights + weight_index_int * 4, 16) == 0)
-			{
-				int frequency = weights[weight_index_int + 5];
-				float weight = (float)weights[weight_index_int + 6] / frequency;
-
-				out_weights[word_id] = weight;
-			}*/
-		}
-	}
-
-	/*
-	if ( word_id < word_max ) 
-	{
-		unsigned int letter_index;
-		if (words[word_index] > 96) 
-			letter_index = words[word_index] - 'a';
-		else
-			letter_index = words[word_index] - 'A';
-
-		unsigned int weight_index = letter_index * max_words_per_letter * 28 + weight_id * 28;
-		unsigned int weight_index_int = letter_index * max_words_per_letter * 7 + weight_id * 7;
-		unsigned int weight_max = letter_index * max_words_per_letter * 28 + num_weights_letter[letter_index] * 28;
-
 		// Get the inputs and outputs to be compared
 
 		char word_0 = words[word_index + 0];
@@ -353,8 +326,6 @@ __kernel void predict(__global char* words, __global int* weights, __global char
 			}
 		}
 	}
-
-	*/
 }
 
 __kernel void predict_bayes(__global char* words, __global int* weights, __global char* weights_char, __global int* num_weights_letter, volatile __global float* out_probabilities_up, volatile __global float* out_probabilities_down, int total_weights_up, int total_weights_down, int total_weights, int c, int max_words_per_letter, int word_max) {
@@ -381,34 +352,6 @@ __kernel void predict_bayes(__global char* words, __global int* weights, __globa
 		unsigned int weight_index_int = letter_index * max_words_per_letter * 7 + weight_id * 7;
 		unsigned int weight_max = letter_index * max_words_per_letter * 28 + num_weights_letter[letter_index] * 28;
 
-		if ( weight_index < weight_max ) 
-		{
-			// Compare them and update the output if necessary
-
-/*			if (memcmp(words + word_index * 16, weights + weight_index_int * 4, 16) == 0)
-			{
-				float up = ((float)weights[weight_index_int + 5] + c) / (total_weights_up + c * total_weights);
-				float down = ((float)weights[weight_index_int + 6] + c) / (total_weights_down + c * total_weights);
-
-				out_probabilities_up[word_id] = up;
-				out_probabilities_down[word_id] = down;
-			}*/
-		}
-	}
-
-	/*
-	if ( word_id < word_max ) 
-	{
-		unsigned int letter_index;
-		if (words[word_index] > 96) 
-			letter_index = words[word_index] - 'a';
-		else
-			letter_index = words[word_index] - 'A';
-
-		unsigned int weight_index = letter_index * max_words_per_letter * 28 + weight_id * 28;
-		unsigned int weight_index_int = letter_index * max_words_per_letter * 7 + weight_id * 7;
-		unsigned int weight_max = letter_index * max_words_per_letter * 28 + num_weights_letter[letter_index] * 28;
-
 		// Get the inputs and outputs to be compared
 
 		char word_0 = words[word_index + 0];
@@ -462,8 +405,6 @@ __kernel void predict_bayes(__global char* words, __global int* weights, __globa
 			}
 		}
 	}
-
-	*/
 }
 """
 

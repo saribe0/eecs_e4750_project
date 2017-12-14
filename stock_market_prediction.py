@@ -2001,7 +2001,7 @@ def predict_movement7_gpu(day):
 		start = time.time()
 
 		# Call the kernel
-		prg_2.predict_bayes(queue, grid, None, word_data_buff, weights_buff, weights_char_buff, num_weights_buff, out_up_buff, out_down_buff, total_words_up, total_words_down, num_words, c, np.uint32(MAX_WORDS_PER_LETTER), np.uint32(len(words_in_text)))
+		prg_2.predict_bayes(queue, grid, None, word_data_buff, weights_buff, weights_char_buff, num_weights_buff, out_up_buff, out_down_buff, np.uint32(total_words_up), np.uint32(total_words_down), np.uint32(num_words), np.uint32(c), np.uint32(MAX_WORDS_PER_LETTER), np.uint32(len(words_in_text)))
 
 		# Collect the output
 		cl.enqueue_copy(queue, out_up, out_up_buff)

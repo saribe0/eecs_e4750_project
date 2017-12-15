@@ -6,7 +6,7 @@
 ####################################################################################################
 
 # Specifies GPU/CPU calculations will be prepformed
-GPU = False
+GPU = True
 
 if GPU:
 	import pyopencl as cl
@@ -2722,10 +2722,10 @@ def main():
 				temp_day = date1 + datetime.timedelta(days = each_day)
 				days.append(str(temp_day.month) + '-' + str(temp_day.day) + '-' + str(temp_day.year))
 
-		load_all_word_weights(weight_opt)
 		load_stock_prices()
 
 		# Run everything on the CPU
+		load_all_word_weights(weight_opt)
 		for each in days:
 
 			logging.info('Updating word weights for: ' + each)
@@ -2737,8 +2737,10 @@ def main():
 
 		if GPU:
 			# Clear and run everything on the GPU
-			words_by_letter = []
-			num_words_by_letter = []
+			del words_by_letter[:]
+			del num_words_by_letter[:]
+
+			load_all_word_weights(weight_opt)
 
 			# Run everything on the GPU
 			for each in days:

@@ -2084,9 +2084,9 @@ def predict_movement_gpu(day):
 		all_probabilities[tickers].append(probability_p1)
 		all_raw_ratings[tickers].append(stock_rating_p1)
 
-		if std_above_avg_p1 > weight_average:
+		if stock_rating_p1 > weight_average:
 			all_predictions[tickers].append(1)
-		elif std_above_avg_p1 < weight_average:
+		elif stock_rating_p1 < weight_average:
 			all_predictions[tickers].append(-1)
 		else:
 			all_predictions[tickers].append(0)
@@ -2120,9 +2120,9 @@ def predict_movement_gpu(day):
 		all_probabilities[tickers].append(probability_p4)
 		all_raw_ratings[tickers].append(stock_rating_p1)
 
-		if std_above_avg_p4 > weight_average_o:
+		if stock_rating_p1 > weight_average_o:
 			all_predictions[tickers].append(1)
-		elif std_above_avg_p4 < weight_average_o:
+		elif stock_rating_p1 < weight_average_o:
 			all_predictions[tickers].append(-1)
 		else:
 			all_predictions[tickers].append(0)

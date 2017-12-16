@@ -2292,8 +2292,8 @@ def predict_movement7_gpu(day):
 		weights_buff = cl.Buffer(ctx, mf.READ_ONLY | mf.COPY_HOST_PTR, hostbuf = np.asarray(words_by_letter))
 		weights_char_buff = cl.Buffer(ctx, mf.READ_ONLY | mf.COPY_HOST_PTR, hostbuf = np.asarray(words_by_letter))
 		num_weights_buff = cl.Buffer(ctx, mf.READ_ONLY | mf.COPY_HOST_PTR, hostbuf = np.asarray(num_words_by_letter, dtype = np.int32))
-		out_up_buff = cl.Buffer(ctx, mf.WRITE_ONLY, out_up.nbytes)
-		out_down_buff = cl.Buffer(ctx, mf.WRITE_ONLY, out_down.nbytes)
+		out_up_buff = cl.Buffer(ctx, mf.WRITE_ONLY | mf.COPY_HOST_PTR, out_up.nbytes)
+		out_down_buff = cl.Buffer(ctx, mf.WRITE_ONLY | mf.COPY_HOST_PTR, out_down.nbytes)
 
 		# Determine the grid size
 		groups, extra = divmod(len(words_in_text), 256)

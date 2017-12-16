@@ -2062,7 +2062,8 @@ def predict_movement_gpu(day):
 			struct.pack_into('16s', word_data, ii * 16, word.lower().encode('utf-8'))
 
 		# Prepare an output buffer
-		out_weights = np.zeros((len(words_in_text), ), dtype = np.float32)
+		out_weights = np.empty((len(words_in_text), ), dtype = np.float32)
+		out_weights.fill(-1.0)
 
 		# Create the buffers for the GPU
 		mf = cl.mem_flags
@@ -2070,7 +2071,7 @@ def predict_movement_gpu(day):
 		weights_buff = cl.Buffer(ctx, mf.READ_ONLY | mf.COPY_HOST_PTR, hostbuf = np.asarray(words_by_letter))
 		weights_char_buff = cl.Buffer(ctx, mf.READ_ONLY | mf.COPY_HOST_PTR, hostbuf = np.asarray(words_by_letter))
 		num_weights_buff = cl.Buffer(ctx, mf.READ_ONLY | mf.COPY_HOST_PTR, hostbuf = np.asarray(num_words_by_letter, dtype = np.int32))
-		out_weights_buff = cl.Buffer(ctx, mf.WRITE_ONLY, out_weights.nbytes)
+		out_weights_buff = cl.Buffer(ctx, mf.WRITE_ONLY, hostbuf = out_weights)
 
 		# Determine the grid size
 		groups, extra = divmod(len(words_in_text), 256)
@@ -2093,6 +2094,9 @@ def predict_movement_gpu(day):
 		stock_rating_cnt_p5 = 0
 
 		for w in out_weights:
+
+			if w < 0:
+				w = weight_average
 
 			prediction_outputs_gpu.append(w)
 

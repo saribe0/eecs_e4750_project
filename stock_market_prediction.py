@@ -2846,8 +2846,6 @@ def main():
 		if len(analysis_outputs_gpu) != len(analysis_outputs_cpu):
 			print('Mismatch in number of analysis outputs between GPU and CPU.')
 		elif len(analysis_outputs_gpu) > 0:
-			print(analysis_outputs_gpu)
-			print(analysis_outputs_cpu)
 			max_percentage = 0
 			sum_percentage = 0
 			for ii in range(0, len(analysis_outputs_cpu)):
@@ -2868,6 +2866,8 @@ def main():
 		elif len(prediction_outputs_gpu) > 0:
 			max_percentage = 0
 			sum_percentage = 0
+			print(prediction_outputs_cpu[:20])
+			print(prediction_outputs_gpu[:20])
 			for ii in range(0, len(prediction_outputs_cpu)):
 
 				if (prediction_outputs_cpu[ii] + prediction_outputs_gpu[ii]) != 0:
@@ -2877,7 +2877,7 @@ def main():
 					if percentage > max_percentage:
 						max_percentage = sum_percentage
 
-			print('Analysis Percent Difference: Max = ' + str(max_percentage * 100) + ', Avg = ' + str(sum_percentage*100 / len(prediction_outputs_cpu)))
+			print('Prediction Percent Difference: Max = ' + str(max_percentage * 100) + ', Avg = ' + str(sum_percentage*100 / len(prediction_outputs_cpu)))
 
 		if len(update_outputs_gpu) != len(update_outputs_cpu):
 			print('Mismatch in number of update outputs between GPU and CPU.')
@@ -2894,7 +2894,7 @@ def main():
 					if percentage > max_percentage:
 						max_percentage = sum_percentage
 
-			print('Analysis Percent Difference: Max = ' + str(max_percentage * 100) + ', Avg = ' + str(sum_percentage*100 / len(update_outputs_cpu)))
+			print('Update Percent Difference: Max = ' + str(max_percentage * 100) + ', Avg = ' + str(sum_percentage*100 / len(update_outputs_cpu)))
 
 		print('')
 		if len(analysis_cpu_kernel_time) != 0 and len(analysis_cpu_function_time) != 0 and len(analysis_gpu_kernel_time) != 0 and len(analysis_gpu_function_time) != 0:

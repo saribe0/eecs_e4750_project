@@ -1088,6 +1088,20 @@ def update_all_word_weights(option, day):
 		update_cpu_kernel_time.append(cpu)
 		update_cpu_function_time.append(end_all - start_all)
 
+	# Add all the weights to the cpu weight array
+	# NOTE: This is ONLY for comparison of outputs between GPU and CPU. It has nothing to do with actual computation
+	for letter in range(0, 26):
+
+		letter_words = words_by_letter[letter]
+
+		for each_word in range(0, num_words_by_letter[letter]);
+
+			test_data = struct.unpack_from('16s f i i', letter_words, each_word * 28)
+
+			update_outputs_cpu.append(test_data[2])
+			update_outputs_cpu.append(test_data[3])
+
+
 '''
 Evening Update Step Helper
 Step 9.5 is to update the specific word. This function goes through all the other words starting with that letter and either updates
@@ -1295,9 +1309,6 @@ def update_all_word_weights_gpu(option, day):
 
 		# Collect the output
 		cl.enqueue_copy(queue, word_bitmap, word_bitmap_buff)
-
-	#	temp_weights = np.empty([26, 7*MAX_WORDS_PER_LETTER], dtype = np.uint32)
-	#	cl.enqueue_copy(queue, temp_weights, weights_buff)
 		
 		for ii in range(0, 26):
 			cl.enqueue_copy(queue, words_by_letter[ii], weights_buff, device_offset = 2500 * 28 * ii)
@@ -1316,6 +1327,20 @@ def update_all_word_weights_gpu(option, day):
 
 		update_gpu_kernel_time.append(end - start)
 		update_gpu_function_time.append(end_all - start_all)
+
+
+	# Add all the weights to the gpu weight array
+	# NOTE: This is ONLY for comparison of outputs between GPU and CPU. It has nothing to do with actual computation
+	for letter in range(0, 26):
+
+		letter_words = words_by_letter[letter]
+
+		for each_word in range(0, num_words_by_letter[letter]);
+
+			test_data = struct.unpack_from('16s f i i', letter_words, each_word * 28)
+
+			update_outputs_gpu.append(test_data[2])
+			update_outputs_gpu.append(test_data[3])
 
 
 '''
@@ -1468,6 +1493,17 @@ def analyze_weights():
 	logging.debug('-- sum_o: ' + str(weight_sum_o))
 	logging.debug('-- cnt_o: ' + str(weight_count_o))
 
+	analysis_outputs_cpu.append(weight_average)
+	analysis_outputs_cpu.append(weight_stdev)
+	analysis_outputs_cpu.append(weight_sum)
+	analysis_outputs_cpu.append(weight_count)
+	analysis_outputs_cpu.append(weight_max)
+	analysis_outputs_cpu.append(weight_min)
+	analysis_outputs_cpu.append(weight_average_o)
+	analysis_outputs_cpu.append(weight_stdev_o)
+	analysis_outputs_cpu.append(weight_sum_o)
+	analysis_outputs_cpu.append(weight_count_o)
+
 	return True
 
 
@@ -1570,6 +1606,17 @@ def analyze_weights_gpu():
 	logging.debug('-- std_o: ' + str(weight_stdev_o))
 	logging.debug('-- sum_o: ' + str(weight_sum_o))
 	logging.debug('-- cnt_o: ' + str(weight_count_o))
+
+	analysis_outputs_gpu.append(weight_average)
+	analysis_outputs_gpu.append(weight_stdev)
+	analysis_outputs_gpu.append(weight_sum)
+	analysis_outputs_gpu.append(weight_count)
+	analysis_outputs_gpu.append(weight_max)
+	analysis_outputs_gpu.append(weight_min)
+	analysis_outputs_gpu.append(weight_average_o)
+	analysis_outputs_gpu.append(weight_stdev_o)
+	analysis_outputs_gpu.append(weight_sum_o)
+	analysis_outputs_gpu.append(weight_count_o)
 
 	return True
 
@@ -1725,6 +1772,7 @@ def predict_movement(day):
 			for words in words_in_text:
 
 				weight = get_word_weight(words)
+				prediction_outputs_cpu.append(weight)
 
 				# Prediction Method 1, 3, 4, 6
 				stock_rating_sum_p1 += weight
@@ -2022,6 +2070,8 @@ def predict_movement_gpu(day):
 		stock_rating_cnt_p5 = 0
 
 		for w in out_weights:
+
+			prediction_outputs_gpu.append(w)
 
 			# Prediction Method 1, 3, 4, 6
 			stock_rating_sum_p1 += w
@@ -2767,8 +2817,53 @@ def main():
 		
 		logging.info('Updating word weights complete')
 
-	# Determine speedup from GPU for this command if using the GPU
+	# Determine speedup from GPU and comparison between GPU and CPU outputs
 	if GPU:
+		print('') 
+		if len(analysis_outputs_gpu) != len(analysis_outputs_cpu):
+			print('Mismatch in number of analysis outputs between GPU and CPU.')
+		else:
+			max_percentage = 0
+			sum_percentage = 0
+			for ii in range(0, len(analysis_outputs_cpu)):
+				percentage = 2 * math.abs(analysis_outputs_cpu[ii] - analysis_outputs_gpu) / (analysis_outputs_cpu[ii] + analysis_outputs_gpu)
+
+				sum_percentage += percentage
+				if percentage > max_percentage:
+					max_percentage = sum_percentage
+
+			print('Analysis Percent Difference: Max = ' + str(max_percentage * 100) + ', Avg = ' + str(sum_percentage*100 / len(analysis_outputs_cpu)))
+
+		if len(prediction_outputs_gpu) != len(prediction_outputs_cpu):
+			print('Mismatch in number of prediction outputs between GPU and CPU.')
+
+		else:
+			max_percentage = 0
+			sum_percentage = 0
+			for ii in range(0, len(prediction_outputs_cpu)):
+				percentage = 2 * math.abs(prediction_outputs_cpu[ii] - prediction_outputs_gpu) / (prediction_outputs_cpu[ii] + prediction_outputs_gpu)
+
+				sum_percentage += percentage
+				if percentage > max_percentage:
+					max_percentage = sum_percentage
+
+			print('Analysis Percent Difference: Max = ' + str(max_percentage * 100) + ', Avg = ' + str(sum_percentage*100 / len(prediction_outputs_cpu)))
+
+		if len(update_outputs_gpu) != len(update_outputs_cpu):
+			print('Mismatch in number of update outputs between GPU and CPU.')
+
+		else:
+			max_percentage = 0
+			sum_percentage = 0
+			for ii in range(0, len(update_outputs_cpu)):
+				percentage = 2 * math.abs(update_outputs_cpu[ii] - update_outputs_gpu) / (update_outputs_cpu[ii] + update_outputs_gpu)
+
+				sum_percentage += percentage
+				if percentage > max_percentage:
+					max_percentage = sum_percentage
+
+			print('Analysis Percent Difference: Max = ' + str(max_percentage * 100) + ', Avg = ' + str(sum_percentage*100 / len(update_outputs_cpu)))
+
 		print('')
 		if len(analysis_cpu_kernel_time) != 0 and len(analysis_cpu_function_time) != 0 and len(analysis_gpu_kernel_time) != 0 and len(analysis_gpu_function_time) != 0:
 			sum_cpu_function = 0

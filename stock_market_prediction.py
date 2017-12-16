@@ -100,6 +100,15 @@ update_gpu_kernel_time = []
 update_cpu_function_time = []
 update_gpu_function_time = []
 
+prediction_outputs_gpu = []
+prediction_outputs_cpu = []
+
+analysis_outputs_gpu = []
+analysis_outputs_cpu = []
+
+update_outputs_gpu = []
+update_outputs_cpu = []
+
 # Global Configurations
 if not os.path.exists('./data/'):
 	os.makedirs('./data/')
@@ -338,7 +347,7 @@ __kernel void predict(__global char* words, __global int* weights, __global char
 	}
 }
 
-__kernel void predict_bayes(__global char* words, __global int* weights, __global char* weights_char, __global int* num_weights_letter, volatile __global float* out_probabilities_up, volatile __global float* out_probabilities_down, int total_weights_up, int total_weights_down, int total_weights, int c, int max_words_per_letter, int word_max) {
+__kernel void predict_bayes(__global char* words, __global int* weights, __global char* weights_char, __global int* num_weights_letter, volatile __global float* out_probabilities_up, volatile __global float* out_probabilities_down, int total_weights_up, int total_weights_down, int total_weights, float c, int max_words_per_letter, int word_max) {
 	
 	// Get the word for the current work-item to focus on
 
@@ -2216,7 +2225,7 @@ def predict_movement7_gpu(day):
 		start = time.time()
 
 		# Call the kernel
-		predict_prg.predict_bayes(queue, grid, None, word_data_buff, weights_buff, weights_char_buff, num_weights_buff, out_up_buff, out_down_buff, np.uint32(total_words_up), np.uint32(total_words_down), np.uint32(num_words), np.uint32(c), np.uint32(MAX_WORDS_PER_LETTER), np.uint32(len(words_in_text)))
+		predict_prg.predict_bayes(queue, grid, None, word_data_buff, weights_buff, weights_char_buff, num_weights_buff, out_up_buff, out_down_buff, np.uint32(total_words_up), np.uint32(total_words_down), np.uint32(num_words), np.float32(c), np.uint32(MAX_WORDS_PER_LETTER), np.uint32(len(words_in_text)))
 
 		# Collect the output
 		cl.enqueue_copy(queue, out_up, out_up_buff)
@@ -2224,11 +2233,11 @@ def predict_movement7_gpu(day):
 
 		# Get the prediction for the stock
 		for w in out_up:
-			if w != 0:
+			if w > 0:
 				stock_rating_up += math.log(w)
 
 		for w in out_down:
-			if w != 0:
+			if w > 0:
 				stock_rating_down += math.log(w)
 
 		end = time.time()
@@ -2610,7 +2619,7 @@ def main():
 		elif opt == '-z':
 			load_all_word_weights('opt1')
 			if GPU:
-				if not analyze_weights() and not analyze_weights_gpu():
+				if not analyze_weights() or not analyze_weights_gpu():
 					print('Error: Unable to analyze weights')
 					sys.exit(-1)
 			else:
@@ -2643,7 +2652,7 @@ def main():
 
 		if weight_opt == 'opt1':
 			if GPU:
-				if not analyze_weights() and not analyze_weights_gpu():
+				if not analyze_weights() or not analyze_weights_gpu():
 					print('Error: Unable to analyze weights')
 					sys.exit(-1)
 

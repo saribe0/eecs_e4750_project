@@ -1039,7 +1039,7 @@ def update_all_word_weights(option, day):
 
 	logging.info('Updating word weights for: ' + day + ' with option: ' + option)
 	print('Updating word weights')
-	print(num_words_by_letter)
+
 	# If the weighting arrays are empty, create them 
 	if len(words_by_letter) == 0 or words_by_letter == 0:
 
@@ -1090,7 +1090,6 @@ def update_all_word_weights(option, day):
 
 	# Add all the weights to the cpu weight array
 	# NOTE: This is ONLY for comparison of outputs between GPU and CPU. It has nothing to do with actual computation
-	print(num_words_by_letter)
 	for letter in range(0, 26):
 
 		letter_words = words_by_letter[letter]
@@ -1249,7 +1248,7 @@ def update_all_word_weights_gpu(option, day):
 			letter_words = bytearray(28*MAX_WORDS_PER_LETTER)
 			words_by_letter.append(letter_words)
 			num_words_by_letter.append(0)
-	print(num_words_by_letter)
+
 	for ticker in STOCK_TAGS:
 		
 		logging.debug('- Updating word weights for: ' + ticker)
@@ -1332,7 +1331,6 @@ def update_all_word_weights_gpu(option, day):
 
 	# Add all the weights to the gpu weight array
 	# NOTE: This is ONLY for comparison of outputs between GPU and CPU. It has nothing to do with actual computation
-	print(num_words_by_letter)
 	for letter in range(0, 26):
 
 		letter_words = words_by_letter[letter]
@@ -2869,7 +2867,7 @@ def main():
 
 					sum_percentage += percentage
 					
-			print('Analysis Avg Percent Difference: ' + str(sum_percentage*100 / len(analysis_outputs_cpu)) + '%' )
+			print('Analysis Avg Percent Difference: ' + str(sum_percentage*100 / len(analysis_outputs_cpu)) + ' %' )
 
 		if len(prediction_outputs_gpu) != len(prediction_outputs_cpu):
 			print('Mismatch in number of prediction outputs between GPU and CPU.')
@@ -2883,7 +2881,7 @@ def main():
 
 					sum_percentage += percentage
 					
-			print('Prediction Avg Percent Difference: ' + str(sum_percentage*100 / len(prediction_outputs_cpu)) + '%' )
+			print('Prediction Avg Percent Difference: ' + str(sum_percentage*100 / len(prediction_outputs_cpu)) + ' %' )
 
 		if len(update_outputs_gpu) != len(update_outputs_cpu):
 			print('Mismatch in number of update outputs between GPU and CPU.')
@@ -2896,7 +2894,7 @@ def main():
 					percentage = 2 * abs(update_outputs_cpu[ii] - update_outputs_gpu[ii]) / (update_outputs_cpu[ii] + update_outputs_gpu[ii])
 
 					sum_percentage += percentage
-			print('Update Avg Percent Difference: ' + str(sum_percentage*100 / len(update_outputs_cpu)) + '%' )
+			print('Update Avg Percent Difference: ' + str(sum_percentage*100 / len(update_outputs_cpu)) + ' %' )
 
 		print('')
 		if len(analysis_cpu_kernel_time) != 0 and len(analysis_cpu_function_time) != 0 and len(analysis_gpu_kernel_time) != 0 and len(analysis_gpu_function_time) != 0:

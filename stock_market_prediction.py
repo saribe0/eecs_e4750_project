@@ -1772,6 +1772,7 @@ def predict_movement(day):
 			for words in words_in_text:
 
 				weight = get_word_weight(words)
+				
 				prediction_outputs_cpu.append(weight)
 
 				# Prediction Method 1, 3, 4, 6
@@ -2826,11 +2827,14 @@ def main():
 			max_percentage = 0
 			sum_percentage = 0
 			for ii in range(0, len(analysis_outputs_cpu)):
-				percentage = 2 * abs(analysis_outputs_cpu[ii] - analysis_outputs_gpu[ii]) / (analysis_outputs_cpu[ii] + analysis_outputs_gpu[ii])
 
-				sum_percentage += percentage
-				if percentage > max_percentage:
-					max_percentage = sum_percentage
+				if (analysis_outputs_cpu[ii] + analysis_outputs_gpu[ii]) != 0:
+
+					percentage = 2 * abs(analysis_outputs_cpu[ii] - analysis_outputs_gpu[ii]) / (analysis_outputs_cpu[ii] + analysis_outputs_gpu[ii])
+
+					sum_percentage += percentage
+					if percentage > max_percentage:
+						max_percentage = sum_percentage
 
 			print('Analysis Percent Difference: Max = ' + str(max_percentage * 100) + ', Avg = ' + str(sum_percentage*100 / len(analysis_outputs_cpu)))
 
@@ -2841,11 +2845,13 @@ def main():
 			max_percentage = 0
 			sum_percentage = 0
 			for ii in range(0, len(prediction_outputs_cpu)):
-				percentage = 2 * abs(prediction_outputs_cpu[ii] - prediction_outputs_gpu[ii]) / (prediction_outputs_cpu[ii] + prediction_outputs_gpu[ii])
 
-				sum_percentage += percentage
-				if percentage > max_percentage:
-					max_percentage = sum_percentage
+				if (prediction_outputs_cpu[ii] + prediction_outputs_gpu[ii]) != 0:
+					percentage = 2 * abs(prediction_outputs_cpu[ii] - prediction_outputs_gpu[ii]) / (prediction_outputs_cpu[ii] + prediction_outputs_gpu[ii])
+
+					sum_percentage += percentage
+					if percentage > max_percentage:
+						max_percentage = sum_percentage
 
 			print('Analysis Percent Difference: Max = ' + str(max_percentage * 100) + ', Avg = ' + str(sum_percentage*100 / len(prediction_outputs_cpu)))
 
@@ -2856,11 +2862,13 @@ def main():
 			max_percentage = 0
 			sum_percentage = 0
 			for ii in range(0, len(update_outputs_cpu)):
-				percentage = 2 * abs(update_outputs_cpu[ii] - update_outputs_gpu[ii]) / (update_outputs_cpu[ii] + update_outputs_gpu[ii])
 
-				sum_percentage += percentage
-				if percentage > max_percentage:
-					max_percentage = sum_percentage
+				if (update_outputs_cpu[ii] + update_outputs_gpu[ii]) != 0:
+					percentage = 2 * abs(update_outputs_cpu[ii] - update_outputs_gpu[ii]) / (update_outputs_cpu[ii] + update_outputs_gpu[ii])
+
+					sum_percentage += percentage
+					if percentage > max_percentage:
+						max_percentage = sum_percentage
 
 			print('Analysis Percent Difference: Max = ' + str(max_percentage * 100) + ', Avg = ' + str(sum_percentage*100 / len(update_outputs_cpu)))
 

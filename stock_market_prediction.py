@@ -1725,7 +1725,7 @@ def get_word_probability_given_label(word_upper, c):
 			return up, down
 
 	# Could not find the word so returning None
-	return None, None
+	return 0, 0
 
 '''
 Morning Prediction Step
@@ -1978,7 +1978,7 @@ def predict_movement7(day):
 				prediction_outputs_cpu.append(up)
 				prediction_outputs_cpu.append(down)
 						
-				if up != None and down != None:
+				if up != 0 and down != 0:
 					stock_rating_up += math.log(up)
 					stock_rating_down += math.log(down)
 
@@ -2878,8 +2878,6 @@ def main():
 		elif len(prediction_outputs_gpu) > 0:
 			max_percentage = 0
 			sum_percentage = 0
-			print(prediction_outputs_cpu[:20])
-			print(prediction_outputs_gpu[:20])
 			for ii in range(0, len(prediction_outputs_cpu)):
 
 				if (prediction_outputs_cpu[ii] + prediction_outputs_gpu[ii]) != 0:

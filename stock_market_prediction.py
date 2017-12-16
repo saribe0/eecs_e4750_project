@@ -1974,6 +1974,9 @@ def predict_movement7(day):
 			for words in words_in_text:
 
 				up, down = get_word_probability_given_label(words, c)
+
+				prediction_outputs_cpu.append(up)
+				prediction_outputs_cpu.append(down)
 						
 				if up != None and down != None:
 					stock_rating_up += math.log(up)
@@ -2309,13 +2312,18 @@ def predict_movement7_gpu(day):
 		cl.enqueue_copy(queue, out_down, out_down_buff)
 
 		# Get the prediction for the stock
-		for w in out_up:
-			if w > 0:
-				stock_rating_up += math.log(w)
+		for ii in range(0, len(out_up)):
 
-		for w in out_down:
-			if w > 0:
-				stock_rating_down += math.log(w)
+			w_up = out_up[ii]
+			w_down = out_down[ii]
+
+			prediction_outputs_gpu.append(w_up)
+			prediction_outputs_gpu.append(w_down)
+
+			if w_up > 0:
+				stock_rating_up += math.log(w_up)
+			if w_down > 0:
+				stock_rating_down += math.log(w_down)
 
 		end = time.time()
 		end_all = time.time()

@@ -1772,7 +1772,7 @@ def predict_movement(day):
 			for words in words_in_text:
 
 				weight = get_word_weight(words)
-				
+
 				prediction_outputs_cpu.append(weight)
 
 				# Prediction Method 1, 3, 4, 6
@@ -2823,7 +2823,9 @@ def main():
 		print('') 
 		if len(analysis_outputs_gpu) != len(analysis_outputs_cpu):
 			print('Mismatch in number of analysis outputs between GPU and CPU.')
-		else:
+		elif len(analysis_outputs_gpu) > 0:
+			print(analysis_outputs_gpu)
+			print(analysis_outputs_cpu)
 			max_percentage = 0
 			sum_percentage = 0
 			for ii in range(0, len(analysis_outputs_cpu)):
@@ -2841,7 +2843,7 @@ def main():
 		if len(prediction_outputs_gpu) != len(prediction_outputs_cpu):
 			print('Mismatch in number of prediction outputs between GPU and CPU.')
 
-		else:
+		elif len(prediction_outputs_gpu) > 0:
 			max_percentage = 0
 			sum_percentage = 0
 			for ii in range(0, len(prediction_outputs_cpu)):
@@ -2858,7 +2860,7 @@ def main():
 		if len(update_outputs_gpu) != len(update_outputs_cpu):
 			print('Mismatch in number of update outputs between GPU and CPU.')
 
-		else:
+		elif len(update_outputs_gpu) > 0:
 			max_percentage = 0
 			sum_percentage = 0
 			for ii in range(0, len(update_outputs_cpu)):

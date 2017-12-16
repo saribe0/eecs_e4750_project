@@ -1412,6 +1412,17 @@ def analyze_weights():
 	global weight_sum_o
 	global weight_count_o
 
+	weight_average = 0
+	weight_stdev = 0
+	weight_sum = 0
+	weight_max = 0
+	weight_min = 1
+	weight_count = 0
+	weight_average_o = 0
+	weight_stdev_o = 0
+	weight_sum_o = 0
+	weight_count_o = 0
+
 	start_all = time.time()
 
 	cpu = 0
@@ -1523,6 +1534,17 @@ def analyze_weights_gpu():
 	global weight_stdev_o
 	global weight_sum_o
 	global weight_count_o
+
+	weight_average = 0
+	weight_stdev = 0
+	weight_sum = 0
+	weight_max = 0
+	weight_min = 1
+	weight_count = 0
+	weight_average_o = 0
+	weight_stdev_o = 0
+	weight_sum_o = 0
+	weight_count_o = 0
 
 	start_all = time.time()
 

@@ -12,15 +12,15 @@ Predictions Based On Weighting Stats:
 - Min: 0.0
 
 Prediction for: amzn 
-- Std above mean: 0.0503682988898
-- Raw val rating: 0.482478623325
-- probability is: 0.520085550935
+- Std above mean: nan
+- Raw val rating: nan
+- probability is: nan
 - Corresponds to: undecided
 
 Prediction for: amat 
-- Std above mean: -0.00185564923881
-- Raw val rating: 0.469310883727
-- probability is: 0.499259703486
+- Std above mean: nan
+- Raw val rating: nan
+- probability is: nan
 - Corresponds to: undecided
 
 Prediction for: agn 
@@ -48,9 +48,9 @@ Prediction for: lmt
 - Corresponds to: undecided
 
 Prediction for: data 
-- Std above mean: -0.00066551881603
-- Raw val rating: 0.469610963059
-- probability is: 0.499734496425
+- Std above mean: nan
+- Raw val rating: nan
+- probability is: nan
 - Corresponds to: undecided
 
 Prediction for: nflx 
@@ -84,9 +84,9 @@ Prediction for: bac
 - Corresponds to: undecided
 
 Prediction for: nvda 
-- Std above mean: 0.0399691205277
-- Raw val rating: 0.479856575823
-- probability is: 0.515941127569
+- Std above mean: nan
+- Raw val rating: nan
+- probability is: nan
 - Corresponds to: undecided
 
 Prediction for: baba 
@@ -108,9 +108,9 @@ Prediction for: jpm
 - Corresponds to: undecided
 
 Prediction for: mu 
-- Std above mean: 0.109883108502
-- Raw val rating: 0.497484679805
-- probability is: 0.543748960561
+- Std above mean: nan
+- Raw val rating: nan
+- probability is: nan
 - Corresponds to: undecided
 
 Prediction for: uaa 

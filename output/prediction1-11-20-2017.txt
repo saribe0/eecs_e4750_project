@@ -12,16 +12,16 @@ Predictions Based On Weighting Stats:
 - Min: 0.0
 
 Prediction for: amzn 
-- Std above mean: 0.268292034396
-- Raw val rating: 0.537425886108
-- probability is: 0.605762731414
-- Corresponds to: undecided
+- Std above mean: 2.83019547395e+34
+- Raw val rating: 7.1360512463e+33
+- probability is: 1.0
+- Corresponds to: buy
 
 Prediction for: amat 
-- Std above mean: 0.346359455774
-- Raw val rating: 0.557109795745
-- probability is: 0.635463704425
-- Corresponds to: undecided
+- Std above mean: 9.28555308012e+33
+- Raw val rating: 2.34125816538e+33
+- probability is: 1.0
+- Corresponds to: buy
 
 Prediction for: agn 
 - Std above mean: -1.18092048582
@@ -48,10 +48,10 @@ Prediction for: lmt
 - Corresponds to: undecided
 
 Prediction for: data 
-- Std above mean: -0.0728320547956
-- Raw val rating: 0.451414901912
-- probability is: 0.470969881323
-- Corresponds to: undecided
+- Std above mean: 3.89567172591e+34
+- Raw val rating: 9.82254170455e+33
+- probability is: 1.0
+- Corresponds to: buy
 
 Prediction for: nflx 
 - Std above mean: -0.036265241805
@@ -84,10 +84,10 @@ Prediction for: bac
 - Corresponds to: undecided
 
 Prediction for: nvda 
-- Std above mean: 0.346295708423
-- Raw val rating: 0.557093722496
-- probability is: 0.635439753243
-- Corresponds to: undecided
+- Std above mean: 8.0125235135e+33
+- Raw val rating: 2.02027665336e+33
+- probability is: 1.0
+- Corresponds to: buy
 
 Prediction for: baba 
 - Std above mean: -0.0924118068305
@@ -108,10 +108,10 @@ Prediction for: jpm
 - Corresponds to: undecided
 
 Prediction for: mu 
-- Std above mean: 0.779310916244
-- Raw val rating: 0.666274121584
-- probability is: 0.782101707104
-- Corresponds to: buy
+- Std above mean: -388083.579258
+- Raw val rating: -97850.8742335
+- probability is: 0.0
+- Corresponds to: sell
 
 Prediction for: uaa 
 - Std above mean: -0.658072781438

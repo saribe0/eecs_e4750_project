@@ -1094,7 +1094,7 @@ def update_all_word_weights(option, day):
 
 		letter_words = words_by_letter[letter]
 
-		for each_word in range(0, num_words_by_letter[letter]);
+		for each_word in range(0, num_words_by_letter[letter]):
 
 			test_data = struct.unpack_from('16s f i i', letter_words, each_word * 28)
 
@@ -1335,7 +1335,7 @@ def update_all_word_weights_gpu(option, day):
 
 		letter_words = words_by_letter[letter]
 
-		for each_word in range(0, num_words_by_letter[letter]);
+		for each_word in range(0, num_words_by_letter[letter]):
 
 			test_data = struct.unpack_from('16s f i i', letter_words, each_word * 28)
 
@@ -2826,7 +2826,7 @@ def main():
 			max_percentage = 0
 			sum_percentage = 0
 			for ii in range(0, len(analysis_outputs_cpu)):
-				percentage = 2 * math.abs(analysis_outputs_cpu[ii] - analysis_outputs_gpu) / (analysis_outputs_cpu[ii] + analysis_outputs_gpu)
+				percentage = 2 * abs(analysis_outputs_cpu[ii] - analysis_outputs_gpu[ii]) / (analysis_outputs_cpu[ii] + analysis_outputs_gpu[ii])
 
 				sum_percentage += percentage
 				if percentage > max_percentage:
@@ -2841,7 +2841,7 @@ def main():
 			max_percentage = 0
 			sum_percentage = 0
 			for ii in range(0, len(prediction_outputs_cpu)):
-				percentage = 2 * math.abs(prediction_outputs_cpu[ii] - prediction_outputs_gpu) / (prediction_outputs_cpu[ii] + prediction_outputs_gpu)
+				percentage = 2 * abs(prediction_outputs_cpu[ii] - prediction_outputs_gpu[ii]) / (prediction_outputs_cpu[ii] + prediction_outputs_gpu[ii])
 
 				sum_percentage += percentage
 				if percentage > max_percentage:
@@ -2856,7 +2856,7 @@ def main():
 			max_percentage = 0
 			sum_percentage = 0
 			for ii in range(0, len(update_outputs_cpu)):
-				percentage = 2 * math.abs(update_outputs_cpu[ii] - update_outputs_gpu) / (update_outputs_cpu[ii] + update_outputs_gpu)
+				percentage = 2 * abs(update_outputs_cpu[ii] - update_outputs_gpu[ii]) / (update_outputs_cpu[ii] + update_outputs_gpu[ii])
 
 				sum_percentage += percentage
 				if percentage > max_percentage:

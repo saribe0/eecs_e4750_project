@@ -1039,7 +1039,7 @@ def update_all_word_weights(option, day):
 
 	logging.info('Updating word weights for: ' + day + ' with option: ' + option)
 	print('Updating word weights')
-
+	print(num_words_by_letter)
 	# If the weighting arrays are empty, create them 
 	if len(words_by_letter) == 0 or words_by_letter == 0:
 
@@ -1090,6 +1090,7 @@ def update_all_word_weights(option, day):
 
 	# Add all the weights to the cpu weight array
 	# NOTE: This is ONLY for comparison of outputs between GPU and CPU. It has nothing to do with actual computation
+	print(num_words_by_letter)
 	for letter in range(0, 26):
 
 		letter_words = words_by_letter[letter]
@@ -1137,7 +1138,8 @@ def update_word(ticker, option, word_upper, day):
 		temp_word = test_data[0].decode('utf_8')
 
 		# Check if the word is the same
-		if temp_word[:len(temp_word.split('\0', 1)[0])] == word[:len(word.split('\0', 1)[0])]:
+		word_len = len(word) if len(word) < 16 else 16
+		if temp_word[:len(temp_word.split('\0', 1)[0])] == word[:word_len]:
 			
 			# If it is the same, mark it as found and update its values
 			# weight = (weight * value + increase)/(value + increase)
@@ -1218,7 +1220,6 @@ def update_word(ticker, option, word_upper, day):
 		# Pack the data into the array
 		struct.pack_into('16s f i i', letter_words, num_letter_words*28, word.encode('utf-8'), weight, extra1, extra2)
 		num_words_by_letter[index] += 1
-
 		logging.debug('-- Added ' + word + ' with weight of ' + str(weight) + ' and occurences of ' + str(extra1) + ', ' + str(extra2))
 
 
@@ -1248,7 +1249,7 @@ def update_all_word_weights_gpu(option, day):
 			letter_words = bytearray(28*MAX_WORDS_PER_LETTER)
 			words_by_letter.append(letter_words)
 			num_words_by_letter.append(0)
-
+	print(num_words_by_letter)
 	for ticker in STOCK_TAGS:
 		
 		logging.debug('- Updating word weights for: ' + ticker)
@@ -1331,6 +1332,7 @@ def update_all_word_weights_gpu(option, day):
 
 	# Add all the weights to the gpu weight array
 	# NOTE: This is ONLY for comparison of outputs between GPU and CPU. It has nothing to do with actual computation
+	print(num_words_by_letter)
 	for letter in range(0, 26):
 
 		letter_words = words_by_letter[letter]
@@ -2858,7 +2860,6 @@ def main():
 		if len(analysis_outputs_gpu) != len(analysis_outputs_cpu):
 			print('Mismatch in number of analysis outputs between GPU and CPU.')
 		elif len(analysis_outputs_gpu) > 0:
-			max_percentage = 0
 			sum_percentage = 0
 			for ii in range(0, len(analysis_outputs_cpu)):
 
@@ -2867,16 +2868,13 @@ def main():
 					percentage = 2 * abs(analysis_outputs_cpu[ii] - analysis_outputs_gpu[ii]) / (analysis_outputs_cpu[ii] + analysis_outputs_gpu[ii])
 
 					sum_percentage += percentage
-					if percentage > max_percentage:
-						max_percentage = sum_percentage
-
-			print('Analysis Percent Difference: Max = ' + str(max_percentage * 100) + ', Avg = ' + str(sum_percentage*100 / len(analysis_outputs_cpu)))
+					
+			print('Analysis Avg Percent Difference: ' + str(sum_percentage*100 / len(analysis_outputs_cpu)) + '%' )
 
 		if len(prediction_outputs_gpu) != len(prediction_outputs_cpu):
 			print('Mismatch in number of prediction outputs between GPU and CPU.')
 
 		elif len(prediction_outputs_gpu) > 0:
-			max_percentage = 0
 			sum_percentage = 0
 			for ii in range(0, len(prediction_outputs_cpu)):
 
@@ -2884,16 +2882,13 @@ def main():
 					percentage = 2 * abs(prediction_outputs_cpu[ii] - prediction_outputs_gpu[ii]) / (prediction_outputs_cpu[ii] + prediction_outputs_gpu[ii])
 
 					sum_percentage += percentage
-					if percentage > max_percentage:
-						max_percentage = sum_percentage
-
-			print('Prediction Percent Difference: Max = ' + str(max_percentage * 100) + ', Avg = ' + str(sum_percentage*100 / len(prediction_outputs_cpu)))
+					
+			print('Prediction Avg Percent Difference: ' + str(sum_percentage*100 / len(prediction_outputs_cpu)) + '%' )
 
 		if len(update_outputs_gpu) != len(update_outputs_cpu):
 			print('Mismatch in number of update outputs between GPU and CPU.')
-
+		
 		elif len(update_outputs_gpu) > 0:
-			max_percentage = 0
 			sum_percentage = 0
 			for ii in range(0, len(update_outputs_cpu)):
 
@@ -2901,10 +2896,7 @@ def main():
 					percentage = 2 * abs(update_outputs_cpu[ii] - update_outputs_gpu[ii]) / (update_outputs_cpu[ii] + update_outputs_gpu[ii])
 
 					sum_percentage += percentage
-					if percentage > max_percentage:
-						max_percentage = sum_percentage
-
-			print('Update Percent Difference: Max = ' + str(max_percentage * 100) + ', Avg = ' + str(sum_percentage*100 / len(update_outputs_cpu)))
+			print('Update Avg Percent Difference: ' + str(sum_percentage*100 / len(update_outputs_cpu)) + '%' )
 
 		print('')
 		if len(analysis_cpu_kernel_time) != 0 and len(analysis_cpu_function_time) != 0 and len(analysis_gpu_kernel_time) != 0 and len(analysis_gpu_function_time) != 0:

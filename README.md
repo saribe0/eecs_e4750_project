@@ -61,7 +61,7 @@ If more tests are desired, you can continue to run the update and predict comman
 
 For the current day:
 ```
-./smp.py -a
+./stock_market_prediction.py -a
 ```
 
 Supported Options:
@@ -74,7 +74,7 @@ none
 
 For the current day with basic weights:
 ```
-./smp.py -p
+./stock_market_prediction.py -p
 ```
 
 Supported Options:
@@ -87,7 +87,7 @@ Supported Options:
 
 For the current day:
 ```
-./smp.py -s
+./stock_market_prediction.py -s
 ```
 
 Supported Options:
@@ -100,7 +100,7 @@ none
 
 For the update basic weights for the current day:
 ```
-./smp.py -u
+./stock_market_prediction.py -u
 ```
 
 Supported Options:
@@ -116,7 +116,7 @@ If a start date is given without an end date, the end date will default to the c
 
 To get this list printed:
 ```
-./smp.py -h
+./stock_market_prediction.py -h
 ```
 
 #### WEIGHT ANALYSIS (helper function that just prints weight statistics):
@@ -124,14 +124,14 @@ To get this list printed:
 
 Print the weight statistics:
 ```
-./smp.py -z
+./stock_market_prediction.py -z
 ```
 
 #### DETERMINE ACCURACY (helper function for analyzing predictions over time):
 
 Determine the accuracy of any predictions in the ./output/ folder:
 ```
-./smp.py -v
+./stock_market_prediction.py -v
 ```
 
 This command also generates the graph of accuracy relative to the days the predictions were made.

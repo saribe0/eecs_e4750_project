@@ -63,12 +63,7 @@ sbatch --gres=gpu:1 --time=20 --wrap="python stock_market_prediction.py -p -d 11
 The `-p` indicates to make a prediction, the `-d` is to specify the day to make the prediction. The update command from the previous section can also use the `-d` option to update weights for a specific day. Once again `-o` is used to signal the Bayesian classifier in the second command.
 
 #### Checking Output
-By "cat"-ing the slurm files, you will be able to see the output of the commands. The update commands will just list the functions being run, the accuracy between of the GPU and the time difference. The listed speedup will likely be fairly low due to it starting from an uninitialized database. The report goes into more depth on why this is the case.The output of the prediction commands will show the predictions for November 10th for each of the 20 stocks with some stats about the prediction. At the bottom of both outputs will be the accuracy and timing. The output of the prediction using the basic weights will also include weight analysis accuracy and timing. The Bayesian classifier prediction does not analyze the weights. If you wish, you can run:
-```
-./stock_market_prediction.py -v
-```
-This will indicate how correct the predictions were.
-
+By "cat"-ing the slurm files, you will be able to see the output of the commands. The update commands will just list the functions being run, the accuracy between of the GPU and the time difference. The listed speedup will likely be fairly low due to it starting from an uninitialized database. The report goes into more depth on why this is the case.The output of the prediction commands will show the predictions for November 8th for each of the 20 stocks with some stats about the prediction. At the bottom of both outputs will be the accuracy and timing. The output of the prediction using the basic weights will also include weight analysis accuracy and timing. The Bayesian classifier prediction does not analyze the weights. 
 #### Expected Output of Test
 After running for a short while, we get the following output:
 ##### For the first update function from "Train Two Models Over 3 Days":
@@ -261,7 +256,8 @@ To run any of the parallelizable ones with the GPU, they must be wrapped in an s
 ```
 sbatch --gres=gpu:1 --time=20 --wrap="python stock_market_prediction.py <options>"
 ```
-Any of the commands that say "GPU Possible" must have `GPU = True` at the top of the file to use the GPU. Other commands should not be run using the above wrapper. When switching between types, make sure to check the `GPU =`
+Any of the commands that say "GPU Possible" must have `GPU = True` at the top of the file to use the GPU. Other commands should not be run using the above wrapper. When switching between types, make sure to check the `GPU =`. Many of these commands may use python libraries that are not on the course server. For this project we focus on the parallelizable aspects which are all runable.
+
 #### PULLING ARTICLES:
 
 For the current day:

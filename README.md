@@ -1,5 +1,6 @@
 # Parallelized NLP Market Prediction
 Stock market prediction through parallel processing of news stories and basic machine learning.
+As a general edit, the title of this directory is elen_e4750_project whereas it should bee eecs_e4750_project.
 
 ## Abstract
 Many consider the stock market to be efficient, however, many of these efficiencies are based on numerical data (ie. past values and financials). There is, however, a wealth of textual data which influences investors’ decisions and may lead to inefficiencies as it is hard to analyze quickly. This project explores how basic Natural Language Processing (NLP) algorithms might be parallelized to take advantage of these inefficiencies. It explores the challenges of memory management and limited string operations in parallelized NLP as well as its feasibility. Finally, we present a possible solution to these considerations and show that parallelization has the potential to speed up NLP by 1.5 to 10 times.
@@ -45,31 +46,215 @@ This code is designed to be run on a general purpose graphics processing unit or
 The parallelizable aspects of this project can be tested on the class GPU by doing the following. First, clone the git repository to the server. It contains a collection of news articles and a database of stock prices that can be used in testing. The folder structure is explained above. The root of the directory contains `stock_market_prediction.py`. This is the file that contains all the functions and code. 
 
 #### Train Two Models Over 3 Days
-The downloaded repository does not have any models trained so the first step is to train a model for both the basic weighting scheme and the Bayesian weighting scheme. Running the following commands from the root directory will train the model over 3 days. You can adjust the end date to train over more days, however, it each day added will take longer as everything is being calculated by the GPU and CPU for comparison. Word weights for both weighting schemes will be updated using the GPU. The first command is for the basic word weights, the second is for the Bayesian ones.
+The downloaded repository does not have any models trained so the first step is to train a model for both the basic weighting scheme and the Bayesian weighting scheme. Running the following commands from the root directory will train the model over 5 days. You can adjust the end date to train over more days, however, it each day added will take longer as everything is being calculated by the GPU and CPU for comparison. Word weights for both weighting schemes will be updated using the GPU. The first command is for the basic word weights, the second is for the Bayesian ones.
 
 ```
-sbatch --gres=gpu:1 --time=20 --wrap="python stock_market_prediction.py -u -b 11-7-2017 -e 11-9-2017"
-sbatch --gres=gpu:1 --time=20 --wrap="python stock_market_prediction.py -u -b 11-7-2017 -e 11-9-2017 -o opt2"
+sbatch --gres=gpu:1 --time=20 --wrap="python stock_market_prediction.py -u -b 11-1-2017 -e 11-7-2017"
+sbatch --gres=gpu:1 --time=20 --wrap="python stock_market_prediction.py -u -b 11-1-2017 -e 11-7-2017 -o opt2"
 ```
 The `-u` in the commands is for update word weights, the `-b` indicates the start day and `-e` indicates the end day. The `-o` indicates the type of weight to be updated. The default is `opt1` for the basic weighting scheme which is why it is left out of the first command.
 
 #### Make A Prediction
 Once trained, a prediction can be made. A prediction for the next day using both weighting types can be done through the following commands. The first is for making predictions with the basic weighting scheme and the second is for making predictions using the Bayesian classifier.
 ```
-sbatch --gres=gpu:1 --time=20 --wrap="python stock_market_prediction.py -p -d 11-10-2017"
-sbatch --gres=gpu:1 --time=20 --wrap="python stock_market_prediction.py -u -d 11-10-2017 -o opt2"
+sbatch --gres=gpu:1 --time=20 --wrap="python stock_market_prediction.py -p -d 11-8-2017"
+sbatch --gres=gpu:1 --time=20 --wrap="python stock_market_prediction.py -p -d 11-8-2017 -o opt2"
 ```
 The `-p` indicates to make a prediction, the `-d` is to specify the day to make the prediction. The update command from the previous section can also use the `-d` option to update weights for a specific day. Once again `-o` is used to signal the Bayesian classifier in the second command.
 
-#### Output
+#### Checking Output
 By "cat"-ing the slurm files, you will be able to see the output of the commands. The update commands will just list the functions being run, the accuracy between of the GPU and the time difference. The listed speedup will likely be fairly low due to it starting from an uninitialized database. The report goes into more depth on why this is the case.The output of the prediction commands will show the predictions for November 10th for each of the 20 stocks with some stats about the prediction. At the bottom of both outputs will be the accuracy and timing. The output of the prediction using the basic weights will also include weight analysis accuracy and timing. The Bayesian classifier prediction does not analyze the weights. If you wish, you can run:
 ```
 ./stock_market_prediction.py -v
 ```
 This will indicate how correct the predictions were.
 
+#### Expected Output of Test
+After running for a short while, we get the following output:
+##### For the first update function from "Train Two Models Over 3 Days":
+The expected output of the slurm file for this command is:
+```
+WARNING:root:- Could not load word weights, Error: [Errno 2] No such file or directory: './data/word_weight_data_opt1.txt'
+ERROR:root:Could not find articles to load for: 11-4-2017
+ERROR:root:Could not find articles to load for: 11-5-2017
+WARNING:root:- Could not load word weights, Error: [Errno 2] No such file or directory: './data/word_weight_data_opt1.txt'
+ERROR:root:Could not find articles to load for: 11-4-2017
+ERROR:root:Could not find articles to load for: 11-5-2017
+Loading stock prices
+Loading word weights
+Loading articles
+Updating word weights
+Loading articles
+Updating word weights
+Loading articles
+Updating word weights
+Loading articles
+Updating word weights
+Loading articles
+Updating word weights
+Loading word weights
+Loading articles
+Updating word weights with gpu
+Loading articles
+Updating word weights with gpu
+Loading articles
+Updating word weights with gpu
+Loading articles
+Updating word weights with gpu
+Loading articles
+Updating word weights with gpu
+Saving word weights
+
+Update Avg Percent Difference: 0 %
+
+Update Speedup: Kernel = 4.07231672133, Function = 2.44689113768
+
+Done
+```
+The speedup is, of course, dependent on the exact run. The values should be minimal because we are starting from an uninitialized database, however, please remember that these speedups include the extra processing required to compare the CPU and GPU that wouldn't normally be used. This is explained more in the report. When checking the `./data/` folder, the following file should have been generated: `./data/word_weight_data_opt1.txt`
+
+##### For the second update function from "Train Two Models Over 3 Days":
+The expected output of the slurm file for this command is:
+```
+WARNING:root:- Could not load word weights, Error: [Errno 2] No such file or directory: './data/word_weight_data_opt2.txt'
+ERROR:root:Could not find articles to load for: 11-4-2017
+ERROR:root:Could not find articles to load for: 11-5-2017
+WARNING:root:- Could not load word weights, Error: [Errno 2] No such file or directory: './data/word_weight_data_opt2.txt'
+ERROR:root:Could not find articles to load for: 11-4-2017
+ERROR:root:Could not find articles to load for: 11-5-2017
+Loading stock prices
+Loading word weights
+Loading articles
+Updating word weights
+Loading articles
+Updating word weights
+Loading articles
+Updating word weights
+Loading articles
+Updating word weights
+Loading articles
+Updating word weights
+Loading word weights
+Loading articles
+Updating word weights with gpu
+Loading articles
+Updating word weights with gpu
+Loading articles
+Updating word weights with gpu
+Loading articles
+Updating word weights with gpu
+Loading articles
+Updating word weights with gpu
+Saving word weights
+
+Update Avg Percent Difference: 0 %
+
+Update Speedup: Kernel = 4.06432365745, Function = 2.45313616393
+
+Done
+```
+The speedup is, of course, dependent on the exact run, The values should be minimal because we are starting from an uninitialized database, however, please remember that these speedups include the extra processing required to compare the CPU and GPU that wouldn't normally be used. This is explained more in the report. When checking the `./data/` folder, the following file should have been generated: `./data/word_weight_data_opt2.txt`
+
+##### For the first prediction function from "Make A Prediction":
+Since this commands output will be quite large, we will only list the first few stocks and then skip to the end of the file. The expected output for the first five stocks and accuracy/speedup stats are:
+```
+Loading word weights
+Loading articles
+Analyzing weights
+Analyzing weights with gpu
+
+PREDICTIONS FOR METHOD 1 BASED ON:
+('\t- AVG: ', 0.40382395628237688)
+('\t- STD: ', 0.3470834424144252)
+('RATING FOR: ', 'amzn')
+('\t- STD ABOVE MEAN: ', 0.2057480781981616)
+('\t- RAW VAL RATING: ', 0.47523570753354716)
+('\t- PROBABILITY IS: ', 0.58150614953004254)
+('\t- CORRESPONDS TO: ', 'undecided')
+('RATING FOR: ', 'amat')
+('\t- STD ABOVE MEAN: ', 0.20417908086945469)
+('\t- RAW VAL RATING: ', 0.47469113453956052)
+('\t- PROBABILITY IS: ', 0.58089322097206253)
+('\t- CORRESPONDS TO: ', 'undecided')
+('RATING FOR: ', 'agn')
+('\t- STD ABOVE MEAN: ', 0.084322376126346674)
+('\t- RAW VAL RATING: ', 0.43309085686087323)
+('\t- PROBABILITY IS: ', 0.53359993890990809)
+('\t- CORRESPONDS TO: ', 'undecided')
+('RATING FOR: ', 'goog')
+('\t- STD ABOVE MEAN: ', 0.26966923113074864)
+('\t- RAW VAL RATING: ', 0.4974216813364884)
+('\t- PROBABILITY IS: ', 0.60629263308516901)
+('\t- CORRESPONDS TO: ', 'undecided')
+('RATING FOR: ', 'hd')
+('\t- STD ABOVE MEAN: ', 0.11119865472510113)
+('\t- RAW VAL RATING: ', 0.44241916815621807)
+('\t- PROBABILITY IS: ', 0.5442705908039871)
+('\t- CORRESPONDS TO: ', 'undecided')
+
+/********
+Many other predictions
+ ********/
+ 
+Analysis Avg Percent Difference: 3.93541291826e-07 %
+Prediction Avg Percent Difference: 0.010266189542 %
+
+Analysis Speedup: Kernel = 40.6981240092, Function = 0.630166790988
+Prediction Speedup: Kernel = 29.1048975375, Function = 5.6398644511
+
+Done
+```
+The speedup and exact accuracy is, of course, dependent on the exact run. Please remember that these speedups include the extra processing required to compare the CPU and GPU that wouldn't normally be used - See the report for averaged speedups without this processing overhead. In the case of analyzing stock weights, this has a significant affect on the functional speedup which is why it is less than 1. This run should create the following files which also has the full output for their respective prediction methods:
+```
+prediction-11-10-2017.txt
+prediction2-11-10-2017.txt
+prediction3-11-10-2017.txt
+prediction4-11-10-2017.txt
+prediction5-11-10-2017.txt
+prediction6-11-10-2017.txt
+```
+##### For the second prediction function from "Make A Prediction":
+Since this commands output will be quite large, we will only list the first few stocks and then skip to the end of the file. The expected output for the first five stocks and accuracy/speedup stats are:
+```
+Loading word weights
+Loading articles
+
+BAYES PREDICTIONS 
+('RATING FOR: ', 'amzn')
+('\t- UP RATING IS  : ', -32496.228423222165)
+('\t- DOWN RATING IS: ', -32750.06874186211)
+('\t- CORRESPONDS TO: ', 'buy')
+('RATING FOR: ', 'amat')
+('\t- UP RATING IS  : ', -34058.5754374649)
+('\t- DOWN RATING IS: ', -34410.98348404315)
+('\t- CORRESPONDS TO: ', 'buy')
+('RATING FOR: ', 'agn')
+('\t- UP RATING IS  : ', -34496.254208406026)
+('\t- DOWN RATING IS: ', -33808.811410338014)
+('\t- CORRESPONDS TO: ', 'sell')
+('RATING FOR: ', 'goog')
+('\t- UP RATING IS  : ', -32966.81247995143)
+('\t- DOWN RATING IS: ', -34044.891535898605)
+('\t- CORRESPONDS TO: ', 'buy')
+('RATING FOR: ', 'hd')
+('\t- UP RATING IS  : ', -34974.7112359665)
+('\t- DOWN RATING IS: ', -34367.416998004905)
+('\t- CORRESPONDS TO: ', 'sell')
+
+/********
+Many other predictions
+ ********/
+ 
+Prediction Avg Percent Difference: 0.0316892841531 %
+
+Prediction Speedup: Kernel = 36.2657635688, Function = 5.72629179833
+
+Done
+```
+The speedup and exact accuracy is, of course, dependent on the exact run. Please remember that these speedups include the extra processing required to compare the CPU and GPU that wouldn't normally be used. This run should create the following file which also has the full output: `prediction6-11-10-2017.txt`
+
 #### Next Testing Steps
-If more tests are desired, you can continue to run the update and predict commands on different days. If you run them on days without stock price data or articles, you will recieve an error. You can determine which days have downloaded articles by examining the ./data/articles/ folder. Each day there is an article has a price in the database except December 5th which has, so far, only been used for predicting.
+If more tests are desired, you can continue to run the update and predict commands on different days. If you run them on days without stock price data or articles, you will recieve an error. You can determine which days have downloaded articles by examining the ./data/articles/ folder. Each day there is an article has a price in the database except December 5th which has, so far, only been used for predicting. While running subsequent update commands, the speedups should be higher due to already having the word weight databases initialized.
 
 ### Available Commands
 To run any of the parallelizable ones with the GPU, they must be wrapped in an sbatch and python must be specified:

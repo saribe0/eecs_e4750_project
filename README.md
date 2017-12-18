@@ -44,7 +44,7 @@ This code is designed to be run on a general purpose graphics processing unit or
 ### A Full Test of Parallelizable Aspects
 The parallelizable aspects of this project can be tested on the class GPU by doing the following. First, clone the git repository to the server. It contains a collection of news articles and a database of stock prices that can be used in testing. The folder structure is explained above. The root of the directory contains `stock_market_prediction.py`. This is the file that contains all the functions and code. 
 
-#### Train Two Models Over 3 Days
+#### Train Two Models Over 5 Days
 The downloaded repository does not have any models trained so the first step is to train a model for both the basic weighting scheme and the Bayesian weighting scheme. Running the following commands from the root directory will train the model over 5 days. You can adjust the end date to train over more days, however, it each day added will take longer as everything is being calculated by the GPU and CPU for comparison. Word weights for both weighting schemes will be updated using the GPU. The first command is for the basic word weights, the second is for the Bayesian ones.
 
 ```

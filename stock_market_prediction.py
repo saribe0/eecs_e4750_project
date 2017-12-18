@@ -2,7 +2,7 @@
 ####################################################################################################
 ## Created 10/27/2017 by Sam Beaulieu
 ##
-##
+## See readme for a description of the project and how to run.
 ####################################################################################################
 
 # Specifies GPU/CPU calculations will be prepformed
@@ -2370,7 +2370,10 @@ def write_predictions_to_file_and_print(day, all_predictions, all_std_devs, all_
 	for ii in range(0, 6):
 
 		# Open file to store todays predictions in
-		file = open('./output/prediction' + str(ii) +'-' + day + '.txt', 'w')
+		if ii > 0:
+			file = open('./output/prediction' + str(ii+1) +'-' + day + '.txt', 'w')
+		else:
+			file = open('./output/prediction' + '-' + day + '.txt', 'w')
 
 		# Print the header info and open the file
 		# When less than 3, uses normal weight analysis 

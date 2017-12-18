@@ -251,7 +251,7 @@ Prediction Speedup: Kernel = 36.2657635688, Function = 5.72629179833
 
 Done
 ```
-The speedup and exact accuracy is, of course, dependent on the exact run. Please remember that these speedups include the extra processing required to compare the CPU and GPU that wouldn't normally be used. This run should create the following file which also has the full output: `prediction6-11-10-2017.txt`
+The speedup and exact accuracy is, of course, dependent on the exact run. Please remember that these speedups include the extra processing required to compare the CPU and GPU that wouldn't normally be used. This run should create the following file which also has the full output: `prediction7-11-10-2017.txt`
 
 #### Next Testing Steps
 If more tests are desired, you can continue to run the update and predict commands on different days. If you run them on days without stock price data or articles, you will recieve an error. You can determine which days have downloaded articles by examining the ./data/articles/ folder. Each day there is an article has a price in the database except December 5th which has, so far, only been used for predicting. While running subsequent update commands, the speedups should be higher due to already having the word weight databases initialized.

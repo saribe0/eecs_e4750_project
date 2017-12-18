@@ -65,7 +65,7 @@ The `-p` indicates to make a prediction, the `-d` is to specify the day to make 
 By "cat"-ing the slurm files, you will be able to see the output of the commands. The update commands will just list the functions being run, the accuracy between of the GPU and the time difference. The listed speedup will likely be fairly low due to it starting from an uninitialized database. The report goes into more depth on why this is the case.The output of the prediction commands will show the predictions for November 8th for each of the 20 stocks with some stats about the prediction. At the bottom of both outputs will be the accuracy and timing. The output of the prediction using the basic weights will also include weight analysis accuracy and timing. The Bayesian classifier prediction does not analyze the weights.
 #### Expected Output of Test
 After running for a short while, we get the following output:
-##### For the first update function from "Train Two Models Over 3 Days":
+##### For the first update function from "Train Two Models Over 5 Days":
 The expected output of the slurm file for this command is:
 ```
 WARNING:root:- Could not load word weights, Error: [Errno 2] No such file or directory: './data/word_weight_data_opt1.txt'
@@ -107,7 +107,7 @@ Done
 ```
 The speedup is, of course, dependent on the exact run. The values should be minimal because we are starting from an uninitialized database, however, please remember that these speedups include the extra processing required to compare the CPU and GPU that wouldn't normally be used. This is explained more in the report. When checking the `./data/` folder, the following file should have been generated: `./data/word_weight_data_opt1.txt`
 
-##### For the second update function from "Train Two Models Over 3 Days":
+##### For the second update function from "Train Two Models Over 5 Days":
 The expected output of the slurm file for this command is:
 ```
 WARNING:root:- Could not load word weights, Error: [Errno 2] No such file or directory: './data/word_weight_data_opt2.txt'

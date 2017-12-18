@@ -1,6 +1,5 @@
 # Parallelized NLP Market Prediction
 Stock market prediction through parallel processing of news stories and basic machine learning.
-As a general edit, the title of this directory is elen_e4750_project whereas it should bee eecs_e4750_project.
 
 ## Abstract
 Many consider the stock market to be efficient, however, many of these efficiencies are based on numerical data (ie. past values and financials). There is, however, a wealth of textual data which influences investors’ decisions and may lead to inefficiencies as it is hard to analyze quickly. This project explores how basic Natural Language Processing (NLP) algorithms might be parallelized to take advantage of these inefficiencies. It explores the challenges of memory management and limited string operations in parallelized NLP as well as its feasibility. Finally, we present a possible solution to these considerations and show that parallelization has the potential to speed up NLP by 1.5 to 10 times.

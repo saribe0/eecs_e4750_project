@@ -206,12 +206,12 @@ Done
 ```
 The speedup and exact accuracy is, of course, dependent on the exact run. Please remember that these speedups include the extra processing required to compare the CPU and GPU that wouldn't normally be used - See the report for averaged speedups without this processing overhead. In the case of analyzing stock weights, this has a significant affect on the functional speedup which is why it is less than 1. This run should create the following files which also has the full output for their respective prediction methods:
 ```
-prediction-11-10-2017.txt
-prediction2-11-10-2017.txt
-prediction3-11-10-2017.txt
-prediction4-11-10-2017.txt
-prediction5-11-10-2017.txt
-prediction6-11-10-2017.txt
+prediction-11-8-2017.txt
+prediction2-11-8-2017.txt
+prediction3-11-8-2017.txt
+prediction4-11-8-2017.txt
+prediction5-11-8-2017.txt
+prediction6-11-8-2017.txt
 ```
 ##### For the second prediction function from "Make A Prediction":
 Since this commands output will be quite large, we will only list the first few stocks and then skip to the end of the file. The expected output for the first five stocks and accuracy/speedup stats are:
@@ -251,7 +251,7 @@ Prediction Speedup: Kernel = 36.2657635688, Function = 5.72629179833
 
 Done
 ```
-The speedup and exact accuracy is, of course, dependent on the exact run. Please remember that these speedups include the extra processing required to compare the CPU and GPU that wouldn't normally be used. This run should create the following file which also has the full output: `prediction7-11-10-2017.txt`
+The speedup and exact accuracy is, of course, dependent on the exact run. Please remember that these speedups include the extra processing required to compare the CPU and GPU that wouldn't normally be used. This run should create the following file which also has the full output: `prediction7-11-8-2017.txt`
 
 #### Next Testing Steps
 If more tests are desired, you can continue to run the update and predict commands on different days. If you run them on days without stock price data or articles, you will recieve an error. You can determine which days have downloaded articles by examining the ./data/articles/ folder. Each day there is an article has a price in the database except December 5th which has, so far, only been used for predicting. While running subsequent update commands, the speedups should be higher due to already having the word weight databases initialized.

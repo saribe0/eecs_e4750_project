@@ -7,7 +7,7 @@ Many consider the stock market to be efficient, however, many of these efficienc
 ## File Structure
 ```
 ./
-./data/
+./data/                                                 <= Folder containing all the data for this project
 ./data/articles/*                                       <= Folders for each day of loaded articles
 ./data/articles/stock_market_prediction-10-28-2017/*    <= Articles for each stock by ticker stored in text files for the day specified by the folder
 ./data/stock_price_data.txt                             <= Text file containing stock price data. This file serves as the database storage on disk for all the pulled stock prices.

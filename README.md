@@ -63,7 +63,7 @@ sbatch --gres=gpu:1 --time=20 --wrap="python stock_market_prediction.py -p -d 11
 The `-p` indicates to make a prediction, the `-d` is to specify the day to make the prediction. The update command from the previous section can also use the `-d` option to update weights for a specific day. Once again `-o` is used to signal the Bayesian classifier in the second command.
 
 #### Checking Output
-By "cat"-ing the slurm files, you will be able to see the output of the commands. The update commands will just list the functions being run, the accuracy between of the GPU and the time difference. The listed speedup will likely be fairly low due to it starting from an uninitialized database. The report goes into more depth on why this is the case.The output of the prediction commands will show the predictions for November 8th for each of the 20 stocks with some stats about the prediction. At the bottom of both outputs will be the accuracy and timing. The output of the prediction using the basic weights will also include weight analysis accuracy and timing. The Bayesian classifier prediction does not analyze the weights. 
+By "cat"-ing the slurm files, you will be able to see the output of the commands. The update commands will just list the functions being run, the accuracy between of the GPU and the time difference. The listed speedup will likely be fairly low due to it starting from an uninitialized database. The report goes into more depth on why this is the case.The output of the prediction commands will show the predictions for November 8th for each of the 20 stocks with some stats about the prediction. At the bottom of both outputs will be the accuracy and timing. The output of the prediction using the basic weights will also include weight analysis accuracy and timing. The Bayesian classifier prediction does not analyze the weights.
 #### Expected Output of Test
 After running for a short while, we get the following output:
 ##### For the first update function from "Train Two Models Over 3 Days":
@@ -246,7 +246,7 @@ Prediction Speedup: Kernel = 36.2657635688, Function = 5.72629179833
 
 Done
 ```
-The speedup and exact accuracy is, of course, dependent on the exact run. Please remember that these speedups include the extra processing required to compare the CPU and GPU that wouldn't normally be used. This run should create the following file which also has the full output: `prediction7-11-8-2017.txt`
+The speedup and exact accuracy is, of course, dependent on the exact run. Please remember that these speedups include the extra processing required to compare the CPU and GPU that wouldn't normally be used. Also note that "buy" is equivilent to an "up" prediction as discussed in the report and "sell" is equivilent to a down prediction. This run should create the following file which also has the full output: `prediction7-11-8-2017.txt`
 
 #### Next Testing Steps
 If more tests are desired, you can continue to run the update and predict commands on different days. If you run them on days without stock price data or articles, you will recieve an error. You can determine which days have downloaded articles by examining the ./data/articles/ folder. Each day there is an article has a price in the database except December 5th which has, so far, only been used for predicting. While running subsequent update commands, the speedups should be higher due to already having the word weight databases initialized.

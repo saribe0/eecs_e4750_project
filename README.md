@@ -20,7 +20,7 @@ Many consider the stock market to be efficient, however, many of these efficienc
 ./gpu_device_query.out                                  <= Output of a device query for the device testing was completed on.
 ./prediction_accuracy.png                               <= Generated graph of prediction acuracy from late October to early December based on the data available in the repository.
 ./README.md                                             <= This file.
-./stock_market_prediction.py                            <= Python file containing all the code for the project. How to run and test is listed below. Examine comments and function names for clarity.                                                                                                                   
+./stock_market_prediction.py                            <= Python file containing all the code for the project. How to run and test is listed below. Examine comments and function names for clarity.                                                   ./E4750_2017Fall_PSMP_srb2208.report.pdf                <= Report for this project in pdf format.                           
 ```
 ## Project Sub-Modules
 To accomplish the objectives listed in the abstract, this project implemnets 2 basic word weighting schemes which are used in 7 different prediction methdos. To do this, we split the project into four basic sub-modules. They are: Pull Articles, Predict Stock Movements, Pull Stock Prices, and Update Word Weights. Each one is explained a bit more in the following subsections. See the how to run section on how to execute these modules.

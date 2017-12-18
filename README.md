@@ -15,7 +15,7 @@ Many consider the stock market to be efficient, however, many of these efficienc
                                                            This file contains the learned word weights for the basic weighting scheme.
 ./data/(word_weight_data_opt2.txt)                      <= Not initially in the folder but will be created when the update command is run for the first time. 
                                                            This file contains the learned word weights for the Bayesian weighting scheme.
-./output/*                                              <= Empty until a prediction is made but will eventually contain every prediction made by the program indicated by the name of the text file.
+./output/*                                              <= Created when the first prediction is made and stores every prediction made by the program for the method and day indicated by the name of the text file.
 ./gpu_device_query.out                                  <= Output of a device query for the device testing was completed on.
 ./prediction_accuracy.png                               <= Generated graph of prediction acuracy from late October to early December based on the data available in the repository.
 ./README.md                                             <= This file.
